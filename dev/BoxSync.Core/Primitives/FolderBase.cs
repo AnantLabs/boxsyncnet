@@ -48,7 +48,7 @@ namespace BoxSync.Core.Primitives
 		}
 
 		/// <summary>
-		/// Folder owner ID
+		/// The ID of the user who owns the folder
 		/// </summary>
 		public long OwnerID
 		{
@@ -75,7 +75,8 @@ namespace BoxSync.Core.Primitives
 		}
 
 		/// <summary>
-		/// Folder password. Could be null
+		/// If the file is shared and password protected, this is the password associated with that file.
+		/// Could be null
 		/// </summary>
 		public string Password
 		{
@@ -84,7 +85,8 @@ namespace BoxSync.Core.Primitives
 		}
 
 		/// <summary>
-		/// Path to the folder. Could be null
+		/// The path of the folder from the root. 
+		/// Could be null
 		/// </summary>
 		public string Path
 		{
@@ -93,7 +95,8 @@ namespace BoxSync.Core.Primitives
 		}
 
 		/// <summary>
-		/// Public name of the folder. Could be null
+		/// If the file is shared, this URL can be used to display a shared page.
+		/// Could be null
 		/// </summary>
 		public string PublicName
 		{

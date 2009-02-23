@@ -6,7 +6,10 @@ using BoxSync.Core.ServiceReference;
 
 namespace BoxSync.Core.Primitives
 {
-	public class User
+	/// <summary>
+	/// Represents Box.NET user entity
+	/// </summary>
+	public sealed class User
 	{
 		private Expression<Func<int, SOAPUser>> _materialize;
 		private bool isMaterialized;
@@ -18,6 +21,9 @@ namespace BoxSync.Core.Primitives
 		private long _spaceAmount;
 		private long _spaceUsed;
 
+		/// <summary>
+		/// Initializes object
+		/// </summary>
 		public User()
 		{
 		}
@@ -27,6 +33,11 @@ namespace BoxSync.Core.Primitives
 			Initialize(user);
 		}
 
+		/// <summary>
+		/// Initializes object
+		/// </summary>
+		/// <param name="id">The unique ID of the user</param>
+		/// <param name="materialize">Callback method for 'lazy' load object's data</param>
 		public User(int id, Expression<Func<int, SOAPUser>> materialize)
 		{
 			_id = id;
@@ -53,11 +64,20 @@ namespace BoxSync.Core.Primitives
 			_spaceUsed = user.space_used;
 		}
 
+		/// <summary>
+		/// The unique ID of the user
+		/// </summary>
 		public int ID
 		{
-			get { return _id; }
+			get
+			{
+				return _id;
+			}
 		}
 
+		/// <summary>
+		/// The user's email address
+		/// </summary>
 		public string Email
 		{
 			get
@@ -71,6 +91,9 @@ namespace BoxSync.Core.Primitives
 			}
 		}
 
+		/// <summary>
+		/// The user's login name
+		/// </summary>
 		public string Login
 		{
 			get
@@ -84,6 +107,9 @@ namespace BoxSync.Core.Primitives
 			}
 		}
 
+		/// <summary>
+		/// The maximum size of the file that user can upload
+		/// </summary>
 		public long MaxUploadSize
 		{
 			get
@@ -92,6 +118,9 @@ namespace BoxSync.Core.Primitives
 			}
 		}
 
+		/// <summary>
+		/// The total amount of space allocated to that account
+		/// </summary>
 		public long SpaceAmount
 		{
 			get
@@ -100,6 +129,9 @@ namespace BoxSync.Core.Primitives
 			}
 		}
 
+		/// <summary>
+		/// The amount of space currently utilized by the user
+		/// </summary>
 		public long SpaceUsed
 		{
 			get
@@ -108,10 +140,16 @@ namespace BoxSync.Core.Primitives
 			}
 		}
 
+		/// <summary>
+		/// If the user is a guest, the AccessID will be the ID of the guest's parent.
+		/// If this is a full user, the AccessID will be the same as the ID property
+		/// </summary>
 		public int AccessID
 		{
-			get { return _accessID; }
-			set { _accessID = value; }
+			get
+			{
+				return _accessID;
+			}
 		}
 	}
 }
