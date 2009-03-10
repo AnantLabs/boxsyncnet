@@ -8,17 +8,16 @@ namespace BoxSync.Core.Primitives
 	/// <summary>
 	/// Represents the response which returns upload file method
 	/// </summary>
-	public sealed class UploadFileResponse
+	public sealed class UploadFileResponse : ResponseBase<UploadFileStatus>
 	{
-		/// <summary>
-		/// Gets or sets the status of upload file operation
-		/// </summary>
-		public UploadFileStatus Status { get; set; }
-
 		/// <summary>
 		/// Gets or sets the ID of the folder to which file(s) was (were) uploaded
 		/// </summary>
-		public long FolderID { get; set; }
+		public long FolderID
+		{
+			get; 
+			set;
+		}
 
 		private Dictionary<File, UploadFileError> _uploadedFileStatus = new Dictionary<File, UploadFileError>();
 

@@ -17,11 +17,13 @@
 		Successful = 1,
 
 		/// <summary>
-		/// Represents 'not_logged_id' status string
+		/// The user did not successfully authenticate.
+		/// Represents 'not_logged_id' status string.
 		/// </summary>
 		NotLoggedID = 2,
 
 		/// <summary>
+		/// An invalid API key was provided, or the API key is restricted from calling this function.
 		/// Represents 'application_restricted' status string
 		/// </summary>
 		ApplicationRestricted = 3

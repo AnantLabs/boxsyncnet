@@ -17,17 +17,20 @@
 		Successful = 1,
 
 		/// <summary>
+		/// Target type is not valid or file/folder ID is not valid for the user's account.
 		/// Represents 'e_delete_node' status string
 		/// </summary>
 		Failed = 2,
 
 		/// <summary>
-		/// Represents 'not_logged_in' status string
+		/// The user did not successfully authenticate.
+		/// Represents 'not_logged_in' status string.
 		/// </summary>
 		NotLoggedIn = 3,
 
 		/// <summary>
-		/// Represents 'application_restricted' status string
+		/// An invalid API key was provided, or the API key is restricted from calling this function.
+		/// Represents 'application_restricted' status string.
 		/// </summary>
 		ApplicationRestricted = 4
 	}

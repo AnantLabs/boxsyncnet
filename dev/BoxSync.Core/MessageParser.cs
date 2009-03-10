@@ -27,7 +27,7 @@ namespace BoxSync.Core
 
 		private readonly static DateTime _unixStartDate = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 
-		internal Folder ParseFolderStructureMessage(string message, Expression<Func<User>> materializeOwner, Expression<Func<long, TagPrimitive>> materializeTag)
+		internal Folder ParseFolderStructureMessage(string message, Expression<Func<long, TagPrimitive>> materializeTag)
 		{
 			if(string.IsNullOrEmpty(message))
 			{

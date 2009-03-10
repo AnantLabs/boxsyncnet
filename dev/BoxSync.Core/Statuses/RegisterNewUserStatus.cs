@@ -2,7 +2,7 @@
 {
 
 	/// <summary>
-	/// Specifies statuses of 'register_new_user' web method
+	/// Specifies execution status of 'register_new_user' web method
 	/// </summary>
 	public enum RegisterNewUserStatus : byte
 	{
@@ -22,18 +22,21 @@
 		Failed = 2,
 
 		/// <summary>
-		/// Represents 'email_invalid' status string
+		/// The login provided is not a valid email address.
+		/// Represents 'email_invalid' status string.
 		/// </summary>
 		EmailInvalid = 3,
 
 		/// <summary>
-		/// Represents 'email_already_registered' status string
+		/// An invalid API key was provided, or the API key is restricted from calling this function.
+		/// Represents 'application_restricted' status string.
 		/// </summary>
-		EmailAlreadyRegistered = 4,
+		ApplicationRestricted = 4,
 
 		/// <summary>
-		/// Represents 'application_restricted' status string
+		/// The login provided is already registered by another user.
+		/// Represents 'email_already_registered' status string.
 		/// </summary>
-		ApplicationRestricted = 5
+		EmailAlreadyRegistered = 5
 	}
 }

@@ -2,12 +2,12 @@
 {
 
 	/// <summary>
-	/// Specifies statuses of 'set_description' web method
+	/// Specifies execution status of 'set_description' web method
 	/// </summary>
 	public enum SetDescriptionStatus : byte
 	{
 		/// <summary>
-		/// Used if status string doen't match to any of enum members
+		/// Unknown status string
 		/// </summary>
 		Unknown = 0,
 
@@ -19,6 +19,12 @@
 		/// <summary>
 		/// Represents 'e_set_description' status string
 		/// </summary>
-		Failed = 2
+		Failed = 2,
+
+		/// <summary>
+		/// An invalid API key was provided, or the API key is restricted from calling this function.
+		/// Represents 'application_restricted' status string.
+		/// </summary>
+		ApplicationRestricted = 3
 	}
 }

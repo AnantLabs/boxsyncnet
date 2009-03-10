@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoxSync.Core", "BoxSync.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoxSync.Core.UnitTests", "BoxSync.Core.UnitTests\BoxSync.Core.UnitTests.csproj", "{35844479-F277-4F4C-9370-736D8C80C55F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoxSync.Core.Extensions", "BoxSync.Core.Extensions\BoxSync.Core.Extensions.csproj", "{BB1BAB09-8451-42CB-9A41-A71EBF809B48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{35844479-F277-4F4C-9370-736D8C80C55F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35844479-F277-4F4C-9370-736D8C80C55F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35844479-F277-4F4C-9370-736D8C80C55F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB1BAB09-8451-42CB-9A41-A71EBF809B48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB1BAB09-8451-42CB-9A41-A71EBF809B48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB1BAB09-8451-42CB-9A41-A71EBF809B48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB1BAB09-8451-42CB-9A41-A71EBF809B48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
