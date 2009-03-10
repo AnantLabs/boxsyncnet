@@ -4,7 +4,7 @@
 	/// <summary>
 	/// Specifies statuses of 'get_auth_token' web method
 	/// </summary>
-	public enum GetAuthorizationTockenStatus : byte
+	public enum GetAuthenticationTokenStatus : byte
 	{
 		/// <summary>
 		/// Unknown status string

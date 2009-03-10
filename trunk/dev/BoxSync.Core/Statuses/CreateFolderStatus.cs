@@ -2,7 +2,7 @@
 {
 
 	/// <summary>
-	/// Specifies statuses of 'create_folder' web method
+	/// Specifies execution status of 'create_folder' web method
 	/// </summary>
 	public enum CreateFolderStatus : byte
 	{
@@ -17,17 +17,20 @@
 		Successful = 1,
 
 		/// <summary>
-		/// Represents 'e_no_parent_folder' status string
+		/// The folder ID provided is not valid for the user's account.
+		/// Represents 'e_no_parent_folder' status string.
 		/// </summary>
 		NoParentFolder = 2,
 
 		/// <summary>
-		/// Represents 'not_logged_in' status string
+		/// The user did not successfully authenticate.
+		/// Represents 'not_logged_in' status string.
 		/// </summary>
 		NotLoggedIn = 3,
 
 		/// <summary>
-		/// Represents 'application_restricted' status string
+		/// An invalid API key was provided, or the API key is restricted from calling this function.
+		/// Represents 'application_restricted' status string.
 		/// </summary>
 		ApplicationRestricted = 4
 	}

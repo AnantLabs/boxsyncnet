@@ -2,7 +2,7 @@
 {
 
 	/// <summary>
-	/// Specifies statuses of 'public_share' web method
+	/// Specifies execution status of 'public_share' web method
 	/// </summary>
 	public enum PublicShareStatus : byte
 	{
@@ -22,17 +22,20 @@
 		Failed = 2,
 
 		/// <summary>
-		/// Represents 'not_logged_in' status string
+		/// The user did not successfully authenticate.
+		/// Represents 'not_logged_in' status string.
 		/// </summary>
 		NotLoggedIn = 3,
 
 		/// <summary>
-		/// Represents 'application_restricted' status string
+		/// An invalid API key was provided, or the API key is restricted from calling this function.
+		/// Represents 'application_restricted' status string.
 		/// </summary>
 		ApplicationRestricted = 4,
 
 		/// <summary>
-		/// Represents 'wrong_node' status string
+		/// The file or folder ID is invalid.
+		/// Represents 'wrong_node' status string.
 		/// </summary>
 		WrongNode = 5
 	}

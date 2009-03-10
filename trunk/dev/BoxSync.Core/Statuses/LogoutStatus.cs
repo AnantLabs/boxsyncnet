@@ -14,10 +14,23 @@
 		/// Represents 'logout_ok' status string
 		/// </summary>
 		Successful = 1,
-		
+
 		/// <summary>
-		/// Represents 'invalid_auth_token' status string
+		/// The user is already no longer logged into Box for your application.
+		/// Represents 'not_logged_id' status string.
 		/// </summary>
-		InvalidAuthToken = 2
+		NotLoggedID = 2,
+
+		/// <summary>
+		/// Provided authentication token is invalid.
+		/// Represents 'invalid_auth_token' status string.
+		/// </summary>
+		InvalidAuthToken = 3,
+
+		/// <summary>
+		/// An invalid API key was provided, or the API key is restricted from calling this function.
+		/// Represents 'application_restricted' status string.
+		/// </summary>
+		ApplicationRestricted = 4
 	}
 }

@@ -19,23 +19,9 @@ namespace BoxSync.Core
 	/// </summary>
 	public sealed class BoxManager
 	{
-		private class AuthorizationInformation
-		{
-			public string Ticket { get; set; }
-			public string Token { get; set; }
-			public SOAPUser User { get; set; }
-			public string UserName { get; set; }
-			public string Password { get; set; }
-			public AuthorizationProcessFinished LoginFinishedCallback;
-			public UpdateStatus UpdateAuthorizationStatus;
-			public Action<AuthorizationInformation> CurrentOperationFinishedCallback;
-			public AuthorizationStatus Status { get; set; }
-		}
-
 		private readonly boxnetService _service;
-		private const string API_KEY = "36ym63ktcqhb58xn72ds6joc5yh6nozl";
+		private readonly string _apiKey;
 		private string _token;
-		private User _user;
 		private readonly IWebProxy _proxy;
 		private TagPrimitiveCollection _tagCollection;
 		
@@ -43,290 +29,331 @@ namespace BoxSync.Core
 		/// <summary>
 		/// Instantiates BoxManager
 		/// </summary>
+		/// <param name="applicationApiKey">The unique API key which is assigned to application</param>
 		/// <param name="serviceUrl">Box.NET SOAP service Url</param>
 		/// <param name="proxy">Proxy information</param>
-        public BoxManager(string serviceUrl, IWebProxy proxy)
+		public BoxManager(string applicationApiKey, string serviceUrl, IWebProxy proxy) :
+			this(applicationApiKey, serviceUrl, proxy, null)
 		{
-			_service = new boxnetService();
-			_proxy = proxy;
-
-			_service.Url = serviceUrl;
-        	_service.Proxy = proxy;
 		}
 
 		/// <summary>
 		/// Instantiates BoxManager
 		/// </summary>
+		/// <param name="applicationApiKey">The unique API key which is assigned to application</param>
 		/// <param name="serviceUrl">Box.NET SOAP service Url</param>
 		/// <param name="proxy">Proxy information</param>
 		/// <param name="authorizationTocken">Valid authorization tocken</param>
-		/// <param name="authorizedUser">Authorized user information</param>
-		public BoxManager(string serviceUrl, IWebProxy proxy, string authorizationTocken, User authorizedUser)
+		public BoxManager(string applicationApiKey, string serviceUrl, IWebProxy proxy, string authorizationTocken)
 		{
+			_apiKey = applicationApiKey;
+			
 			_service = new boxnetService();
 			_proxy = proxy;
-
+			
 			_service.Url = serviceUrl;
 			_service.Proxy = proxy;
 
 			_token = authorizationTocken;
-			_user = authorizedUser;
 		}
 
 
 		/// <summary>
-		/// Gets the user which is currently logged in
+		/// Gets or sets authentication token required for communication 
+		/// between Box.NET service and user's application
 		/// </summary>
-		public User User
+		public string AuthenticationToken
 		{
 			get
 			{
-				return _user;
+				return _token;
 			}
-		}
-
-
-		#region Authorization methods
-
-		/// <summary>
-		/// Does user authorization
-		/// </summary>
-		/// <param name="accountLogin">Account login</param>
-		/// <param name="accountPassword">Account password</param>
-		/// <returns>Indicates if authorization process was successful</returns>
-		public bool Login(string accountLogin, string accountPassword)
-		{
-			bool toReturn = false;
-			ManualResetEvent loginFinishedEvent = new ManualResetEvent(false);
-
-			AuthorizationProcessFinished loginFinished = loginResult =>
-			                             	{
-			                             		toReturn = loginResult;
-			                             		loginFinishedEvent.Set();
-			                             	};
-
-			Login(accountLogin, accountPassword, loginFinished, null);
-
-			loginFinishedEvent.WaitOne();
-
-			return toReturn;
-		}
-
-		/// <summary>
-		/// Does asynchronous user authorization
-		/// </summary>
-		/// <param name="userLogin">User login</param>
-		/// <param name="userPassword">User password</param>
-		/// <param name="authorizationFinished">Callback method which will be invoked after authorization process completes. Can't be null</param>
-		/// <param name="updateAuthorizationStatus">Delegate which will be invoked on each step of authorization process. Can be null</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="authorizationFinished"/> is null</exception>
-		public void Login(string userLogin, string userPassword, AuthorizationProcessFinished authorizationFinished, UpdateStatus updateAuthorizationStatus)
-		{
-			ThrowIfParameterIsNull(authorizationFinished, "authorizationFinished");
-
-			AuthorizationInformation authorizationInformation = new AuthorizationInformation
-			                                                    	{
-			                                                    		CurrentOperationFinishedCallback = ProcessUserAuthorization,
-			                                                    		LoginFinishedCallback = authorizationFinished,
-			                                                    		Password = userPassword,
-			                                                    		UserName = userLogin,
-																		Status = AuthorizationStatus.ReadyToStartAuthorization,
-			                                                    		Ticket = null,
-																		UpdateAuthorizationStatus = updateAuthorizationStatus
-			                                                    	};
-
-			ProcessUserAuthorization(authorizationInformation);
-		}
-
-		/// <summary>
-		/// Manages user authorization process
-		/// </summary>
-		/// <param name="authorizationInformation">Authorization information</param>
-		private void ProcessUserAuthorization(AuthorizationInformation authorizationInformation)
-		{
-			switch (authorizationInformation.Status)
+			set
 			{
-				case AuthorizationStatus.ReadyToStartAuthorization:
-					authorizationInformation.UpdateAuthorizationStatus.SafeInvoke("Ready to start authorization...");
-					GetTicket(authorizationInformation);
-					authorizationInformation.UpdateAuthorizationStatus.SafeInvoke("Retrieving ticket...");
-					break;
-				case AuthorizationStatus.GetTicketFinishedSuccessful:
-					authorizationInformation.UpdateAuthorizationStatus.SafeInvoke("Submiting login/password...");
-					SubmitAuthorizationInformation(authorizationInformation);
-					ProcessUserAuthorization(authorizationInformation);
-					break;
-				case AuthorizationStatus.SubmitUserCredentialsFinishedSuccessful:
-					authorizationInformation.UpdateAuthorizationStatus.SafeInvoke("Retrieving authorization token...");
-					GetAuthorizationToken(authorizationInformation);
-					break;
-				case AuthorizationStatus.GetAuthorizationTokenFinishedSuccessful:
-					authorizationInformation.UpdateAuthorizationStatus.SafeInvoke("Authorization finished successfuly...");
-					authorizationInformation.Status = AuthorizationStatus.AuthorizationFinishedSuccessfuly;
-
-					_token = authorizationInformation.Token;
-					_user = new User(authorizationInformation.User);
-
-					authorizationInformation.LoginFinishedCallback(true);
-					break;
-
-				case AuthorizationStatus.GetAuthorizationTokenFailed:
-					authorizationInformation.UpdateAuthorizationStatus.SafeInvoke("Failed to retrieve authorization tocken...");
-					authorizationInformation.LoginFinishedCallback(false);
-					break;
-				case AuthorizationStatus.GetTicketFinishedFailed:
-					authorizationInformation.UpdateAuthorizationStatus.SafeInvoke("Failed to retrieve user ticket...");
-					authorizationInformation.LoginFinishedCallback(false);
-					break;
-				case AuthorizationStatus.SubmitUserCredentialsFailed:
-					authorizationInformation.UpdateAuthorizationStatus.SafeInvoke("Failed submit login/password...");
-					authorizationInformation.LoginFinishedCallback(false);
-					break;
+				_token = value;
 			}
+		}
 
+		/// <summary>
+		/// Proxy used to access Box.NET service
+		/// </summary>
+		public IWebProxy Proxy
+		{
+			get
+			{
+				return _proxy;
+			}
+		}
+
+
+		#region AuthenticateUser
+
+		/// <summary>
+		/// Authenticates user
+		/// </summary>
+		/// <param name="login">Account login</param>
+		/// <param name="password">Account password</param>
+		/// <param name="method"></param>
+		/// <param name="authenticationToken">Authentication token</param>
+		/// <param name="authenticatedUser">Authenticated user information</param>
+		/// <returns>Operation result</returns>
+		public AuthorizeStatus AuthenticateUser(string login, string password, string method, out string authenticationToken, out User authenticatedUser)
+		{
+			SOAPUser user;
 			
+			string result = _service.authorization(_apiKey, login, password, method, out authenticationToken, out user);
+			
+			authenticatedUser = new User(user);
+
+			return StatusMessageParser.ParseAuthorizeStatus(result);
 		}
 
 		/// <summary>
-		/// Starts asynchronous retrieving of authorization ticket
+		/// Authenticates user
 		/// </summary>
-		/// <param name="authorizationInformation">Authorization information</param>
-		private void GetTicket(AuthorizationInformation authorizationInformation)
+		/// <param name="login">Account login</param>
+		/// <param name="password">Account password</param>
+		/// <param name="method"></param>
+		/// <param name="authenticateUserCompleted">Callback method which will be invoked when operation completes</param>
+		/// <exception cref="ArgumentNullException">Thrown if <paramref name="authenticateUserCompleted"/> is null</exception>
+		public void AuthenticateUser(
+			string login,
+			string password,
+			string method,
+			OperationFinished<AuthenticateUserResponse> authenticateUserCompleted)
 		{
-			_service.Beginget_ticket(API_KEY, GetTicketFinished, authorizationInformation);
+			AuthenticateUser(login, password, method, authenticateUserCompleted, null);
 		}
-		
+
 		/// <summary>
-		/// Finishes asynchronous retrieving of authorization ticket
+		/// Authenticates user
 		/// </summary>
-		/// <param name="asyncResult">Result of asynchronous execution</param>
-		private void GetTicketFinished(IAsyncResult asyncResult)
+		/// <param name="login">Account login</param>
+		/// <param name="password">Account password</param>
+		/// <param name="method"></param>
+		/// <param name="authenticateUserCompleted">Callback method which will be invoked when operation completes</param>
+		/// <param name="userState"></param>
+		/// <exception cref="ArgumentNullException">Thrown if <paramref name="authenticateUserCompleted"/> is null</exception>
+		public void AuthenticateUser(
+			string login,
+			string password,
+			string method,
+			OperationFinished<AuthenticateUserResponse> authenticateUserCompleted,
+			object userState)
 		{
-			string ticket;
-			string result = _service.Endget_ticket(asyncResult, out ticket);
+			ThrowIfParameterIsNull(authenticateUserCompleted, "authenticateUserCompleted");
 
-			GetTicketStatus status = StatusMessageParser.ParseGetTicketStatus(result);
-			AuthorizationInformation authorizationInformation = (AuthorizationInformation)asyncResult.AsyncState;
+			_service.authorizationCompleted += AuthorizationFinished;
 
-			if (!string.IsNullOrEmpty(ticket) && status == GetTicketStatus.Successful)
+			object[] state = {authenticateUserCompleted, userState};
+
+			_service.authorizationAsync(_apiKey, login, password, method, state);
+		}
+
+		private void AuthorizationFinished(object sender, authorizationCompletedEventArgs e)
+		{
+			object[] state = (object[])e.UserState;
+
+			OperationFinished<AuthenticateUserResponse> authenticateUserCompleted =
+				(OperationFinished<AuthenticateUserResponse>)state[0];
+
+			AuthorizeStatus status = StatusMessageParser.ParseAuthorizeStatus(e.Result);
+			AuthenticateUserResponse response;
+
+			switch (status)
 			{
-				authorizationInformation.Status = AuthorizationStatus.GetTicketFinishedSuccessful;
-				authorizationInformation.Ticket = ticket;
+				case AuthorizeStatus.Successful:
+					User authenticatedUser = new User(e.user);
+					response = new AuthenticateUserResponse
+					           	{
+					           		AuthenticatedUser = authenticatedUser,
+					           		Status = status,
+					           		Token = e.auth_token,
+					           		UserState = state[1]
+					           	};
+					authenticateUserCompleted(response, null);
+					break;
+				case AuthorizeStatus.Failed:
+					response = new AuthenticateUserResponse
+					           	{
+									Status = status,
+					           		UserState = state[1]
+					           	};
+					authenticateUserCompleted(response, null);
+					break;
+				default:
+					authenticateUserCompleted(null, e.Result);
+					break;
 			}
-			else
-			{
-				authorizationInformation.Status = AuthorizationStatus.GetTicketFinishedFailed;
-			}
-
-			authorizationInformation.CurrentOperationFinishedCallback(authorizationInformation);
 		}
 
+		#endregion
+
+		#region GetAuthenticationToken
 
 		/// <summary>
-		/// Starts asynchronous retrieving of authorization token
+		/// Gets authentication token required for communication between Box.NET service and user's application.
+		/// Method habe to be called after the user has authorized themself on Box.NET site
 		/// </summary>
-		/// <param name="authorizationInformation">Authorization information</param>
-		private void GetAuthorizationToken(AuthorizationInformation authorizationInformation)
+		/// <param name="authenticationTicket">Athentication ticket</param>
+		/// <param name="authenticationToken">Authentication token</param>
+		/// <param name="authenticatedUser">Authenticated user account information</param>
+		/// <returns>Operation result</returns>
+		public GetAuthenticationTokenStatus GetAuthenticationToken(string authenticationTicket, out string authenticationToken, out User authenticatedUser)
 		{
-			_service.Beginget_auth_token(API_KEY, authorizationInformation.Ticket, GetAuthorizationTokenFinished,
-			                             authorizationInformation);
-		}
-		
-		/// <summary>
-		/// Finishes asynchronous retrieving of authorization token
-		/// </summary>
-		/// <param name="asyncResult">Result of asynchronous execution</param>
-		public void GetAuthorizationTokenFinished(IAsyncResult asyncResult)
-		{
-			string token;
 			SOAPUser user;
 
-			string result = _service.Endget_auth_token(asyncResult, out token, out user);
+			string result = _service.get_auth_token(_apiKey, authenticationTicket, out authenticationToken, out user);
 
-			GetAuthorizationTockenStatus status = StatusMessageParser.ParseGetAuthorizationTockenStatus(result);
+			authenticatedUser = new User(user);
 
-			AuthorizationInformation authorizationInformation = (AuthorizationInformation)asyncResult.AsyncState;
-
-			if (status != GetAuthorizationTockenStatus.Successful || string.IsNullOrEmpty(token))
-			{
-				authorizationInformation.Status = AuthorizationStatus.GetAuthorizationTokenFailed;
-			}
-			else
-			{
-				authorizationInformation.Status = AuthorizationStatus.GetAuthorizationTokenFinishedSuccessful;
-				authorizationInformation.Token = token;
-				authorizationInformation.User = user;
-			}
-
-			authorizationInformation.CurrentOperationFinishedCallback(authorizationInformation);
+			return StatusMessageParser.ParseGetAuthenticationTockenStatus(result);
 		}
-
 
 		/// <summary>
-		/// Submits login/password
+		/// Gets authentication token required for communication between Box.NET service and user's application.
+		/// Method habe to be called after the user has authorized themself on Box.NET site
 		/// </summary>
-		/// <param name="authorizationInformation">Authorization information</param>
-		/// <returns>Result which server returns after login/password submit</returns>
-		private string SubmitAuthorizationInformation(AuthorizationInformation authorizationInformation)
+		/// <param name="authenticationTicket">Athentication ticket</param>
+		/// <param name="getAuthenticationTokenCompleted">Call back method which will be invoked when operation completes</param>
+		/// <exception cref="ArgumentNullException">Thrown if <paramref name="getAuthenticationTokenCompleted"/> is null</exception>
+		public void GetAuthenticationToken(string authenticationTicket, OperationFinished<GetAuthenticationTokenResponse> getAuthenticationTokenCompleted)
 		{
-			string uploadResult = null;
-
-			using (WebClient client = new WebClient {Proxy = _proxy})
-			{
-
-				client.Headers.Add("Content-Type:application/x-www-form-urlencoded");
-
-				Uri destinationAddress = new Uri("http://www.box.net/api/1.0/auth/" + authorizationInformation.Ticket);
-
-				ManualResetEvent submitFinishedEvent = new ManualResetEvent(false);
-
-				Action submitLoginPassword = () =>
-				                             	{
-				                             		uploadResult = client.UploadString(destinationAddress, "POST",
-				                             		                                   "login=" + authorizationInformation.UserName +
-				                             		                                   "&password=" +
-				                             		                                   authorizationInformation.Password +
-				                             		                                   "&dologin=1&__login=1");
-				                             	};
-
-				AsyncCallback callback = asyncResult =>
-				                         	{
-				                         		ManualResetEvent submitFinished = (ManualResetEvent) asyncResult.AsyncState;
-
-				                         		submitFinished.Set();
-				                         	};
-
-				IAsyncResult asyncResult2 = submitLoginPassword.BeginInvoke(callback, submitFinishedEvent);
-
-				submitFinishedEvent.WaitOne();
-
-				submitLoginPassword.EndInvoke(asyncResult2);
-			}
-
-			authorizationInformation.Status = !string.IsNullOrEmpty(uploadResult)
-			                                  	? AuthorizationStatus.SubmitUserCredentialsFinishedSuccessful
-			                                  	: AuthorizationStatus.SubmitUserCredentialsFailed;
-
-			return uploadResult;
+			GetAuthenticationToken(authenticationTicket, getAuthenticationTokenCompleted, null);
 		}
-		
+
+		/// <summary>
+		/// Gets authentication token required for communication between Box.NET service and user's application.
+		/// Method habe to be called after the user has authorized themself on Box.NET site
+		/// </summary>
+		/// <param name="authenticationTicket">Athentication ticket</param>
+		/// <param name="getAuthenticationTokenCompleted">Call back method which will be invoked when operation completes</param>
+		/// <param name="userState"></param>
+		/// <exception cref="ArgumentNullException">Thrown if <paramref name="getAuthenticationTokenCompleted"/> is null</exception>
+		public void GetAuthenticationToken(string authenticationTicket, OperationFinished<GetAuthenticationTokenResponse> getAuthenticationTokenCompleted, object userState)
+		{
+			ThrowIfParameterIsNull(getAuthenticationTokenCompleted, "getAuthenticationTokenCompleted");
+
+			_service.get_auth_tokenCompleted += GetAuthenticationTokenFinished;
+
+			object[] state = {getAuthenticationTokenCompleted, userState};
+
+			_service.get_auth_tokenAsync(_apiKey, authenticationTicket, state);
+		}
+
+		private void GetAuthenticationTokenFinished(object sender, get_auth_tokenCompletedEventArgs e)
+		{
+			object[] state = (object[])e.UserState;
+
+			OperationFinished<GetAuthenticationTokenResponse> getAuthenticationTokenCompleted =
+				(OperationFinished<GetAuthenticationTokenResponse>)state[0];
+
+			GetAuthenticationTokenStatus status = StatusMessageParser.ParseGetAuthenticationTockenStatus(e.Result);
+
+			GetAuthenticationTokenResponse response = new GetAuthenticationTokenResponse
+			{	
+				Status = status,
+				UserState = state[1]
+			};
+
+
+			switch (status)
+			{
+				case GetAuthenticationTokenStatus.Successful:
+					User authenticatedUser = new User(e.user);
+					response.AuthenticatedUser = authenticatedUser;
+					response.AuthenticationToken = e.auth_token;
+
+					getAuthenticationTokenCompleted(response, null);
+					break;
+				case GetAuthenticationTokenStatus.Failed:
+					getAuthenticationTokenCompleted(response, null);
+					break;
+				default:
+					getAuthenticationTokenCompleted(response, e.Result);
+					break;
+			}
+		}
+
+		#endregion
+
+		#region GetTicket
+
+		/// <summary>
+		/// Gets ticket which is used to generate an authentication page 
+		/// for the user to login
+		/// </summary>
+		/// <param name="authenticationTicket">Authentication ticket</param>
+		/// <returns>Operation status</returns>
+		public GetTicketStatus GetTicket(out string authenticationTicket)
+		{
+			string result = _service.get_ticket(_apiKey, out authenticationTicket);
+
+			return StatusMessageParser.ParseGetTicketStatus(result);
+		}
+
+		/// <summary>
+		/// Gets ticket which is used to generate an authentication page 
+		/// for the user to login
+		/// </summary>
+		/// <param name="getAuthenticationTicketCompleted">Call back method which will be invoked when operation completes</param>
+		public void GetTicket(OperationFinished<GetTicketResponse> getAuthenticationTicketCompleted)
+		{
+			GetTicket(getAuthenticationTicketCompleted, null);
+		}
+
+		/// <summary>
+		/// Gets ticket which is used to generate an authentication page 
+		/// for the user to login
+		/// </summary>
+		/// <param name="getAuthenticationTicketCompleted">Call back method which will be invoked when operation completes</param>
+		/// <param name="userState"></param>
+		public void GetTicket(OperationFinished<GetTicketResponse> getAuthenticationTicketCompleted, object userState)
+		{
+			ThrowIfParameterIsNull(getAuthenticationTicketCompleted, "getAuthenticationTicketCompleted");
+
+			object[] data = {getAuthenticationTicketCompleted, userState};
+
+			_service.get_ticketCompleted += GetTicketFinished;
+
+			_service.get_ticketAsync(_apiKey, data);
+		}
+
+		private void GetTicketFinished(object sender, get_ticketCompletedEventArgs e)
+		{
+			object[] data = (object[]) e.UserState;
+			OperationFinished<GetTicketResponse> getAuthenticationTicketCompleted = (OperationFinished<GetTicketResponse>)data[0];
+			GetTicketStatus status = StatusMessageParser.ParseGetTicketStatus(e.Result);
+			GetTicketResponse response = new GetTicketResponse { Status = status, Ticket = e.ticket, data[1] };
+
+			switch (status)
+			{
+				case GetTicketStatus.Successful:
+					getAuthenticationTicketCompleted(response, null);
+					break;
+				default:
+					getAuthenticationTicketCompleted(response, e.Result);
+					break;
+			}
+		}
+
 		#endregion
 
 		#region Upload file
 
 		/// <summary>
-		/// Uploads the specified local file to the specified folder
+		/// Adds the specified local file to the specified folder
 		/// </summary>
 		/// <param name="filePath">Path to the file which needs to be uploaded</param>
 		/// <param name="destinationFolderID">ID of the destination folder</param>
 		/// <returns>Operation status</returns>
-		public UploadFileResponse UploadFile(string filePath, long destinationFolderID)
+		public UploadFileResponse AddFile(string filePath, long destinationFolderID)
 		{
 			UploadFileResponse uploadFileResponse;
 			
-			using (WebClient client = new WebClient { Proxy = _proxy })
+			using (WebClient client = new WebClient { Proxy = Proxy })
 			{
-				Uri destinationAddress = new Uri(string.Format("http://upload.box.net/api/1.0/upload/{0}/{1}", _token, destinationFolderID));
+				Uri destinationAddress = new Uri(string.Format("http://upload.box.net/api/1.0/upload/{0}/{1}", AuthenticationToken, destinationFolderID));
 
 				byte[] response = client.UploadFile(destinationAddress, "POST", filePath);
 				
@@ -340,26 +367,40 @@ namespace BoxSync.Core
 		}
 
 		/// <summary>
-		/// Asynchronously uploads the specified local file to the specified folder
+		/// Asynchronously adds the specified local file to the specified folder
 		/// </summary>
 		/// <param name="filePath">Path to the file which needs to be uploaded</param>
 		/// <param name="parentFolderID">ID of the destination folder</param>
 		/// <param name="fileUploadCompleted">Callback method which will be invoked after file-upload operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is null</exception>
-		public void UploadFile(string filePath, long parentFolderID, OperationFinished<UploadFileStatus, UploadFileResponse> fileUploadCompleted)
+		public void AddFile(string filePath, long parentFolderID, OperationFinished<UploadFileResponse> fileUploadCompleted)
+		{
+			AddFile(filePath, parentFolderID, fileUploadCompleted, null);
+		}
+
+		/// <summary>
+		/// Asynchronously adds the specified local file to the specified folder
+		/// </summary>
+		/// <param name="filePath">Path to the file which needs to be uploaded</param>
+		/// <param name="parentFolderID">ID of the destination folder</param>
+		/// <param name="fileUploadCompleted">Callback method which will be invoked after file-upload operation completes</param>
+		/// <param name="userState"></param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is null</exception>
+		public void AddFile(string filePath, long parentFolderID, OperationFinished<UploadFileResponse> fileUploadCompleted, object userState)
 		{
 			ThrowIfParameterIsNull(fileUploadCompleted, "fileUploadCompleted");
 
-			using (WebClient client = new WebClient { Proxy = _proxy })
+			using (WebClient client = new WebClient { Proxy = Proxy })
 			{
-				Uri destinationAddress = new Uri(string.Format("http://upload.box.net/api/1.0/upload/{0}/{1}", _token, parentFolderID));
+				Uri destinationAddress = new Uri(string.Format("http://upload.box.net/api/1.0/upload/{0}/{1}", AuthenticationToken, parentFolderID));
 
 				client.UploadFileCompleted += UploadFileFinished;
 
-				object[] state = new object[2];
+				object[] state = new object[3];
 
-				state[0] = parentFolderID;
-				state[1] = fileUploadCompleted;
+				state[0] = fileUploadCompleted;
+				state[1] = userState;
+				state[2] = parentFolderID;
 
 				client.UploadFileAsync(destinationAddress, "POST", filePath, state);
 			}
@@ -373,22 +414,29 @@ namespace BoxSync.Core
 		private void UploadFileFinished(object sender, UploadFileCompletedEventArgs e)
 		{
 			object[] state = (object[])e.UserState;
-			long folderID = (long)state[0];
-			OperationFinished<UploadFileStatus, UploadFileResponse> fileUploadFinishedHandler = (OperationFinished<UploadFileStatus, UploadFileResponse>)state[1];
-
-			if (e.Cancelled)
-			{
-				fileUploadFinishedHandler(UploadFileStatus.Cancelled, null, null);
-				return;
-			}
+			long folderID = (long)state[2];
+			object userState = state[1];
+			OperationFinished<UploadFileResponse> fileUploadFinishedHandler = (OperationFinished<UploadFileResponse>)state[0];
 
 			string result = Encoding.ASCII.GetString(e.Result);
 
 			UploadFileResponse uploadFileResponse = MessageParser.Instance.ParseUploadResponseMessage(result);
 
 			uploadFileResponse.FolderID = folderID;
+			uploadFileResponse.UserState = userState;
 
-			fileUploadFinishedHandler(uploadFileResponse.Status, uploadFileResponse, null);
+			switch(uploadFileResponse.Status)
+			{
+				case UploadFileStatus.Successful:
+				case UploadFileStatus.ApplicationRestricted:
+				case UploadFileStatus.Failed:
+				case UploadFileStatus.NotLoggedID:
+					fileUploadFinishedHandler(uploadFileResponse, null);
+					break;
+				default:
+					fileUploadFinishedHandler(uploadFileResponse, e.Result);
+					break;
+			}
 		}
 		#endregion
 
@@ -405,7 +453,7 @@ namespace BoxSync.Core
 		public CreateFolderStatus CreateFolder(string folderName, long parentFolderID, bool isShared, out FolderBase folder)
 		{
 			SOAPFolder soapFolder;
-			string response = _service.create_folder(API_KEY, _token, parentFolderID, folderName, isShared ? 1 : 0, out soapFolder);
+			string response = _service.create_folder(_apiKey, AuthenticationToken, parentFolderID, folderName, isShared ? 1 : 0, out soapFolder);
 			
 			folder = new FolderBase(soapFolder);
 
@@ -420,22 +468,44 @@ namespace BoxSync.Core
 		/// <param name="isShared">Indicates if new folder will be publicly shared</param>
 		/// <param name="createFolderCompleted">Callback method which will be invoked after operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="createFolderCompleted"/> is null</exception>
-		public void CreateFolder(string folderName, long parentFolderID, bool isShared, OperationFinished<CreateFolderStatus, FolderBase> createFolderCompleted)
+		public void CreateFolder(string folderName, long parentFolderID, bool isShared, OperationFinished<CreateFolderResponse> createFolderCompleted)
+		{
+			CreateFolder(folderName, parentFolderID, isShared, createFolderCompleted, null);
+		}
+
+		/// <summary>
+		/// Asynchronously creates folder
+		/// </summary>
+		/// <param name="folderName">Folder name</param>
+		/// <param name="parentFolderID">ID of the parent folder where new folder needs to be created or '0'</param>
+		/// <param name="isShared">Indicates if new folder will be publicly shared</param>
+		/// <param name="createFolderCompleted">Callback method which will be invoked after operation completes</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="createFolderCompleted"/> is null</exception>
+		public void CreateFolder(string folderName, long parentFolderID, bool isShared, OperationFinished<CreateFolderResponse> createFolderCompleted, object userState)
 		{
 			ThrowIfParameterIsNull(createFolderCompleted, "createFolderCompleted");
 
 			_service.create_folderCompleted += CreateFolderFinished;
 
-			_service.create_folderAsync(API_KEY, _token, parentFolderID, folderName, isShared ? 1 : 0, createFolderCompleted);
+			object[] state = {createFolderCompleted, userState};
+
+			_service.create_folderAsync(_apiKey, AuthenticationToken, parentFolderID, folderName, isShared ? 1 : 0,
+										state);
 		}
 
 		private void CreateFolderFinished(object sender, create_folderCompletedEventArgs e)
 		{
-			OperationFinished<CreateFolderStatus, FolderBase> createFolderFinishedHandler =
-				(OperationFinished<CreateFolderStatus, FolderBase>)e.UserState;
+			object[] state = (object[]) e.UserState;
+			OperationFinished<CreateFolderResponse> createFolderFinishedHandler =
+				(OperationFinished<CreateFolderResponse>)state[0];
 
 			CreateFolderStatus status = StatusMessageParser.ParseAddFolderStatus(e.Result);
-			FolderBase folder = new FolderBase(e.folder);
+
+			CreateFolderResponse response = new CreateFolderResponse
+			                                	{
+			                                		Status = status,
+			                                		UserState = state[1]
+			                                	};
 
 			switch (status)
 			{
@@ -443,10 +513,12 @@ namespace BoxSync.Core
 				case CreateFolderStatus.ApplicationRestricted:
 				case CreateFolderStatus.NoParentFolder:
 				case CreateFolderStatus.NotLoggedIn:
-					createFolderFinishedHandler(status, folder, null);
+					response.Folder = new FolderBase(e.folder);
+
+					createFolderFinishedHandler(response, null);
 					break;
 				default:
-					createFolderFinishedHandler(status, folder, e.Result);
+					createFolderFinishedHandler(response, e.Result);
 					break;
 			}
 		}
@@ -464,7 +536,7 @@ namespace BoxSync.Core
 		public DeleteObjectStatus DeleteObject(long objectID, ObjectType objectType)
 		{
 			string type = ObjectType2String(objectType);
-			string result = _service.delete(API_KEY, _token, type, objectID);
+			string result = _service.delete(_apiKey, AuthenticationToken, type, objectID);
 
 			return StatusMessageParser.ParseDeleteObjectStatus(result);
 		}
@@ -474,7 +546,7 @@ namespace BoxSync.Core
 		/// </summary>
 		/// <param name="objectID">ID of the object to delete</param>
 		/// <param name="objectType">Type of the object</param>
-		/// <param name="deleteObjectCompleted">Callback method which will be executed after delete operation completes</param>
+		/// <param name="deleteObjectCompleted">Callback method which will be invoked after delete operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="deleteObjectCompleted"/> is null</exception>
 		public void DeleteObject(long objectID, ObjectType objectType, OperationFinished<DeleteObjectStatus> deleteObjectCompleted)
 		{
@@ -484,13 +556,38 @@ namespace BoxSync.Core
 
 			_service.deleteCompleted += DeleteObjectFinished;
 
-			_service.deleteAsync(API_KEY, _token, type, objectID, deleteObjectCompleted);
+			_service.deleteAsync(_apiKey, AuthenticationToken, type, objectID, deleteObjectCompleted);
+		}
+
+		/// <summary>
+		/// Asynchronously deletes specified object
+		/// </summary>
+		/// <param name="objectID">ID of the object to delete</param>
+		/// <param name="objectType">Type of the object</param>
+		/// <param name="deleteObjectCompleted">Callback method which will be invoked after delete operation completes</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="deleteObjectCompleted"/> is null</exception>
+		public void DeleteObject(
+			long objectID,
+			ObjectType objectType,
+			OperationFinished<DeleteObjectResponse> deleteObjectCompleted,
+			object userState)
+		{
+			ThrowIfParameterIsNull(deleteObjectCompleted, "deleteObjectCompleted");
+
+			string type = ObjectType2String(objectType);
+
+			_service.deleteCompleted += DeleteObjectFinished;
+
+			object[] state = {deleteObjectCompleted, userState};
+
+			_service.deleteAsync(_apiKey, AuthenticationToken, type, objectID, state);
 		}
 
 		private void DeleteObjectFinished(object sender, deleteCompletedEventArgs e)
 		{
-			OperationFinished<DeleteObjectStatus> deleteObjectFinishedHandler =
-				(OperationFinished<DeleteObjectStatus>)e.UserState;
+			object[] state = (object[]) e.UserState;
+			OperationFinished<DeleteObjectResponse> deleteObjectFinishedHandler =
+				(OperationFinished<DeleteObjectResponse>)state[0];
 
 			DeleteObjectStatus status = StatusMessageParser.ParseDeleteObjectStatus(e.Result);
 
@@ -549,7 +646,7 @@ namespace BoxSync.Core
 
 			byte[] folderInfoXml;
 
-			string result = _service.get_account_tree(API_KEY, _token, folderID, new string[0], out folderInfoXml);
+			string result = _service.get_account_tree(_apiKey, AuthenticationToken, folderID, new string[0], out folderInfoXml);
 			GetAccountTreeStatus status = StatusMessageParser.ParseGetAccountTreeStatus(result);
 
 			switch (status)
@@ -592,7 +689,7 @@ namespace BoxSync.Core
 
 			_service.get_account_treeCompleted += GetFolderStructureFinished;
 
-			_service.get_account_treeAsync(API_KEY, _token, folderID, retrieveOptions.ToStringArray(), state);
+			_service.get_account_treeAsync(_apiKey, AuthenticationToken, folderID, retrieveOptions.ToStringArray(), state);
 		}
 
 		private void GetFolderStructureFinished(object sender, get_account_treeCompletedEventArgs e)
@@ -647,7 +744,7 @@ namespace BoxSync.Core
 		{
 			byte[] xmlMessage;
 
-			string result = _service.export_tags(API_KEY, _token, out xmlMessage);
+			string result = _service.export_tags(_apiKey, AuthenticationToken, out xmlMessage);
 			ExportTagsStatus status = StatusMessageParser.ParseExportTagStatus(result);
 
 			tagList = MessageParser.Instance.ParseExportTagsMessage(Encoding.ASCII.GetString(xmlMessage));
@@ -666,7 +763,7 @@ namespace BoxSync.Core
 
 			_service.export_tagsCompleted += ExportTagsFinished;
 
-			_service.export_tagsAsync(API_KEY, _token, exportTagsCompleted);
+			_service.export_tagsAsync(_apiKey, AuthenticationToken, exportTagsCompleted);
 		}
 
 		private void ExportTagsFinished(object sender, export_tagsCompletedEventArgs e)
@@ -744,7 +841,7 @@ namespace BoxSync.Core
 		{
 			string type = ObjectType2String(objectType);
 
-			string result = _service.set_description(API_KEY, _token, type, objectID, description);
+			string result = _service.set_description(_apiKey, AuthenticationToken, type, objectID, description);
 			
 			return StatusMessageParser.ParseSetDescriptionStatus(result);
 		}
@@ -765,7 +862,7 @@ namespace BoxSync.Core
 
 			_service.set_descriptionCompleted += SetDescriptionFinished;
 
-			_service.set_descriptionAsync(API_KEY, _token, type, objectID, description, setDescriptionCompleted);
+			_service.set_descriptionAsync(_apiKey, AuthenticationToken, type, objectID, description, setDescriptionCompleted);
 		}
 
 		private void SetDescriptionFinished(object sender, set_descriptionCompletedEventArgs e)
@@ -800,7 +897,7 @@ namespace BoxSync.Core
 		public RenameObjectStatus RenameObject(long objectID, ObjectType objectType, string newName)
 		{
 			string type = ObjectType2String(objectType);
-			string result = _service.rename(API_KEY, _token, type, objectID, newName);
+			string result = _service.rename(_apiKey, AuthenticationToken, type, objectID, newName);
 
 			return StatusMessageParser.ParseRenameObjectStatus(result);
 		}
@@ -821,7 +918,7 @@ namespace BoxSync.Core
 			
 			_service.renameCompleted += RenameObjectCompleted;
 
-			_service.renameAsync(API_KEY, _token, type, objectID, newName, renameObjectCompleted);
+			_service.renameAsync(_apiKey, AuthenticationToken, type, objectID, newName, renameObjectCompleted);
 		}
 
 		/// <summary>
@@ -846,61 +943,6 @@ namespace BoxSync.Core
 		
 		#endregion
 
-		#region Copy
-
-		/// <summary>
-		/// Copies file or folder to a specified folder
-		/// (currently works only for files)
-		/// </summary>
-		/// <param name="targetObjectID">ID of the object which must be copied</param>
-		/// <param name="targetObjectType">Type of the object which must be copied</param>
-		/// <param name="destinationFolderID">ID of the destination folder</param>
-		/// <returns>Operation status</returns>
-		public CopyObjectStatus CopyObject(long targetObjectID, ObjectType targetObjectType, long destinationFolderID)
-		{
-			string type = ObjectType2String(targetObjectType);
-			string result = _service.copy(API_KEY, _token, type, targetObjectID, destinationFolderID);
-
-			return StatusMessageParser.ParseCopyObjectStatus(result);
-		}
-		
-		/// <summary>
-		/// Asynchronously copies file or folder to a specified folder
-		/// </summary>
-		/// <param name="targetObjectID">ID of the object which must be copied</param>
-		/// <param name="targetObjectType">Type of the object which must be copied</param>
-		/// <param name="destinationFolderID">ID of the destination folder</param>
-		/// <param name="copyObjectCompleted">Callback method which will be invoked after copy operation completes</param>
-		public void CopyObject(long targetObjectID, ObjectType targetObjectType, long destinationFolderID, OperationFinished<CopyObjectStatus> copyObjectCompleted)
-		{
-			string type = ObjectType2String(targetObjectType);
-
-			_service.copyCompleted += CopyObjectFinished;
-
-			_service.copyAsync(API_KEY, _token, type, targetObjectID, destinationFolderID, copyObjectCompleted);
-		}
-
-		private void CopyObjectFinished(object sender, copyCompletedEventArgs e)
-		{
-			OperationFinished<CopyObjectStatus> copyObjectFinishedHandler =
-				(OperationFinished<CopyObjectStatus>)e.UserState;
-
-			CopyObjectStatus status = StatusMessageParser.ParseCopyObjectStatus(e.Result);
-
-			switch (status)
-			{
-				case CopyObjectStatus.Successful:
-				case CopyObjectStatus.Failed:
-					copyObjectFinishedHandler(status, null);
-					break;
-				default:
-					copyObjectFinishedHandler(status, e.Result);
-					break;
-			}
-		}
-		
-		#endregion
-
 		#region Move
 		
 		/// <summary>
@@ -913,7 +955,7 @@ namespace BoxSync.Core
 		public MoveObjectStatus MoveObject(long targetObjectID, ObjectType targetObjectType, long destinationFolderID)
 		{
 			string type = ObjectType2String(targetObjectType);
-			string result = _service.move(API_KEY, _token, type, targetObjectID, destinationFolderID);
+			string result = _service.move(_apiKey, AuthenticationToken, type, targetObjectID, destinationFolderID);
 
 			return StatusMessageParser.ParseMoveObjectStatus(result);
 		}
@@ -934,7 +976,7 @@ namespace BoxSync.Core
 
 			_service.moveCompleted += MoveObjectFinished;
 
-			_service.moveAsync(API_KEY, _token, type, targetObjectID, destinationFolderID, moveObjectCompleted);
+			_service.moveAsync(_apiKey, AuthenticationToken, type, targetObjectID, destinationFolderID, moveObjectCompleted);
 		}
 
 		private void MoveObjectFinished(object sender, moveCompletedEventArgs e)
@@ -967,7 +1009,7 @@ namespace BoxSync.Core
 		/// <returns>Operation status</returns>
 		public LogoutStatus Logout()
 		{
-			string result = _service.logout(API_KEY, _token);
+			string result = _service.logout(_apiKey, AuthenticationToken);
 
 			return StatusMessageParser.ParseLogoutStatus(result);
 		}
@@ -982,7 +1024,7 @@ namespace BoxSync.Core
 
 			_service.logoutCompleted += LogoutFinished;
 
-			_service.logoutAsync(API_KEY, _token, logoutCompleted);
+			_service.logoutAsync(_apiKey, AuthenticationToken, logoutCompleted);
 		}
 
 		private void LogoutFinished(object sender, logoutCompletedEventArgs e)
@@ -1018,7 +1060,7 @@ namespace BoxSync.Core
 			string token;
 			SOAPUser user;
 
-			string result = _service.register_new_user(API_KEY, login, password, out token, out user);
+			string result = _service.register_new_user(_apiKey, login, password, out token, out user);
 
 			response = new RegisterNewUserResponse {Token = token, User = user};
 
@@ -1038,7 +1080,7 @@ namespace BoxSync.Core
 
 			_service.register_new_userCompleted += RegisterNewUserFinished;
 
-			_service.register_new_userAsync(API_KEY, login, password, registerNewUserCompleted);
+			_service.register_new_userAsync(_apiKey, login, password, registerNewUserCompleted);
 		}
 
 		private void RegisterNewUserFinished(object sender, register_new_userCompletedEventArgs e)
@@ -1075,7 +1117,7 @@ namespace BoxSync.Core
 		/// <returns>Operation status</returns>
 		public VerifyRegistrationEmailStatus VerifyRegistrationEmail(string login)
 		{
-			string result = _service.verify_registration_email(API_KEY, login);
+			string result = _service.verify_registration_email(_apiKey, login);
 
 			return StatusMessageParser.ParseVerifyRegistrationEmailStatus(result);
 		}
@@ -1092,7 +1134,7 @@ namespace BoxSync.Core
 
 			_service.verify_registration_emailCompleted += VerifyRegistrationEmail;
 
-			_service.verify_registration_emailAsync(API_KEY, login, verifyRegistrationEmailCompleted);
+			_service.verify_registration_emailAsync(_apiKey, login, verifyRegistrationEmailCompleted);
 		}
 
 		private void VerifyRegistrationEmail(object sender, verify_registration_emailCompletedEventArgs e)
@@ -1127,7 +1169,7 @@ namespace BoxSync.Core
 		/// <returns>Operation status</returns>
 		public AddToMyBoxStatus AddToMyBox(long targetFileID, long destinationFolderID, TagPrimitiveCollection tagList)
 		{
-			string result = _service.add_to_mybox(API_KEY, _token, targetFileID, null, destinationFolderID,
+			string result = _service.add_to_mybox(_apiKey, AuthenticationToken, targetFileID, null, destinationFolderID,
 			                      ConvertTagPrimitiveCollection2String(tagList));
 
 			return StatusMessageParser.ParseAddToMyBoxStatus(result);
@@ -1142,7 +1184,7 @@ namespace BoxSync.Core
 		/// <returns>Operation status</returns>
 		public AddToMyBoxStatus AddToMyBox(string targetFileName, long destinationFolderID, TagPrimitiveCollection tagList)
 		{
-			string result = _service.add_to_mybox(API_KEY, _token, 0, targetFileName, destinationFolderID,
+			string result = _service.add_to_mybox(_apiKey, AuthenticationToken, 0, targetFileName, destinationFolderID,
 								  ConvertTagPrimitiveCollection2String(tagList));
 
 			return StatusMessageParser.ParseAddToMyBoxStatus(result);
@@ -1162,7 +1204,7 @@ namespace BoxSync.Core
 
 			_service.add_to_myboxCompleted += AddToMyBoxFinished;
 
-			_service.add_to_myboxAsync(API_KEY, _token, targetFileID, null, destinationFolderID, ConvertTagPrimitiveCollection2String(tagList), addToMyBoxCompleted);
+			_service.add_to_myboxAsync(_apiKey, AuthenticationToken, targetFileID, null, destinationFolderID, ConvertTagPrimitiveCollection2String(tagList), addToMyBoxCompleted);
 		}
 
 		/// <summary>
@@ -1179,7 +1221,7 @@ namespace BoxSync.Core
 
 			_service.add_to_myboxCompleted += AddToMyBoxFinished;
 
-			_service.add_to_myboxAsync(API_KEY, _token, 0, targetFileName, destinationFolderID, ConvertTagPrimitiveCollection2String(tagList), addToMyBoxCompleted);
+			_service.add_to_myboxAsync(_apiKey, AuthenticationToken, 0, targetFileName, destinationFolderID, ConvertTagPrimitiveCollection2String(tagList), addToMyBoxCompleted);
 		}
 
 		private void AddToMyBoxFinished(object sender, add_to_myboxCompletedEventArgs e)
@@ -1219,7 +1261,7 @@ namespace BoxSync.Core
 		public PublicShareStatus PublicShare(long targetObjectID, ObjectType targetObjectType, string password, string notificationMessage, string[] emailList, out string publicName)
 		{
 			string type = ObjectType2String(targetObjectType);
-			string result = _service.public_share(API_KEY, _token, type, targetObjectID, password, notificationMessage, emailList, out publicName);
+			string result = _service.public_share(_apiKey, AuthenticationToken, type, targetObjectID, password, notificationMessage, emailList, out publicName);
 
 			return StatusMessageParser.ParsePublicShareStatus(result);
 		}
@@ -1242,7 +1284,7 @@ namespace BoxSync.Core
 			string type = ObjectType2String(targetObjectType);
 
 			_service.public_shareCompleted += PublicShareFinished;
-			_service.private_shareAsync(API_KEY, _token, type, targetObjectID, emailList, message, sendNotification, publicShareCompleted);
+			_service.private_shareAsync(_apiKey, AuthenticationToken, type, targetObjectID, emailList, message, sendNotification, publicShareCompleted);
 		}
 
 		private void PublicShareFinished(object sender, public_shareCompletedEventArgs e)
@@ -1278,7 +1320,7 @@ namespace BoxSync.Core
 		public PublicUnshareStatus PublicUnshare(long targetObjectID, ObjectType targetObjectType)
 		{
 			string type = ObjectType2String(targetObjectType);
-			string result = _service.public_unshare(API_KEY, _token, type, targetObjectID);
+			string result = _service.public_unshare(_apiKey, AuthenticationToken, type, targetObjectID);
 
 			return StatusMessageParser.ParsePublicUnshareStatus(result);
 		}
@@ -1298,7 +1340,7 @@ namespace BoxSync.Core
 			
 			_service.public_unshareCompleted += PublicUnshareCompleted;
 
-			_service.public_unshareAsync(API_KEY, _token, type, targetObjectID, publicUnshareCompleted);
+			_service.public_unshareAsync(_apiKey, AuthenticationToken, type, targetObjectID, publicUnshareCompleted);
 		}
 
 		private void PublicUnshareCompleted(object sender, public_unshareCompletedEventArgs e)
@@ -1338,7 +1380,7 @@ namespace BoxSync.Core
 		public PrivateShareStatus PrivateShare(long targetObjectID, ObjectType targetObjectType, string password, string notificationMessage, string[] emailList, bool sendNotification)
 		{
 			string type = ObjectType2String(targetObjectType);
-			string result = _service.private_share(API_KEY, _token, type, targetObjectID, emailList, notificationMessage, sendNotification);
+			string result = _service.private_share(_apiKey, AuthenticationToken, type, targetObjectID, emailList, notificationMessage, sendNotification);
 
 			return StatusMessageParser.ParsePrivateShareStatus(result);
 		}
@@ -1354,24 +1396,44 @@ namespace BoxSync.Core
 		/// <param name="sendNotification">Indicates if the notification about object sharing must be send</param>
 		/// <param name="privateShareCompleted">Callback method which will be invoked after operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="privateShareCompleted"/> is null</exception>
-		public void PrivateShare(long targetObjectID, ObjectType targetObjectType, string password, string notificationMessage, string[] emailList, bool sendNotification, OperationFinished<PrivateShareStatus> privateShareCompleted)
+		public void PrivateShare(long targetObjectID, ObjectType targetObjectType, string password, string notificationMessage, string[] emailList, bool sendNotification, OperationFinished<PrivateShareResponse> privateShareCompleted)
 		{
-			if(privateShareCompleted == null)
-			{
-				throw new ArgumentException("'privateShareCompleted' can not be null");
-			}
+			PrivateShare(targetObjectID, targetObjectType, password, notificationMessage, emailList, sendNotification,
+			             privateShareCompleted, null);
+		}
 
+		/// <summary>
+		/// Asynchronously privately shares an object with another user(s)
+		/// </summary>
+		/// <param name="targetObjectID">ID of the object to be shared</param>
+		/// <param name="targetObjectType">Type of the object</param>
+		/// <param name="password">Password to protect shared object or Null</param>
+		/// <param name="notificationMessage">Message to be included in a notification email</param>
+		/// <param name="emailList">Array of emails for which to notify users about a newly shared file or folder</param>
+		/// <param name="sendNotification">Indicates if the notification about object sharing must be send</param>
+		/// <param name="privateShareCompleted">Callback method which will be invoked after operation completes</param>
+		/// <param name="userState"></param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="privateShareCompleted"/> is null</exception>
+		public void PrivateShare(long targetObjectID, ObjectType targetObjectType, string password, string notificationMessage, string[] emailList, bool sendNotification, OperationFinished<PrivateShareResponse> privateShareCompleted, object userState)
+		{
+			ThrowIfParameterIsNull(privateShareCompleted, "privateShareCompleted");
+			
 			string type = ObjectType2String(targetObjectType);
 
 			_service.private_shareCompleted += PrivateShareFinished;
-			
-			_service.private_shareAsync(API_KEY, _token, type, targetObjectID, emailList, notificationMessage, sendNotification, privateShareCompleted);
+
+			object[] data = {userState, privateShareCompleted};
+
+			_service.private_shareAsync(_apiKey, AuthenticationToken, type, targetObjectID, emailList, notificationMessage, sendNotification, data);
 		}
 
 		private void PrivateShareFinished(object sender, private_shareCompletedEventArgs e)
 		{
-			OperationFinished<PrivateShareStatus> privateShareCompleted = (OperationFinished<PrivateShareStatus>) e.UserState;
+			object[] userState = (object[])e.UserState;
+			OperationFinished<PrivateShareResponse> privateShareCompleted = (OperationFinished<PrivateShareResponse>)userState[1];
 			PrivateShareStatus status = StatusMessageParser.ParsePrivateShareStatus(e.Result);
+
+			PrivateShareResponse response = new PrivateShareResponse { Status = status, UserState = userState[0] };
 
 			switch (status)
 			{
@@ -1380,10 +1442,10 @@ namespace BoxSync.Core
 				case PrivateShareStatus.ApplicationRestricted:
 				case PrivateShareStatus.NotLoggedIn:
 				case PrivateShareStatus.WrongNode:
-					privateShareCompleted(status, null);
+					privateShareCompleted(response, null);
 					break;
 				default:
-					privateShareCompleted(status, e.Result);
+					privateShareCompleted(response, e.Result);
 					break;
 			}
 		}
@@ -1398,7 +1460,7 @@ namespace BoxSync.Core
 		/// </summary>
 		/// <param name="parameter">Parameter which needs to be checked</param>
 		/// <param name="parameterName">Parameter name</param>
-		private static void ThrowIfParameterIsNull(object parameter, string parameterName)
+		internal static void ThrowIfParameterIsNull(object parameter, string parameterName)
 		{
 			if (parameter == null)
 			{
@@ -1461,10 +1523,9 @@ namespace BoxSync.Core
 		/// <returns>Parsed folder structure</returns>
 		private Folder ParseFolderStructureXmlMessage(string message)
 		{
-			Expression<Func<User>> materializeUser = () => User;
 			Expression<Func<long, TagPrimitive>> materializeTag = tagID => GetTag(tagID);
 
-			return MessageParser.Instance.ParseFolderStructureMessage(message, materializeUser, materializeTag);
+			return MessageParser.Instance.ParseFolderStructureMessage(message, materializeTag);
 		}
 
 		/// <summary>

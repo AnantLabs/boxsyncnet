@@ -8,6 +8,15 @@ namespace BoxSync.Core
 	/// </summary>
 	internal static class StatusMessageParser
 	{
+		internal static AuthorizeStatus ParseAuthorizeStatus(string status)
+		{
+			switch (status)
+			{
+				default:
+					return AuthorizeStatus.Unknown;
+			}
+		}
+
 		internal static CreateFolderStatus ParseAddFolderStatus(string status)
 		{
 			switch (status)
@@ -115,16 +124,16 @@ namespace BoxSync.Core
 			}
 		}
 
-		internal static GetAuthorizationTockenStatus ParseGetAuthorizationTockenStatus(string status)
+		internal static GetAuthenticationTokenStatus ParseGetAuthenticationTockenStatus(string status)
 		{
 			switch (status)
 			{
 				case "get_auth_token_error":
-					return GetAuthorizationTockenStatus.Failed;
+					return GetAuthenticationTokenStatus.Failed;
 				case "get_auth_token_ok":
-					return GetAuthorizationTockenStatus.Successful;
+					return GetAuthenticationTokenStatus.Successful;
 				default:
-					return GetAuthorizationTockenStatus.Unknown;
+					return GetAuthenticationTokenStatus.Unknown;
 			}
 		}
 
@@ -181,6 +190,10 @@ namespace BoxSync.Core
 			{
 				case "logout_ok":
 					return LogoutStatus.Successful;
+				case "not_logged_in":
+					return LogoutStatus.NotLoggedID;
+				case "application_restricted":
+					return LogoutStatus.ApplicationRestricted;
 				case "invalid_auth_token":
 					return LogoutStatus.InvalidAuthToken;
 				default:

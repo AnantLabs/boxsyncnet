@@ -2,12 +2,12 @@
 {
 
 	/// <summary>
-	/// Specifies statuses of 'rename' web method
+	/// Specifies execution status of 'rename' web method
 	/// </summary>
 	public enum RenameObjectStatus : byte
 	{
 		/// <summary>
-		/// Used if status string doen't match to any of enum members
+		/// Unknown status string
 		/// </summary>
 		Unknown = 0,
 
@@ -22,12 +22,14 @@
 		Failed = 2,
 
 		/// <summary>
-		/// Represents 'not_logged_in' status string
+		/// The user did not successfully authenticate.
+		/// Represents 'not_logged_in' status string.
 		/// </summary>
 		NotLoggedIn = 3,
 
 		/// <summary>
-		/// Represents 'application_restricted' status string
+		/// An invalid API key was provided, or the API key is restricted from calling this function.
+		/// Represents 'application_restricted' status string.
 		/// </summary>
 		ApplicationRestricted = 4
 	}
