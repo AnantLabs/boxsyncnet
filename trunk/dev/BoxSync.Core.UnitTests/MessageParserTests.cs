@@ -23,7 +23,7 @@ namespace BoxSync.Core.UnitTests
 			Expression<Func<User>> materializeUser = () => GetUser(1);
 			Expression<Func<long, TagPrimitive>> materializeTag = tagID => GetTag(tagID);
 
-			Folder folder = MessageParser.Instance.ParseFolderStructureMessage(data, materializeUser, materializeTag);
+			Folder folder = MessageParser.Instance.ParseFolderStructureMessage(data, materializeTag);
 
 			Assert.IsNotNull(folder);
 			Assert.AreEqual(0, folder.ID);

@@ -124,5 +124,22 @@ namespace BoxSync.Core
 		{
 			return GetEnumerator();
 		}
+
+		/// <summary>
+		/// Gets or sets the tag at the specified index
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		public TagPrimitive this[int index]
+		{
+			get
+			{
+				return _tagList[index];
+			}
+			set
+			{
+				_tagList[index] = value;
+			}
+		}
 	}
 }

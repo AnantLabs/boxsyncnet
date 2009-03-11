@@ -97,7 +97,12 @@ namespace BoxSync.Core
 		/// <param name="authenticationToken">Authentication token</param>
 		/// <param name="authenticatedUser">Authenticated user information</param>
 		/// <returns>Operation result</returns>
-		public AuthorizeStatus AuthenticateUser(string login, string password, string method, out string authenticationToken, out User authenticatedUser)
+		public AuthorizeStatus AuthenticateUser(
+			string login, 
+			string password, 
+			string method, 
+			out string authenticationToken, 
+			out User authenticatedUser)
 		{
 			SOAPUser user;
 			
@@ -199,7 +204,10 @@ namespace BoxSync.Core
 		/// <param name="authenticationToken">Authentication token</param>
 		/// <param name="authenticatedUser">Authenticated user account information</param>
 		/// <returns>Operation result</returns>
-		public GetAuthenticationTokenStatus GetAuthenticationToken(string authenticationTicket, out string authenticationToken, out User authenticatedUser)
+		public GetAuthenticationTokenStatus GetAuthenticationToken(
+			string authenticationTicket, 
+			out string authenticationToken, 
+			out User authenticatedUser)
 		{
 			SOAPUser user;
 
@@ -217,7 +225,9 @@ namespace BoxSync.Core
 		/// <param name="authenticationTicket">Athentication ticket</param>
 		/// <param name="getAuthenticationTokenCompleted">Call back method which will be invoked when operation completes</param>
 		/// <exception cref="ArgumentNullException">Thrown if <paramref name="getAuthenticationTokenCompleted"/> is null</exception>
-		public void GetAuthenticationToken(string authenticationTicket, OperationFinished<GetAuthenticationTokenResponse> getAuthenticationTokenCompleted)
+		public void GetAuthenticationToken(
+			string authenticationTicket, 
+			OperationFinished<GetAuthenticationTokenResponse> getAuthenticationTokenCompleted)
 		{
 			GetAuthenticationToken(authenticationTicket, getAuthenticationTokenCompleted, null);
 		}
@@ -230,7 +240,10 @@ namespace BoxSync.Core
 		/// <param name="getAuthenticationTokenCompleted">Call back method which will be invoked when operation completes</param>
 		/// <param name="userState"></param>
 		/// <exception cref="ArgumentNullException">Thrown if <paramref name="getAuthenticationTokenCompleted"/> is null</exception>
-		public void GetAuthenticationToken(string authenticationTicket, OperationFinished<GetAuthenticationTokenResponse> getAuthenticationTokenCompleted, object userState)
+		public void GetAuthenticationToken(
+			string authenticationTicket, 
+			OperationFinished<GetAuthenticationTokenResponse> getAuthenticationTokenCompleted, 
+			object userState)
 		{
 			ThrowIfParameterIsNull(getAuthenticationTokenCompleted, "getAuthenticationTokenCompleted");
 
@@ -324,7 +337,12 @@ namespace BoxSync.Core
 			object[] data = (object[]) e.UserState;
 			OperationFinished<GetTicketResponse> getAuthenticationTicketCompleted = (OperationFinished<GetTicketResponse>)data[0];
 			GetTicketStatus status = StatusMessageParser.ParseGetTicketStatus(e.Result);
-			GetTicketResponse response = new GetTicketResponse { Status = status, Ticket = e.ticket, data[1] };
+			GetTicketResponse response = new GetTicketResponse
+			                             	{
+			                             		Status = status, 
+												Ticket = e.ticket, 
+												UserState = data[1]
+			                             	};
 
 			switch (status)
 			{
@@ -373,7 +391,10 @@ namespace BoxSync.Core
 		/// <param name="parentFolderID">ID of the destination folder</param>
 		/// <param name="fileUploadCompleted">Callback method which will be invoked after file-upload operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is null</exception>
-		public void AddFile(string filePath, long parentFolderID, OperationFinished<UploadFileResponse> fileUploadCompleted)
+		public void AddFile(
+			string filePath, 
+			long parentFolderID, 
+			OperationFinished<UploadFileResponse> fileUploadCompleted)
 		{
 			AddFile(filePath, parentFolderID, fileUploadCompleted, null);
 		}
@@ -386,7 +407,11 @@ namespace BoxSync.Core
 		/// <param name="fileUploadCompleted">Callback method which will be invoked after file-upload operation completes</param>
 		/// <param name="userState"></param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is null</exception>
-		public void AddFile(string filePath, long parentFolderID, OperationFinished<UploadFileResponse> fileUploadCompleted, object userState)
+		public void AddFile(
+			string filePath, 
+			long parentFolderID, 
+			OperationFinished<UploadFileResponse> fileUploadCompleted, 
+			object userState)
 		{
 			ThrowIfParameterIsNull(fileUploadCompleted, "fileUploadCompleted");
 
@@ -468,7 +493,11 @@ namespace BoxSync.Core
 		/// <param name="isShared">Indicates if new folder will be publicly shared</param>
 		/// <param name="createFolderCompleted">Callback method which will be invoked after operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="createFolderCompleted"/> is null</exception>
-		public void CreateFolder(string folderName, long parentFolderID, bool isShared, OperationFinished<CreateFolderResponse> createFolderCompleted)
+		public void CreateFolder(
+			string folderName, 
+			long parentFolderID, 
+			bool isShared, 
+			OperationFinished<CreateFolderResponse> createFolderCompleted)
 		{
 			CreateFolder(folderName, parentFolderID, isShared, createFolderCompleted, null);
 		}
@@ -481,7 +510,12 @@ namespace BoxSync.Core
 		/// <param name="isShared">Indicates if new folder will be publicly shared</param>
 		/// <param name="createFolderCompleted">Callback method which will be invoked after operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="createFolderCompleted"/> is null</exception>
-		public void CreateFolder(string folderName, long parentFolderID, bool isShared, OperationFinished<CreateFolderResponse> createFolderCompleted, object userState)
+		public void CreateFolder(
+			string folderName, 
+			long parentFolderID, 
+			bool isShared, 
+			OperationFinished<CreateFolderResponse> createFolderCompleted, 
+			object userState)
 		{
 			ThrowIfParameterIsNull(createFolderCompleted, "createFolderCompleted");
 
@@ -548,15 +582,12 @@ namespace BoxSync.Core
 		/// <param name="objectType">Type of the object</param>
 		/// <param name="deleteObjectCompleted">Callback method which will be invoked after delete operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="deleteObjectCompleted"/> is null</exception>
-		public void DeleteObject(long objectID, ObjectType objectType, OperationFinished<DeleteObjectStatus> deleteObjectCompleted)
+		public void DeleteObject(
+			long objectID, 
+			ObjectType objectType, 
+			OperationFinished<DeleteObjectResponse> deleteObjectCompleted)
 		{
-			ThrowIfParameterIsNull(deleteObjectCompleted, "deleteObjectCompleted");
-
-			string type = ObjectType2String(objectType);
-
-			_service.deleteCompleted += DeleteObjectFinished;
-
-			_service.deleteAsync(_apiKey, AuthenticationToken, type, objectID, deleteObjectCompleted);
+			DeleteObject(objectID, objectType, deleteObjectCompleted, null);
 		}
 
 		/// <summary>
@@ -565,6 +596,7 @@ namespace BoxSync.Core
 		/// <param name="objectID">ID of the object to delete</param>
 		/// <param name="objectType">Type of the object</param>
 		/// <param name="deleteObjectCompleted">Callback method which will be invoked after delete operation completes</param>
+		/// <param name="userState"></param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="deleteObjectCompleted"/> is null</exception>
 		public void DeleteObject(
 			long objectID,
@@ -586,10 +618,16 @@ namespace BoxSync.Core
 		private void DeleteObjectFinished(object sender, deleteCompletedEventArgs e)
 		{
 			object[] state = (object[]) e.UserState;
-			OperationFinished<DeleteObjectResponse> deleteObjectFinishedHandler =
+			OperationFinished<DeleteObjectResponse> deleteObjectCompleted =
 				(OperationFinished<DeleteObjectResponse>)state[0];
 
 			DeleteObjectStatus status = StatusMessageParser.ParseDeleteObjectStatus(e.Result);
+
+			DeleteObjectResponse response = new DeleteObjectResponse
+			                                	{
+													Status = StatusMessageParser.ParseDeleteObjectStatus(e.Result),
+													UserState = state[1]
+			                                	};
 
 			switch (status)
 			{
@@ -597,10 +635,10 @@ namespace BoxSync.Core
 				case DeleteObjectStatus.Failed:
 				case DeleteObjectStatus.ApplicationRestricted:
 				case DeleteObjectStatus.NotLoggedIn:
-					deleteObjectFinishedHandler(status, null);
+					deleteObjectCompleted(response, null);
 					break;
 				default:
-					deleteObjectFinishedHandler(status, e.Result);
+					deleteObjectCompleted(response, e.Result);
 					break;
 			}
 		}
@@ -626,11 +664,26 @@ namespace BoxSync.Core
 		/// <param name="retrieveOptions">Retrieve options</param>
 		/// <param name="getFolderStructureCompleted">Callback method which will be executed after operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="getFolderStructureCompleted"/> is null</exception>
-		public void GetRootFolderStructure(RetrieveFolderStructureOptions retrieveOptions, OperationFinished<GetAccountTreeStatus, Folder> getFolderStructureCompleted)
+		public void GetRootFolderStructure(
+			RetrieveFolderStructureOptions retrieveOptions,
+			OperationFinished<GetFolderStructureResponse> getFolderStructureCompleted)
 		{
-			ThrowIfParameterIsNull(getFolderStructureCompleted, "getFolderStructureCompleted");
+			GetFolderStructure(0, retrieveOptions, getFolderStructureCompleted, null);
+		}
 
-			GetFolderStructure(0, retrieveOptions, getFolderStructureCompleted);
+		/// <summary>
+		/// Asynchronously retrieves a user's root folder structure
+		/// </summary>
+		/// <param name="retrieveOptions">Retrieve options</param>
+		/// <param name="getFolderStructureCompleted">Callback method which will be executed after operation completes</param>
+		/// <param name="userState"></param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="getFolderStructureCompleted"/> is null</exception>
+		public void GetRootFolderStructure(
+			RetrieveFolderStructureOptions retrieveOptions,
+			OperationFinished<GetFolderStructureResponse> getFolderStructureCompleted,
+			object userState)
+		{
+			GetFolderStructure(0, retrieveOptions, getFolderStructureCompleted, userState);
 		}
 
 		/// <summary>
@@ -640,7 +693,10 @@ namespace BoxSync.Core
 		/// <param name="retrieveOptions">Retrieve options</param>
 		/// <param name="folder">Folder object</param>
 		/// <returns>Operation status</returns>
-		public GetAccountTreeStatus GetFolderStructure(long folderID, RetrieveFolderStructureOptions retrieveOptions, out Folder folder)
+		public GetAccountTreeStatus GetFolderStructure(
+			long folderID, 
+			RetrieveFolderStructureOptions retrieveOptions, 
+			out Folder folder)
 		{
 			folder = null;
 
@@ -678,14 +734,35 @@ namespace BoxSync.Core
 		/// <param name="retrieveOptions">Retrieve options</param>
 		/// <param name="getFolderStructureCompleted">Callback method which will be executed after operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="getFolderStructureCompleted"/> is null</exception>
-		public void GetFolderStructure(long folderID, RetrieveFolderStructureOptions retrieveOptions, OperationFinished<GetAccountTreeStatus, Folder> getFolderStructureCompleted)
+		public void GetFolderStructure(
+			long folderID, 
+			RetrieveFolderStructureOptions retrieveOptions,
+			OperationFinished<GetFolderStructureResponse> getFolderStructureCompleted)
+		{
+			GetFolderStructure(folderID, retrieveOptions, getFolderStructureCompleted, null);
+		}
+
+		/// <summary>
+		/// Asynchronously retrieves a user's folder structure by ID
+		/// </summary>
+		/// <param name="folderID">ID of the folder to retrieve</param>
+		/// <param name="retrieveOptions">Retrieve options</param>
+		/// <param name="getFolderStructureCompleted">Callback method which will be executed after operation completes</param>
+		/// <param name="userState"></param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="getFolderStructureCompleted"/> is null</exception>
+		public void GetFolderStructure(
+			long folderID,
+			RetrieveFolderStructureOptions retrieveOptions,
+			OperationFinished<GetFolderStructureResponse> getFolderStructureCompleted,
+			object userState)
 		{
 			ThrowIfParameterIsNull(getFolderStructureCompleted, "getFolderStructureCompleted");
 
-			object[] state = new object[2];
+			object[] state = new object[3];
 
-			state[0] = retrieveOptions;
-			state[1] = getFolderStructureCompleted;
+			state[0] = getFolderStructureCompleted;
+			state[1] = retrieveOptions;
+			state[2] = userState;
 
 			_service.get_account_treeCompleted += GetFolderStructureFinished;
 
@@ -695,12 +772,16 @@ namespace BoxSync.Core
 		private void GetFolderStructureFinished(object sender, get_account_treeCompletedEventArgs e)
 		{
 			object[] state = (object[])e.UserState;
-			RetrieveFolderStructureOptions retrieveOptions = (RetrieveFolderStructureOptions)state[0];
-			OperationFinished<GetAccountTreeStatus, Folder> getFolderStructureFinishedHandler = (OperationFinished<GetAccountTreeStatus, Folder>)state[1];
+			RetrieveFolderStructureOptions retrieveOptions = (RetrieveFolderStructureOptions)state[1];
+			OperationFinished<GetFolderStructureResponse> getFolderStructureCompleted = (OperationFinished<GetFolderStructureResponse>)state[0];
 
-			GetAccountTreeStatus status = StatusMessageParser.ParseGetAccountTreeStatus(e.Result);
-			
-			switch (status)
+			GetFolderStructureResponse response = new GetFolderStructureResponse
+			                                      	{
+                                                        Status = StatusMessageParser.ParseGetAccountTreeStatus(e.Result),
+														UserState = state[2]
+			                                      	};
+
+			switch (response.Status)
 			{
 				case GetAccountTreeStatus.Successful:
 					byte[] folderInfoXml = null;
@@ -718,15 +799,17 @@ namespace BoxSync.Core
 
 					Folder folder = ParseFolderStructureXmlMessage(folderInfo);
 
-					getFolderStructureFinishedHandler(status, folder, null);
+					response.Folder = folder;
+
+					getFolderStructureCompleted(response, null);
 					break;
 				case GetAccountTreeStatus.ApplicationRestricted:
 				case GetAccountTreeStatus.FolderIDError:
 				case GetAccountTreeStatus.NotLoggedID:
-					getFolderStructureFinishedHandler(status, null, null);
+					getFolderStructureCompleted(response, null);
 					break;
 				default:
-					getFolderStructureFinishedHandler(status, null, e.Result);
+					getFolderStructureCompleted(response, e.Result);
 					break;
 			}
 		}
@@ -757,34 +840,56 @@ namespace BoxSync.Core
 		/// </summary>
 		/// <param name="exportTagsCompleted">Callback method which will be invioked after operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="exportTagsCompleted"/> is null</exception>
-		public void ExportTags(OperationFinished<ExportTagsStatus, TagPrimitiveCollection> exportTagsCompleted)
+		public void ExportTags(OperationFinished<ExportTagsResponse> exportTagsCompleted)
+		{
+			ExportTags(exportTagsCompleted, null);
+		}
+
+		/// <summary>
+		/// Asynchronously retrieves list of user's tags
+		/// </summary>
+		/// <param name="exportTagsCompleted">Callback method which will be invioked after operation completes</param>
+		/// <param name="userState"></param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="exportTagsCompleted"/> is null</exception>
+		public void ExportTags(
+			OperationFinished<ExportTagsResponse> exportTagsCompleted,
+			object userState)
 		{
 			ThrowIfParameterIsNull(exportTagsCompleted, "exportTagsCompleted");
 
 			_service.export_tagsCompleted += ExportTagsFinished;
 
-			_service.export_tagsAsync(_apiKey, AuthenticationToken, exportTagsCompleted);
+			object[] state = { exportTagsCompleted, userState };
+
+			_service.export_tagsAsync(_apiKey, AuthenticationToken, state);
 		}
 
 		private void ExportTagsFinished(object sender, export_tagsCompletedEventArgs e)
 		{
-			OperationFinished<ExportTagsStatus, TagPrimitiveCollection> exportTagsFinishedHandler =
-				(OperationFinished<ExportTagsStatus, TagPrimitiveCollection>)e.UserState;
+			object[] state = (object[]) e.UserState;
+			OperationFinished<ExportTagsResponse> exportTagsFinishedHandler =
+				(OperationFinished<ExportTagsResponse>)state[0];
 
-			ExportTagsStatus status = StatusMessageParser.ParseExportTagStatus(e.Result);
+			ExportTagsResponse response = new ExportTagsResponse
+			                              	{
+			                              		Status = StatusMessageParser.ParseExportTagStatus(e.Result),
+												UserState = state[1]
+			                              	};
 
-			switch (status)
+			switch (response.Status)
 			{
 				case ExportTagsStatus.Successful:
-					TagPrimitiveCollection tags = MessageParser.Instance.ParseExportTagsMessage(Encoding.ASCII.GetString(e.tag_xml));
-					exportTagsFinishedHandler(status, tags, null);
+					response.TagsList = MessageParser.Instance.ParseExportTagsMessage(Encoding.ASCII.GetString(e.tag_xml));
+
+					exportTagsFinishedHandler(response, null);
 					break;
 				case ExportTagsStatus.ApplicationRestricted:
 				case ExportTagsStatus.NotLoggedID:
-					exportTagsFinishedHandler(status, new TagPrimitiveCollection(), null);
+					response.TagsList = new TagPrimitiveCollection();
+					exportTagsFinishedHandler(response, null);
 					break;
 				default:
-					exportTagsFinishedHandler(status, null, e.Result);
+					exportTagsFinishedHandler(response, e.Result);
 					break;
 			}
 		}
@@ -792,6 +897,7 @@ namespace BoxSync.Core
 		#endregion
 
 		#region GetTag
+
 		private TagPrimitive GetTag(long id)
 		{
 			ManualResetEvent wait = new ManualResetEvent(false);
@@ -807,16 +913,15 @@ namespace BoxSync.Core
 
 			return result;
 		}
+
 		private void GetTag(long id, OperationFinished<ExportTagsStatus, TagPrimitive> getTagFinishedHandler)
 		{
 			if (_tagCollection == null || _tagCollection.IsEmpty)
 			{
-				OperationFinished<ExportTagsStatus, TagPrimitiveCollection> exportTagsFinishedHandler =
-					(status, tags, errorData) =>
+				OperationFinished<ExportTagsResponse> exportTagsFinishedHandler =
+					(response, errorData) =>
 						{
-							_tagCollection = tags;
-
-							getTagFinishedHandler(status, _tagCollection.GetTag(id), errorData);
+							getTagFinishedHandler(response.Status, response.TagsList.GetTag(id), errorData);
 						};
 
 				ExportTags(exportTagsFinishedHandler);
@@ -826,6 +931,7 @@ namespace BoxSync.Core
 				getTagFinishedHandler(ExportTagsStatus.Successful, _tagCollection.GetTag(id), null);
 			}
 		}
+
 		#endregion
 
 		#region SetDescription
@@ -837,7 +943,10 @@ namespace BoxSync.Core
 		/// <param name="objectType">Object type</param>
 		/// <param name="description">Description text</param>
 		/// <returns>Operation status</returns>
-		public SetDescriptionStatus SetDescription(long objectID, ObjectType objectType, string description)
+		public SetDescriptionStatus SetDescription(
+			long objectID, 
+			ObjectType objectType, 
+			string description)
 		{
 			string type = ObjectType2String(objectType);
 
@@ -854,7 +963,30 @@ namespace BoxSync.Core
 		/// <param name="description">Description text</param>
 		/// <param name="setDescriptionCompleted">Callback method which will be invoked after delete operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="setDescriptionCompleted"/> is null</exception>
-		public void SetDescription(long objectID, ObjectType objectType, string description, OperationFinished<SetDescriptionStatus> setDescriptionCompleted)
+		public void SetDescription(
+			long objectID,
+			ObjectType objectType,
+			string description,
+			OperationFinished<SetDescriptionResponse> setDescriptionCompleted)
+		{
+			SetDescription(objectID, objectType, description, setDescriptionCompleted, null);
+		}
+
+		/// <summary>
+		/// Asynchronously sets description of the object
+		/// </summary>
+		/// <param name="objectID">ID of the object</param>
+		/// <param name="objectType">Object type</param>
+		/// <param name="description">Description text</param>
+		/// <param name="setDescriptionCompleted">Callback method which will be invoked after delete operation completes</param>
+		/// <param name="userState"></param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="setDescriptionCompleted"/> is null</exception>
+		public void SetDescription(
+			long objectID,
+			ObjectType objectType,
+			string description,
+			OperationFinished<SetDescriptionResponse> setDescriptionCompleted,
+			object userState)
 		{
 			ThrowIfParameterIsNull(setDescriptionCompleted, "setDescriptionCompleted");
 
@@ -862,23 +994,31 @@ namespace BoxSync.Core
 
 			_service.set_descriptionCompleted += SetDescriptionFinished;
 
-			_service.set_descriptionAsync(_apiKey, AuthenticationToken, type, objectID, description, setDescriptionCompleted);
+			object[] state = { setDescriptionCompleted, userState };
+
+			_service.set_descriptionAsync(_apiKey, AuthenticationToken, type, objectID, description, state);
 		}
 
 		private void SetDescriptionFinished(object sender, set_descriptionCompletedEventArgs e)
 		{
-			OperationFinished<SetDescriptionStatus> setDescriptionFinishedHandler = (OperationFinished<SetDescriptionStatus>)e.UserState;
+			object[] state = (object[]) e.UserState;
+			OperationFinished<SetDescriptionResponse> setDescriptionFinishedHandler =
+				(OperationFinished<SetDescriptionResponse>)state[0];
 
-			SetDescriptionStatus status = StatusMessageParser.ParseSetDescriptionStatus(e.Result);
+			SetDescriptionResponse response = new SetDescriptionResponse
+			                                  	{
+													Status = StatusMessageParser.ParseSetDescriptionStatus(e.Result),
+													UserState = state[1]
+			                                  	};
 
-			switch (status)
+			switch (response.Status)
 			{
 				case SetDescriptionStatus.Failed:
 				case SetDescriptionStatus.Successful:
-					setDescriptionFinishedHandler(status, null);
+					setDescriptionFinishedHandler(response, null);
 					break;
 				default:
-					setDescriptionFinishedHandler(status, e.Result);
+					setDescriptionFinishedHandler(response, e.Result);
 					break;
 			}
 		}
@@ -894,7 +1034,10 @@ namespace BoxSync.Core
 		/// <param name="objectType">Type of the object</param>
 		/// <param name="newName">New name of the object</param>
 		/// <returns>Operation status</returns>
-		public RenameObjectStatus RenameObject(long objectID, ObjectType objectType, string newName)
+		public RenameObjectStatus RenameObject(
+			long objectID, 
+			ObjectType objectType, 
+			string newName)
 		{
 			string type = ObjectType2String(objectType);
 			string result = _service.rename(_apiKey, AuthenticationToken, type, objectID, newName);
@@ -910,7 +1053,11 @@ namespace BoxSync.Core
 		/// <param name="newName">New name of the object</param>
 		/// <param name="renameObjectCompleted">Callback method which will be invoked after rename operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="renameObjectCompleted"/> is null</exception>
-		public void RenameObject(long objectID, ObjectType objectType, string newName, OperationFinished<RenameObjectStatus> renameObjectCompleted)
+		public void RenameObject(
+			long objectID, 
+			ObjectType objectType, 
+			string newName, 
+			OperationFinished<RenameObjectStatus> renameObjectCompleted)
 		{
 			ThrowIfParameterIsNull(renameObjectCompleted, "renameObjectCompleted");
 

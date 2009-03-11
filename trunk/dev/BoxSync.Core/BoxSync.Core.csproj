@@ -53,12 +53,15 @@
     <Compile Include="Primitives\AuthenticateUserResponse.cs" />
     <Compile Include="Primitives\CreateFolderResponse.cs" />
     <Compile Include="Primitives\DeleteObjectResponse.cs" />
+    <Compile Include="Primitives\ExportTagsResponse.cs" />
     <Compile Include="Primitives\FolderBase.cs" />
+    <Compile Include="Primitives\GetFolderStructureResponse.cs" />
     <Compile Include="Primitives\GetTicketResponse.cs" />
     <Compile Include="Primitives\GetAuthenticationTokenResponse.cs" />
     <Compile Include="Primitives\ResponseBase.cs" />
     <Compile Include="Primitives\PrivateShareResponse.cs" />
     <Compile Include="Primitives\RegisterNewUserResponse.cs" />
+    <Compile Include="Primitives\SetDescriptionResponse.cs" />
     <Compile Include="Statuses\AddToMyBoxStatus.cs" />
     <Compile Include="Statuses\AuthorizeStatus.cs" />
     <Compile Include="Statuses\CreateFolderStatus.cs" />
