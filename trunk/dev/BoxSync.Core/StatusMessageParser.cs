@@ -117,6 +117,8 @@ namespace BoxSync.Core
 		{
 			switch (status)
 			{
+				case "application_restricted":
+					return GetTicketStatus.ApplicationRestricted;
 				case "get_ticket_ok":
 					return GetTicketStatus.Successful;
 				default:
@@ -128,6 +130,10 @@ namespace BoxSync.Core
 		{
 			switch (status)
 			{
+				case "application_restricted":
+					return GetAuthenticationTokenStatus.ApplicationRestricted;
+				case "not_logged_in":
+					return GetAuthenticationTokenStatus.NotLoggedID;
 				case "get_auth_token_error":
 					return GetAuthenticationTokenStatus.Failed;
 				case "get_auth_token_ok":

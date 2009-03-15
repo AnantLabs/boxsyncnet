@@ -14,6 +14,12 @@
 		/// <summary>
 		/// Represents 'get_ticket_ok' status string
 		/// </summary>
-		Successful = 1
+		Successful = 1,
+
+		/// <summary>
+		/// An invalid API key was provided, or the API key is restricted from calling this function.
+		/// Represents 'application_restricted' status string.
+		/// </summary>
+		ApplicationRestricted = 4
 	}
 }

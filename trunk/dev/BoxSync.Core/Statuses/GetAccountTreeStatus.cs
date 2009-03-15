@@ -23,6 +23,7 @@
 		NotLoggedID = 2,
 
 		/// <summary>
+		/// Folder ID and/or method params are invalid.
 		/// Represents 'e_folder_id' status string
 		/// </summary>
 		FolderIDError = 3,

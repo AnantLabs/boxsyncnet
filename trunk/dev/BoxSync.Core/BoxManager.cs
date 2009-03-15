@@ -44,7 +44,11 @@ namespace BoxSync.Core
 		/// <param name="serviceUrl">Box.NET SOAP service Url</param>
 		/// <param name="proxy">Proxy information</param>
 		/// <param name="authorizationTocken">Valid authorization tocken</param>
-		public BoxManager(string applicationApiKey, string serviceUrl, IWebProxy proxy, string authorizationTocken)
+		public BoxManager(
+			string applicationApiKey, 
+			string serviceUrl, 
+			IWebProxy proxy, 
+			string authorizationTocken)
 		{
 			_apiKey = applicationApiKey;
 			
@@ -137,7 +141,8 @@ namespace BoxSync.Core
 		/// <param name="password">Account password</param>
 		/// <param name="method"></param>
 		/// <param name="authenticateUserCompleted">Callback method which will be invoked when operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="authenticateUserCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentNullException">Thrown if <paramref name="authenticateUserCompleted"/> is null</exception>
 		public void AuthenticateUser(
 			string login,
@@ -237,8 +242,9 @@ namespace BoxSync.Core
 		/// Method habe to be called after the user has authorized themself on Box.NET site
 		/// </summary>
 		/// <param name="authenticationTicket">Athentication ticket</param>
-		/// <param name="getAuthenticationTokenCompleted">Call back method which will be invoked when operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="getAuthenticationTokenCompleted">Callback method which will be invoked when operation completes</param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="getAuthenticationTokenCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentNullException">Thrown if <paramref name="getAuthenticationTokenCompleted"/> is null</exception>
 		public void GetAuthenticationToken(
 			string authenticationTicket, 
@@ -320,8 +326,11 @@ namespace BoxSync.Core
 		/// for the user to login
 		/// </summary>
 		/// <param name="getAuthenticationTicketCompleted">Call back method which will be invoked when operation completes</param>
-		/// <param name="userState"></param>
-		public void GetTicket(OperationFinished<GetTicketResponse> getAuthenticationTicketCompleted, object userState)
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="getAuthenticationTicketCompleted"/> delegate as a part of response when the operation is completed</param>
+		public void GetTicket(
+			OperationFinished<GetTicketResponse> getAuthenticationTicketCompleted, 
+			object userState)
 		{
 			ThrowIfParameterIsNull(getAuthenticationTicketCompleted, "getAuthenticationTicketCompleted");
 
@@ -331,6 +340,7 @@ namespace BoxSync.Core
 
 			_service.get_ticketAsync(_apiKey, data);
 		}
+
 
 		private void GetTicketFinished(object sender, get_ticketCompletedEventArgs e)
 		{
@@ -405,7 +415,8 @@ namespace BoxSync.Core
 		/// <param name="filePath">Path to the file which needs to be uploaded</param>
 		/// <param name="parentFolderID">ID of the destination folder</param>
 		/// <param name="fileUploadCompleted">Callback method which will be invoked after file-upload operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="fileUploadCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is null</exception>
 		public void AddFile(
 			string filePath, 
@@ -431,6 +442,7 @@ namespace BoxSync.Core
 			}
 		}
 		
+
 		/// <summary>
 		/// Handler method which will be executed after file-upload operation completes
 		/// </summary>
@@ -463,6 +475,7 @@ namespace BoxSync.Core
 					break;
 			}
 		}
+		
 		#endregion
 
 		#region Create folder
@@ -475,7 +488,11 @@ namespace BoxSync.Core
 		/// <param name="isShared">Indicates if new folder will be publicly shared</param>
 		/// <param name="folder">Contains all information about newly created folder</param>
 		/// <returns>Operation status</returns>
-		public CreateFolderStatus CreateFolder(string folderName, long parentFolderID, bool isShared, out FolderBase folder)
+		public CreateFolderStatus CreateFolder(
+			string folderName, 
+			long parentFolderID, 
+			bool isShared, 
+			out FolderBase folder)
 		{
 			SOAPFolder soapFolder;
 			string response = _service.create_folder(_apiKey, _token, parentFolderID, folderName, isShared ? 1 : 0, out soapFolder);
@@ -509,7 +526,8 @@ namespace BoxSync.Core
 		/// <param name="parentFolderID">ID of the parent folder where new folder needs to be created or '0'</param>
 		/// <param name="isShared">Indicates if new folder will be publicly shared</param>
 		/// <param name="createFolderCompleted">Callback method which will be invoked after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="createFolderCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="createFolderCompleted"/> is null</exception>
 		public void CreateFolder(
 			string folderName, 
@@ -597,7 +615,8 @@ namespace BoxSync.Core
 		/// <param name="objectID">ID of the object to delete</param>
 		/// <param name="objectType">Type of the object</param>
 		/// <param name="deleteObjectCompleted">Callback method which will be invoked after delete operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="deleteObjectCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="deleteObjectCompleted"/> is null</exception>
 		public void DeleteObject(
 			long objectID,
@@ -677,7 +696,8 @@ namespace BoxSync.Core
 		/// </summary>
 		/// <param name="retrieveOptions">Retrieve options</param>
 		/// <param name="getFolderStructureCompleted">Callback method which will be executed after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="getFolderStructureCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="getFolderStructureCompleted"/> is null</exception>
 		public void GetRootFolderStructure(
 			RetrieveFolderStructureOptions retrieveOptions,
@@ -749,7 +769,8 @@ namespace BoxSync.Core
 		/// <param name="folderID">ID of the folder to retrieve</param>
 		/// <param name="retrieveOptions">Retrieve options</param>
 		/// <param name="getFolderStructureCompleted">Callback method which will be executed after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="getFolderStructureCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="getFolderStructureCompleted"/> is null</exception>
 		public void GetFolderStructure(
 			long folderID,
@@ -769,6 +790,7 @@ namespace BoxSync.Core
 
 			_service.get_account_treeAsync(_apiKey, _token, folderID, retrieveOptions.ToStringArray(), state);
 		}
+
 
 		private void GetFolderStructureFinished(object sender, get_account_treeCompletedEventArgs e)
 		{
@@ -850,7 +872,8 @@ namespace BoxSync.Core
 		/// Asynchronously retrieves list of user's tags
 		/// </summary>
 		/// <param name="exportTagsCompleted">Callback method which will be invioked after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="exportTagsCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="exportTagsCompleted"/> is null</exception>
 		public void ExportTags(
 			OperationFinished<ExportTagsResponse> exportTagsCompleted,
@@ -864,6 +887,7 @@ namespace BoxSync.Core
 
 			_service.export_tagsAsync(_apiKey, _token, state);
 		}
+
 
 		private void ExportTagsFinished(object sender, export_tagsCompletedEventArgs e)
 		{
@@ -922,6 +946,8 @@ namespace BoxSync.Core
 				OperationFinished<ExportTagsResponse> exportTagsFinishedHandler =
 					(response, errorData) =>
 						{
+							_tagCollection = response.TagsList;
+
 							getTagFinishedHandler(response.Status, response.TagsList.GetTag(id), errorData);
 						};
 
@@ -980,7 +1006,8 @@ namespace BoxSync.Core
 		/// <param name="objectType">Object type</param>
 		/// <param name="description">Description text</param>
 		/// <param name="setDescriptionCompleted">Callback method which will be invoked after delete operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="setDescriptionCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="setDescriptionCompleted"/> is null</exception>
 		public void SetDescription(
 			long objectID,
@@ -999,6 +1026,7 @@ namespace BoxSync.Core
 
 			_service.set_descriptionAsync(_apiKey, _token, type, objectID, description, state);
 		}
+
 
 		private void SetDescriptionFinished(object sender, set_descriptionCompletedEventArgs e)
 		{
@@ -1070,7 +1098,8 @@ namespace BoxSync.Core
 		/// <param name="objectType">Type of the object</param>
 		/// <param name="newName">New name of the object</param>
 		/// <param name="renameObjectCompleted">Callback method which will be invoked after rename operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="renameObjectCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="renameObjectCompleted"/> is null</exception>
 		public void RenameObject(
 			long objectID,
@@ -1157,7 +1186,8 @@ namespace BoxSync.Core
 		/// <param name="targetObjectType">Type of the object</param>
 		/// <param name="destinationFolderID">ID of the destination folder</param>
 		/// <param name="moveObjectCompleted">Callback method which will be invoked after move operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="moveObjectCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="moveObjectCompleted"/> is null</exception>
 		public void MoveObject(
 			long targetObjectID,
@@ -1230,7 +1260,8 @@ namespace BoxSync.Core
 		/// Asynchronously logouts current user
 		/// </summary>
 		/// <param name="logoutCompleted">Callback method which will be invoked after logout operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="logoutCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="logoutCompleted"/> is null</exception>
 		public void Logout(
 			OperationFinished<LogoutResponse> logoutCompleted,
@@ -1311,7 +1342,8 @@ namespace BoxSync.Core
 		/// <param name="login">Account login name</param>
 		/// <param name="password">Account password</param>
 		/// <param name="registerNewUserCompleted">Callback method which will be invoked after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="registerNewUserCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="registerNewUserCompleted"/> is null</exception>
 		public void RegisterNewUser(
 			string login,
@@ -1392,7 +1424,8 @@ namespace BoxSync.Core
 		/// </summary>
 		/// <param name="login">Account login name</param>
 		/// <param name="verifyRegistrationEmailCompleted">Callback method which will be invoked after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="verifyRegistrationEmailCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="verifyRegistrationEmailCompleted"/> is null</exception>
 		public void VerifyRegistrationEmail(
 			string login,
@@ -1500,7 +1533,8 @@ namespace BoxSync.Core
 		/// <param name="destinationFolderID">ID of the destination folder</param>
 		/// <param name="tagList">Tags which need to be assigned to the target file</param>
 		/// <param name="addToMyBoxCompleted">Delegate which will be executed after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="addToMyBoxCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="addToMyBoxCompleted"/> is null</exception>
 		public void AddToMyBox(
 			long targetFileID,
@@ -1543,7 +1577,8 @@ namespace BoxSync.Core
 		/// <param name="destinationFolderID">ID of the destination folder</param>
 		/// <param name="tagList">Tags which need to be assigned to the target file</param>
 		/// <param name="addToMyBoxCompleted">Callback method which will be invoked after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="addToMyBoxCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="addToMyBoxCompleted"/> is null</exception>
 		public void AddToMyBox(
 			string targetFileName,
@@ -1560,6 +1595,7 @@ namespace BoxSync.Core
 
 			_service.add_to_myboxAsync(_apiKey, _token, 0, targetFileName, destinationFolderID, ConvertTagPrimitiveCollection2String(tagList), state);
 		}
+
 
 		private void AddToMyBoxFinished(object sender, add_to_myboxCompletedEventArgs e)
 		{
@@ -1655,7 +1691,8 @@ namespace BoxSync.Core
 		/// <param name="emailList">Array of emails for which to notify users about a newly shared file or folder</param>
 		/// <param name="sendNotification">Indicates if the notification about object sharing must be send</param>
 		/// <param name="publicShareCompleted">Callback method which will be invoked after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="publicShareCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="publicShareCompleted"/> is null</exception>
 		public void PublicShare(
 			long targetObjectID,
@@ -1752,7 +1789,8 @@ namespace BoxSync.Core
 		/// <param name="targetObjectID">ID of the object to be unshared</param>
 		/// <param name="targetObjectType">Type of the object</param>
 		/// <param name="publicUnshareCompleted">Callback method which will be invoked after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="publicUnshareCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="publicUnshareCompleted"/> is null</exception>
 		public void PublicUnshare(
 			long targetObjectID,
@@ -1858,7 +1896,8 @@ namespace BoxSync.Core
 		/// <param name="emailList">Array of emails for which to notify users about a newly shared file or folder</param>
 		/// <param name="sendNotification">Indicates if the notification about object sharing must be send</param>
 		/// <param name="privateShareCompleted">Callback method which will be invoked after operation completes</param>
-		/// <param name="userState"></param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="privateShareCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="privateShareCompleted"/> is null</exception>
 		public void PrivateShare(
 			long targetObjectID, 
