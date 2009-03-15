@@ -15,8 +15,8 @@ namespace BoxSync.Core.Primitives
 		/// </summary>
 		public long FolderID
 		{
-			get; 
-			set;
+			get;
+			internal set;
 		}
 
 		private Dictionary<File, UploadFileError> _uploadedFileStatus = new Dictionary<File, UploadFileError>();
@@ -30,7 +30,7 @@ namespace BoxSync.Core.Primitives
 			{
 				return _uploadedFileStatus;
 			}
-			set
+			internal set
 			{
 				if (value == null)
 				{

@@ -3,7 +3,10 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class SetDescriptionResponse : ResponseBase<SetDescriptionStatus>
+	/// <summary>
+	/// Represents response from 'SetDescription' method
+	/// </summary>
+	public sealed class SetDescriptionResponse : ResponseBase<SetDescriptionStatus>
 	{
 	}
 }

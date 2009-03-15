@@ -3,7 +3,10 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class AddToMyBoxResponse : ResponseBase<AddToMyBoxStatus>
+	/// <summary>
+	/// Represents response from 'AddToMyBox' method
+	/// </summary>
+	public sealed class AddToMyBoxResponse : ResponseBase<AddToMyBoxStatus>
 	{
 	}
 }

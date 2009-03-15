@@ -3,7 +3,10 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class LogoutResponse : ResponseBase<LogoutStatus>
+	/// <summary>
+	/// Represents response from 'Logout' method
+	/// </summary>
+	public sealed class LogoutResponse : ResponseBase<LogoutStatus>
 	{
 	}
 }

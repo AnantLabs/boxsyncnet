@@ -3,7 +3,10 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class VerifyRegistrationEmailResponse : ResponseBase<VerifyRegistrationEmailStatus>
+	/// <summary>
+	/// Represents response from 'VerifyRegistrationEmail' method
+	/// </summary>
+	public sealed class VerifyRegistrationEmailResponse : ResponseBase<VerifyRegistrationEmailStatus>
 	{
 	}
 }

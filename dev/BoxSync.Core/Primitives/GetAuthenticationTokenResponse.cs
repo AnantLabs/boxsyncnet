@@ -3,10 +3,27 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class GetAuthenticationTokenResponse : ResponseBase<GetAuthenticationTokenStatus>
+	/// <summary>
+	/// Represents response from 'GetAuthenticationToken' method
+	/// </summary>
+	public sealed class GetAuthenticationTokenResponse : ResponseBase<GetAuthenticationTokenStatus>
 	{
-		public User AuthenticatedUser { get; set; }
+		/// <summary>
+		/// Basic information about a user's account
+		/// </summary>
+		public User AuthenticatedUser
+		{
+			get;
+			internal set;
+		}
 
-		public string AuthenticationToken { get; set; }
+		/// <summary>
+		/// The authentication token used to access and apply operations to a user's account.
+		/// </summary>
+		public string AuthenticationToken
+		{
+			get;
+			internal set;
+		}
 	}
 }
