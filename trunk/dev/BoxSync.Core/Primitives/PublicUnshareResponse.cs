@@ -3,7 +3,10 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class PublicUnshareResponse : ResponseBase<PublicUnshareStatus>
+	/// <summary>
+	/// Represents response from 'PublicUnshare' method
+	/// </summary>
+	public sealed class PublicUnshareResponse : ResponseBase<PublicUnshareStatus>
 	{
 	}
 }

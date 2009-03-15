@@ -4,7 +4,10 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class MoveObjectResponse : ResponseBase<MoveObjectStatus>
+	/// <summary>
+	/// Represents response from 'MoveObject' method
+	/// </summary>
+	public sealed class MoveObjectResponse : ResponseBase<MoveObjectStatus>
 	{
 	}
 }

@@ -2,7 +2,10 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class AuthenticateUserResponse : ResponseBase<AuthorizeStatus>
+	/// <summary>
+	/// Represents response from 'AuthenticateUser' method
+	/// </summary>
+	public sealed class AuthenticateUserResponse : ResponseBase<AuthorizeStatus>
 	{
 		/// <summary>
 		/// Authenticated user information
@@ -13,6 +16,9 @@ namespace BoxSync.Core.Primitives
 			internal set;
 		}
 
+		/// <summary>
+		/// The authentication token used to access and apply operations to a user's account.
+		/// </summary>
 		public string Token
 		{
 			get; 

@@ -3,6 +3,9 @@
 
 namespace BoxSync.Core.Primitives
 {
+	/// <summary>
+	/// Represents response from 'CreateFolder' method
+	/// </summary>
 	public sealed class CreateFolderResponse : ResponseBase<CreateFolderStatus>
 	{
 

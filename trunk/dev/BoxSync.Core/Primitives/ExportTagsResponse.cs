@@ -3,12 +3,18 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class ExportTagsResponse : ResponseBase<ExportTagsStatus>
+	/// <summary>
+	/// Represents response from 'ExportTags' method
+	/// </summary>
+	public sealed class ExportTagsResponse : ResponseBase<ExportTagsStatus>
 	{
+		/// <summary>
+		/// List of tags associated with user's account
+		/// </summary>
 		public TagPrimitiveCollection TagsList
 		{
-			get; 
-			set;
+			get;
+			internal set;
 		}
 	}
 }

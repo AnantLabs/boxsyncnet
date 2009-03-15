@@ -3,12 +3,18 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class GetFolderStructureResponse : ResponseBase<GetAccountTreeStatus>
+	/// <summary>
+	/// Represents response from 'GetFolderStructure' method
+	/// </summary>
+	public sealed class GetFolderStructureResponse : ResponseBase<GetAccountTreeStatus>
 	{
+		/// <summary>
+		/// Folder information
+		/// </summary>
 		public Folder Folder
 		{
-			get; 
-			set;
+			get;
+			internal set;
 		}
 	}
 }

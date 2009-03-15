@@ -5,7 +5,7 @@ using BoxSync.Core.Statuses;
 namespace BoxSync.Core.Primitives
 {
 	/// <summary>
-	/// Represents the response which returns 'register_new_user' web method
+	/// Represents response from 'RegisterNewUser' method
 	/// </summary>
 	public sealed class RegisterNewUserResponse : ResponseBase<RegisterNewUserStatus>
 	{
@@ -15,7 +15,7 @@ namespace BoxSync.Core.Primitives
 		public string Token
 		{
 			get; 
-			set;
+			internal set;
 		}
 
 		/// <summary>
@@ -24,7 +24,7 @@ namespace BoxSync.Core.Primitives
 		public SOAPUser User
 		{
 			get; 
-			set;
+			internal set;
 		}
 	}
 }

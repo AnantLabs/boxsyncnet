@@ -3,7 +3,10 @@
 
 namespace BoxSync.Core.Primitives
 {
-	public class PrivateShareResponse
+	/// <summary>
+	/// Represents response from 'PrivateShare' method
+	/// </summary>
+	public sealed class PrivateShareResponse
 	{
 		/// <summary>
 		/// Final operation status
