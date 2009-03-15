@@ -17,6 +17,7 @@
 		Successful = 1,
 
 		/// <summary>
+		/// The target is not 'file'/'folder'. Or the new name contains invalid characters.
 		/// Represents 'share_error' status string
 		/// </summary>
 		Failed = 2,
