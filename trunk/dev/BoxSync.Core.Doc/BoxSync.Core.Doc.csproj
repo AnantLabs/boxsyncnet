@@ -59,7 +59,7 @@
   </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties ProcessComponentTypeName="BoxSync.Core.Doc.BuildProcess" IsDocProject="true" DocProjectVersion="1.11.0.0" BuildEngineProviderName="Sandcastle" Sandcastle_Version="2.4.10520.1" Sandcastle_PresentationName="Visual Studio 2005" Sandcastle_ProduceHelp1x="True" ExternalSources="" />
+      <UserProperties DefaultApplyToAll="True" DoNotAskIncludeOutputInProject="True" ProcessComponentTypeName="BoxSync.Core.Doc.BuildProcess" IsDocProject="true" DocProjectVersion="1.11.0.0" BuildEngineProviderName="Sandcastle" Sandcastle_Version="2.4.10520.1" Sandcastle_PresentationName="Visual Studio 2005" Sandcastle_ProduceHelp1x="True" ExternalSources="" />
     </VisualStudio>
   </ProjectExtensions>
   <ItemGroup>
@@ -67,5 +67,8 @@
       <Project>{FC868A3E-DDC5-43D2-85AA-A27FEC79B251}</Project>
       <Name>BoxSync.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Help\" />
   </ItemGroup>
 </Project>
