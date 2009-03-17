@@ -43,12 +43,12 @@ namespace BoxSync.Core
 		/// <param name="applicationApiKey">The unique API key which is assigned to application</param>
 		/// <param name="serviceUrl">Box.NET SOAP service Url</param>
 		/// <param name="proxy">Proxy information</param>
-		/// <param name="authorizationTocken">Valid authorization tocken</param>
+		/// <param name="authorizationToken">Valid authorization token</param>
 		public BoxManager(
 			string applicationApiKey, 
 			string serviceUrl, 
 			IWebProxy proxy, 
-			string authorizationTocken)
+			string authorizationToken)
 		{
 			_apiKey = applicationApiKey;
 			
@@ -58,7 +58,7 @@ namespace BoxSync.Core
 			_service.Url = serviceUrl;
 			_service.Proxy = proxy;
 
-			_token = authorizationTocken;
+			_token = authorizationToken;
 		}
 
 
@@ -203,7 +203,7 @@ namespace BoxSync.Core
 
 		/// <summary>
 		/// Gets authentication token required for communication between Box.NET service and user's application.
-		/// Method habe to be called after the user has authorized themself on Box.NET site
+		/// Method has to be called after the user has authorized themself on Box.NET site
 		/// </summary>
 		/// <param name="authenticationTicket">Athentication ticket</param>
 		/// <param name="authenticationToken">Authentication token</param>
@@ -220,12 +220,12 @@ namespace BoxSync.Core
 
 			authenticatedUser = new User(user);
 
-			return StatusMessageParser.ParseGetAuthenticationTockenStatus(result);
+			return StatusMessageParser.ParseGetAuthenticationTokenStatus(result);
 		}
 
 		/// <summary>
 		/// Gets authentication token required for communication between Box.NET service and user's application.
-		/// Method habe to be called after the user has authorized themself on Box.NET site
+		/// Method has to be called after the user has authorized themself on Box.NET site
 		/// </summary>
 		/// <param name="authenticationTicket">Athentication ticket</param>
 		/// <param name="getAuthenticationTokenCompleted">Call back method which will be invoked when operation completes</param>
@@ -239,7 +239,7 @@ namespace BoxSync.Core
 
 		/// <summary>
 		/// Gets authentication token required for communication between Box.NET service and user's application.
-		/// Method habe to be called after the user has authorized themself on Box.NET site
+		/// Method has to be called after the user has authorized themself on Box.NET site
 		/// </summary>
 		/// <param name="authenticationTicket">Athentication ticket</param>
 		/// <param name="getAuthenticationTokenCompleted">Callback method which will be invoked when operation completes</param>
@@ -267,7 +267,7 @@ namespace BoxSync.Core
 			OperationFinished<GetAuthenticationTokenResponse> getAuthenticationTokenCompleted =
 				(OperationFinished<GetAuthenticationTokenResponse>)state[0];
 
-			GetAuthenticationTokenStatus status = StatusMessageParser.ParseGetAuthenticationTockenStatus(e.Result);
+			GetAuthenticationTokenStatus status = StatusMessageParser.ParseGetAuthenticationTokenStatus(e.Result);
 
 			GetAuthenticationTokenResponse response = new GetAuthenticationTokenResponse
 			{	

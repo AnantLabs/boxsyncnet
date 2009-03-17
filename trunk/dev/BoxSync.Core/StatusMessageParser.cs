@@ -126,7 +126,7 @@ namespace BoxSync.Core
 			}
 		}
 
-		internal static GetAuthenticationTokenStatus ParseGetAuthenticationTockenStatus(string status)
+		internal static GetAuthenticationTokenStatus ParseGetAuthenticationTokenStatus(string status)
 		{
 			switch (status)
 			{

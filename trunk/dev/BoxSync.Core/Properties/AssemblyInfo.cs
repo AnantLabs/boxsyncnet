@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("3e7b454b-2ed0-456b-a793-648ba020cd03")]
 
-[assembly: AssemblyVersion("0.1.0.0")]
-[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: AssemblyVersion("0.2.0.10")]
+[assembly: AssemblyFileVersion("0.2.0.10")]
 [assembly: InternalsVisibleTo("BoxSync.Core.UnitTests")]
 [assembly: InternalsVisibleTo("BoxSync.Core.Extensions")]
