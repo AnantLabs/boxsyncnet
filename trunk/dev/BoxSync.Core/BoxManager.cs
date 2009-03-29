@@ -19,6 +19,9 @@ namespace BoxSync.Core
 	/// </summary>
 	public sealed class BoxManager
 	{
+		private const string UPLOAD_FILE_URI_TEMPLATE = "http://upload.box.net/api/1.0/upload/{0}/{1}";
+		private const string OVERWRITE_FILE_URI_TEMPLATE = "http://upload.box.net/api/1.0/overwrite/{0}/{1}";
+		
 		private readonly boxnetService _service;
 		private readonly string _apiKey;
 		private string _token;
@@ -101,7 +104,7 @@ namespace BoxSync.Core
 		/// <param name="authenticationToken">Authentication token</param>
 		/// <param name="authenticatedUser">Authenticated user information</param>
 		/// <returns>Operation result</returns>
-		public AuthorizeStatus AuthenticateUser(
+		public AuthenticationStatus AuthenticateUser(
 			string login, 
 			string password, 
 			string method, 
@@ -167,12 +170,12 @@ namespace BoxSync.Core
 			OperationFinished<AuthenticateUserResponse> authenticateUserCompleted =
 				(OperationFinished<AuthenticateUserResponse>)state[0];
 
-			AuthorizeStatus status = StatusMessageParser.ParseAuthorizeStatus(e.Result);
+			AuthenticationStatus status = StatusMessageParser.ParseAuthorizeStatus(e.Result);
 			AuthenticateUserResponse response;
 
 			switch (status)
 			{
-				case AuthorizeStatus.Successful:
+				case AuthenticationStatus.Successful:
 					User authenticatedUser = new User(e.user);
 					response = new AuthenticateUserResponse
 					           	{
@@ -183,7 +186,7 @@ namespace BoxSync.Core
 					           	};
 					authenticateUserCompleted(response, null);
 					break;
-				case AuthorizeStatus.Failed:
+				case AuthenticationStatus.Failed:
 					response = new AuthenticateUserResponse
 					           	{
 									Status = status,
@@ -263,30 +266,48 @@ namespace BoxSync.Core
 		private void GetAuthenticationTokenFinished(object sender, get_auth_tokenCompletedEventArgs e)
 		{
 			object[] state = (object[])e.UserState;
-
+			object errorData = null;
+			
 			OperationFinished<GetAuthenticationTokenResponse> getAuthenticationTokenCompleted =
 				(OperationFinished<GetAuthenticationTokenResponse>)state[0];
 
-			GetAuthenticationTokenStatus status = StatusMessageParser.ParseGetAuthenticationTokenStatus(e.Result);
+			GetAuthenticationTokenStatus status;
+
+			if(e.Error != null)
+			{
+				status = StatusMessageParser.ParseGetAuthenticationTokenStatus(e.Result);
+
+				if (status == GetAuthenticationTokenStatus.Unknown)
+				{
+					errorData = e.Result;
+				}
+			}
+			else
+			{
+				status = GetAuthenticationTokenStatus.Failed;
+				errorData = e.Error;
+			}
 
 			GetAuthenticationTokenResponse response = new GetAuthenticationTokenResponse
-			{	
-				Status = status,
-				UserState = state[1]
-			};
+			                                          	{
+			                                          		Status = status,
+			                                          		UserState = state[1]
+			                                          	};
 
-
-			switch (status)
+			switch (response.Status)
 			{
 				case GetAuthenticationTokenStatus.Successful:
 					User authenticatedUser = new User(e.user);
 					response.AuthenticatedUser = authenticatedUser;
 					response.AuthenticationToken = e.auth_token;
+					_token = e.auth_token;
 
 					getAuthenticationTokenCompleted(response, null);
 					break;
+				case GetAuthenticationTokenStatus.NotLoggedID:
+				case GetAuthenticationTokenStatus.ApplicationRestricted:
 				case GetAuthenticationTokenStatus.Failed:
-					getAuthenticationTokenCompleted(response, null);
+					getAuthenticationTokenCompleted(response, errorData);
 					break;
 				default:
 					getAuthenticationTokenCompleted(response, e.Result);
@@ -346,23 +367,34 @@ namespace BoxSync.Core
 		{
 			object[] data = (object[]) e.UserState;
 			OperationFinished<GetTicketResponse> getAuthenticationTicketCompleted = (OperationFinished<GetTicketResponse>)data[0];
-			GetTicketStatus status = StatusMessageParser.ParseGetTicketStatus(e.Result);
-			GetTicketResponse response = new GetTicketResponse
-			                             	{
-			                             		Status = status, 
-												Ticket = e.ticket, 
-												UserState = data[1]
-			                             	};
+			GetTicketResponse response;
+			object errorData;
 
-			switch (status)
+			if (e.Error != null)
 			{
-				case GetTicketStatus.Successful:
-					getAuthenticationTicketCompleted(response, null);
-					break;
-				default:
-					getAuthenticationTicketCompleted(response, e.Result);
-					break;
+				errorData = e.Error;
+
+				response = new GetTicketResponse
+				           	{
+				           		Status = GetTicketStatus.Failed,
+				           		UserState = data[1]
+				           	};
 			}
+			else
+			{
+				GetTicketStatus status = StatusMessageParser.ParseGetTicketStatus(e.Result);
+
+				errorData = status == GetTicketStatus.Unknown ? e.Result : null;
+
+				response = new GetTicketResponse
+				           	{
+				           		Status = status,
+				           		Ticket = e.ticket,
+				           		UserState = data[1]
+				           	};
+			}
+
+			getAuthenticationTicketCompleted(response, errorData);
 		}
 
 		#endregion
@@ -375,111 +407,269 @@ namespace BoxSync.Core
 		/// <param name="filePath">Path to the file which needs to be uploaded</param>
 		/// <param name="destinationFolderID">ID of the destination folder</param>
 		/// <returns>Operation status</returns>
-		public UploadFileResponse AddFile(string filePath, long destinationFolderID)
+		public UploadFileResponse AddFile(
+			string filePath, 
+			long destinationFolderID)
 		{
-			UploadFileResponse uploadFileResponse;
-			
-			using (WebClient client = new WebClient { Proxy = Proxy })
-			{
-				Uri destinationAddress = new Uri(string.Format("http://upload.box.net/api/1.0/upload/{0}/{1}", _token, destinationFolderID));
-
-				byte[] response = client.UploadFile(destinationAddress, "POST", filePath);
-				
-				string result = Encoding.ASCII.GetString(response);
-
-				uploadFileResponse = MessageParser.Instance.ParseUploadResponseMessage(result);
-				uploadFileResponse.FolderID = destinationFolderID;
-			}
-
-			return uploadFileResponse;
+			return AddFiles(new[] {filePath}, destinationFolderID);
 		}
 
 		/// <summary>
 		/// Asynchronously adds the specified local file to the specified folder
 		/// </summary>
 		/// <param name="filePath">Path to the file which needs to be uploaded</param>
-		/// <param name="parentFolderID">ID of the destination folder</param>
+		/// <param name="destinationFolderID">ID of the destination folder</param>
 		/// <param name="fileUploadCompleted">Callback method which will be invoked after file-upload operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is null</exception>
 		public void AddFile(
-			string filePath, 
-			long parentFolderID, 
+			string filePath,
+			long destinationFolderID,
 			OperationFinished<UploadFileResponse> fileUploadCompleted)
 		{
-			AddFile(filePath, parentFolderID, fileUploadCompleted, null);
+			AddFile(filePath, destinationFolderID, fileUploadCompleted, null);
 		}
 
 		/// <summary>
 		/// Asynchronously adds the specified local file to the specified folder
 		/// </summary>
 		/// <param name="filePath">Path to the file which needs to be uploaded</param>
-		/// <param name="parentFolderID">ID of the destination folder</param>
+		/// <param name="destinationFolderID">ID of the destination folder</param>
 		/// <param name="fileUploadCompleted">Callback method which will be invoked after file-upload operation completes</param>
 		/// <param name="userState">A user-defined object containing state information. 
 		/// This object is passed to the <paramref name="fileUploadCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is null</exception>
 		public void AddFile(
-			string filePath, 
-			long parentFolderID, 
-			OperationFinished<UploadFileResponse> fileUploadCompleted, 
+			string filePath,
+			long destinationFolderID,
+			OperationFinished<UploadFileResponse> fileUploadCompleted,
 			object userState)
 		{
-			ThrowIfParameterIsNull(fileUploadCompleted, "fileUploadCompleted");
-
-			using (WebClient client = new WebClient { Proxy = Proxy })
-			{
-				Uri destinationAddress = new Uri(string.Format("http://upload.box.net/api/1.0/upload/{0}/{1}", _token, parentFolderID));
-
-				client.UploadFileCompleted += UploadFileFinished;
-
-				object[] state = new object[3];
-
-				state[0] = fileUploadCompleted;
-				state[1] = userState;
-				state[2] = parentFolderID;
-
-				client.UploadFileAsync(destinationAddress, "POST", filePath, state);
-			}
+			AddFiles(
+				new[] { filePath },
+				destinationFolderID,
+				false,
+				null,
+				null,
+				fileUploadCompleted,
+				userState);
 		}
-		
+
 
 		/// <summary>
-		/// Handler method which will be executed after file-upload operation completes
+		/// Adds files to the specified folder
 		/// </summary>
-		/// <param name="sender">The source of the event</param>
-		/// <param name="e">Argument that contains event data</param>
-		private void UploadFileFinished(object sender, UploadFileCompletedEventArgs e)
+		/// <param name="files">Paths to files to upload</param>
+		/// <param name="destinationFolderID">ID of the destination folder</param>
+		/// <returns>Operation status</returns>
+		public UploadFileResponse AddFiles(
+			string[] files, 
+			long destinationFolderID)
 		{
-			object[] state = (object[])e.UserState;
-			long folderID = (long)state[2];
-			object userState = state[1];
-			OperationFinished<UploadFileResponse> fileUploadFinishedHandler = (OperationFinished<UploadFileResponse>)state[0];
+			return AddFiles(files, destinationFolderID, false, null, null);
+		}
 
-			string result = Encoding.ASCII.GetString(e.Result);
+		/// <summary>
+		/// Adds files to the specified folder
+		/// </summary>
+		/// <param name="files">Paths to files to upload</param>
+		/// <param name="destinationFolderID">ID of the destination folder</param>
+		/// <param name="isFilesShared">Indicates if uploaded files should be marked as shared</param>
+		/// <param name="message">Text of the message to send in a notification email to all addresses in the <paramref name="emailsToNotify"/> list</param>
+		/// <param name="emailsToNotify">List of email addresses to notify about newly uploaded files</param>
+		/// <returns>Operation status</returns>
+		public UploadFileResponse AddFiles(
+			string[] files, 
+			long destinationFolderID, 
+			bool isFilesShared, 
+			string message, 
+			string[] emailsToNotify)
+		{
+			MultipartWebRequest request = new MultipartWebRequest(string.Format(UPLOAD_FILE_URI_TEMPLATE, _token, destinationFolderID), Proxy);
 
-			UploadFileResponse uploadFileResponse = MessageParser.Instance.ParseUploadResponseMessage(result);
+			string serverResponse = request.SubmitFiles(files, isFilesShared, message, emailsToNotify);
 
-			uploadFileResponse.FolderID = folderID;
-			uploadFileResponse.UserState = userState;
+			UploadFileResponse response = MessageParser.Instance.ParseUploadResponseMessage(serverResponse);
+			response.FolderID = destinationFolderID;
 
-			switch(uploadFileResponse.Status)
-			{
-				case UploadFileStatus.Successful:
-				case UploadFileStatus.ApplicationRestricted:
-				case UploadFileStatus.Failed:
-				case UploadFileStatus.NotLoggedID:
-					fileUploadFinishedHandler(uploadFileResponse, null);
-					break;
-				default:
-					fileUploadFinishedHandler(uploadFileResponse, e.Result);
-					break;
-			}
+			return response;
+		}
+
+		/// <summary>
+		/// Asynchronously adds files to the specified folder
+		/// </summary>
+		/// <param name="files">Paths to files to upload</param>
+		/// <param name="destinationFolderID">ID of the destination folder</param>
+		/// <param name="isFilesShared">Indicates if uploaded files should be marked as shared</param>
+		/// <param name="message">Text of the message to send in a notification email to all addresses in the <paramref name="emailsToNotify"/> list</param>
+		/// <param name="emailsToNotify">List of email addresses to notify about newly uploaded files</param>
+		/// <param name="filesUploadCompleted">Callback method which will be invoked after operation completes</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="filesUploadCompleted"/> is null</exception>
+		public void AddFiles(
+			string[] files, 
+			long destinationFolderID, 
+			bool isFilesShared, 
+			string message, 
+			string[] emailsToNotify,
+			OperationFinished<UploadFileResponse> filesUploadCompleted)
+		{
+			AddFiles(files, destinationFolderID, isFilesShared, message, emailsToNotify, filesUploadCompleted, null);
+		}
+
+		/// <summary>
+		/// Asynchronously adds files to the specified folder
+		/// </summary>
+		/// <param name="files">Paths to files to upload</param>
+		/// <param name="destinationFolderID">ID of the destination folder</param>
+		/// <param name="isFilesShared">Indicates if uploaded files should be marked as shared</param>
+		/// <param name="message">Text of the message to send in a notification email to all addresses in the <paramref name="emailsToNotify"/> list</param>
+		/// <param name="emailsToNotify">List of email addresses to notify about newly uploaded files</param>
+		/// <param name="filesUploadCompleted">Callback method which will be invoked after operation completes</param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="filesUploadCompleted"/> delegate as a part of response when the operation is completed</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="filesUploadCompleted"/> is null</exception>
+		public void AddFiles(
+			string[] files,
+			long destinationFolderID,
+			bool isFilesShared,
+			string message,
+			string[] emailsToNotify,
+			OperationFinished<UploadFileResponse> filesUploadCompleted,
+			object userState)
+		{
+			ThrowIfParameterIsNull(filesUploadCompleted, "filesUploadCompleted");
+
+			MultipartWebRequest request =
+				new MultipartWebRequest(string.Format(UPLOAD_FILE_URI_TEMPLATE, _token, destinationFolderID), Proxy);
+
+			object[] state = new[] {filesUploadCompleted, userState, destinationFolderID};
+
+			request.SubmitFiles(files, isFilesShared, message, emailsToNotify, UploadFilesFinished, state);
+		}
+
+
+		private void UploadFilesFinished(MultipartRequestUploadResponse uploadFilesResponse, object errorData)
+		{
+			object[] state = (object[]) uploadFilesResponse.UserState;
+			OperationFinished<UploadFileResponse> filesUploadCompleted = (OperationFinished<UploadFileResponse>) state[0];
+
+			UploadFileResponse response = errorData != null
+			           	?
+			           		MessageParser.Instance.ParseUploadResponseMessage(uploadFilesResponse.Status)
+			           	:
+			           		new UploadFileResponse();
+
+			response.FolderID = (int) state[2];
+			response.UserState = state[1];
+
+			filesUploadCompleted(response, errorData);
+		}
+		
+		#endregion
+
+		#region Overwrite file
+
+		/// <summary>
+		/// Overwrites existing file with the new one
+		/// </summary>
+		/// <param name="filePath">Path to new file</param>
+		/// <param name="fileID">ID of the old file to overwrite</param>
+		/// <returns>Operation status</returns>
+		public OverwriteFileResponse OverwriteFile(
+			string filePath, 
+			long fileID)
+		{
+			return OverwriteFile(filePath, fileID, false, null, null);
+		}
+
+		/// <summary>
+		/// Overwrites existing file with the new one
+		/// </summary>
+		/// <param name="filePath">Path to new file</param>
+		/// <param name="fileID">ID of the old file to overwrite</param>
+		/// <param name="isFileShared">Indicates if uploaded file should be marked as shared</param>
+		/// <param name="message">Text of the message to send in a notification email to all addresses in the <paramref name="emailsToNotify"/> list</param>
+		/// <param name="emailsToNotify">List of email addresses to notify about newly uploaded files</param>
+		/// <returns>Operation status</returns>
+		public OverwriteFileResponse OverwriteFile(
+			string filePath, 
+			long fileID, 
+			bool isFileShared, 
+			string message, 
+			string[] emailsToNotify)
+		{
+			MultipartWebRequest request = new MultipartWebRequest(string.Format(OVERWRITE_FILE_URI_TEMPLATE, _token, fileID), Proxy);
+
+			string response = request.SubmitFiles(new[] { filePath }, isFileShared, message, emailsToNotify);
+
+			return MessageParser.Instance.ParseOverwriteFileResponseMessage(response);
+		}
+
+		/// <summary>
+		/// Asynchronously overwrites existing file with the new one
+		/// </summary>
+		/// <param name="filePath">Path to new file</param>
+		/// <param name="fileID">ID of the old file to overwrite</param>
+		/// <param name="overwriteFileCompleted">Callback method which will be invoked after file-overwrite operation completes</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="overwriteFileCompleted"/> is null</exception>
+		public void OverwriteFile(
+			string filePath, 
+			long fileID,
+			OperationFinished<OverwriteFileResponse> overwriteFileCompleted)
+		{
+			OverwriteFile(filePath, fileID, false, null, null, overwriteFileCompleted, null);
+		}
+
+		/// <summary>
+		/// Asynchronously overwrites existing file with the new one
+		/// </summary>
+		/// <param name="filePath">Path to new file</param>
+		/// <param name="fileID">ID of the old file to overwrite</param>
+		/// <param name="isFileShared">Indicates if uploaded file should be marked as shared</param>
+		/// <param name="message">Text of the message to send in a notification email to all addresses in the <paramref name="emailsToNotify"/> list</param>
+		/// <param name="emailsToNotify">List of email addresses to notify about newly uploaded files</param>
+		/// <param name="overwriteFileCompleted">Callback method which will be invoked after file-overwrite operation completes</param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="overwriteFileCompleted"/> delegate as a part of response when the operation is completed</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="overwriteFileCompleted"/> is null</exception>
+		public void OverwriteFile(
+			string filePath,
+			long fileID,
+			bool isFileShared,
+			string message,
+			string[] emailsToNotify,
+			OperationFinished<OverwriteFileResponse> overwriteFileCompleted,
+			object userState)
+		{
+			ThrowIfParameterIsNull(overwriteFileCompleted, "overwriteFileCompleted");
+
+			MultipartWebRequest request =
+				new MultipartWebRequest(string.Format(OVERWRITE_FILE_URI_TEMPLATE, _token, fileID), Proxy);
+
+			object[] state = new[] { overwriteFileCompleted, userState, fileID };
+
+			request.SubmitFiles(new[] { filePath }, isFileShared, message, emailsToNotify, OverwriteFileFinished, state);
+		}
+
+		private void OverwriteFileFinished(MultipartRequestUploadResponse uploadFilesResponse, object errorData)
+		{
+			object[] state = (object[])uploadFilesResponse.UserState;
+			OperationFinished<OverwriteFileResponse> overwriteFileCompleted = (OperationFinished<OverwriteFileResponse>)state[0];
+
+			OverwriteFileResponse overwriteFileResponse = errorData != null
+						?
+							MessageParser.Instance.ParseOverwriteFileResponseMessage(uploadFilesResponse.Status)
+						:
+							new OverwriteFileResponse();
+
+			overwriteFileResponse.UserState = state[1];
+
+			overwriteFileCompleted(overwriteFileResponse, errorData);
 		}
 		
 		#endregion
 
 		#region Create folder
-		
+
 		/// <summary>
 		/// Creates folder
 		/// </summary>

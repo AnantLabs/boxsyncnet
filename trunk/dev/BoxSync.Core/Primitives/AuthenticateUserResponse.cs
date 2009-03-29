@@ -5,7 +5,7 @@ namespace BoxSync.Core.Primitives
 	/// <summary>
 	/// Represents response from 'AuthenticateUser' method
 	/// </summary>
-	public sealed class AuthenticateUserResponse : ResponseBase<AuthorizeStatus>
+	public sealed class AuthenticateUserResponse : ResponseBase<AuthenticationStatus>
 	{
 		/// <summary>
 		/// Authenticated user information

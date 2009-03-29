@@ -1,15 +1,23 @@
 ﻿namespace BoxSync.Core.Statuses
 {
-	internal enum AuthenticationStatus : byte
+	/// <summary>
+	/// Specifies authentication process statuses
+	/// </summary>
+	public enum AuthenticationStatus : byte
 	{
+		/// <summary>
+		/// Unknown status
+		/// </summary>
 		Unknown = 0,
-		ReadyToStartAuthentication = 1,
-		GetTicketFinishedSuccessful = 2,
-		GetTicketFinishedFailed = 3,
-		SubmitUserCredentialsFinishedSuccessful = 4,
-		SubmitUserCredentialsFailed = 5,
-		GetAuthenticationTokenFinishedSuccessful = 6,
-		GetAuthenticationTokenFailed = 7,
-		AuthenticationFinishedSuccessfuly = 8
+
+		/// <summary>
+		/// Authentication completed successfully
+		/// </summary>
+		Successful = 1,
+
+		/// <summary>
+		/// Authentication failed
+		/// </summary>
+		Failed = 2
 	}
 }
