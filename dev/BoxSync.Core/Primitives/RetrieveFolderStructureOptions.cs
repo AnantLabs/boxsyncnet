@@ -10,6 +10,10 @@ namespace BoxSync.Core.Primitives
 	[Flags]
 	public enum RetrieveFolderStructureOptions : byte
 	{
+		/// <summary>
+		/// Indicates that retrieve process should use default
+		/// options
+		/// </summary>
 		None = 0,
 
 		/// <summary>
@@ -37,11 +41,22 @@ namespace BoxSync.Core.Primitives
 	/// </summary>
 	public static class FolderStructureRetrieveModeExtensions
 	{
+		/// <summary>
+		/// Checks if <paramref name="folderStructureOptions"/> contains <paramref name="options"/>
+		/// </summary>
+		/// <param name="folderStructureOptions">Set of RetrieveFolderStructureOptions flags</param>
+		/// <param name="options">Single folder structure retrieve option</param>
+		/// <returns>True if set of flags <paramref name="folderStructureOptions"/> contains <paramref name="options"/></returns>
 		public static bool Contains(this RetrieveFolderStructureOptions folderStructureOptions, RetrieveFolderStructureOptions options)
 		{
 			return (folderStructureOptions & options) == options;
 		}
 
+		/// <summary>
+		/// Converts <paramref name="folderStructureOptions"/> to string array
+		/// </summary>
+		/// <param name="folderStructureOptions">Folder structure retrieve options</param>
+		/// <returns>String array representation of <paramref name="folderStructureOptions"/></returns>
 		public static string[] ToStringArray(this RetrieveFolderStructureOptions folderStructureOptions)
 		{
 			List<string> result = new List<string>(3);

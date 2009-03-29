@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoxManager.cs" />
+    <Compile Include="MultipartWebRequest.cs" />
     <Compile Include="MessageParser.cs" />
     <Compile Include="NotSupportedObjectTypeException.cs" />
     <Compile Include="Primitives\AddToMyBoxResponse.cs" />
@@ -63,6 +64,8 @@
     <Compile Include="Primitives\GetAuthenticationTokenResponse.cs" />
     <Compile Include="Primitives\LogoutResponse.cs" />
     <Compile Include="Primitives\MoveObjectResponse.cs" />
+    <Compile Include="Primitives\MultipartRequestUploadResponse.cs" />
+    <Compile Include="Primitives\OverwriteFileResponse.cs" />
     <Compile Include="Primitives\PublicShareResponse.cs" />
     <Compile Include="Primitives\PublicUnshareResponse.cs" />
     <Compile Include="Primitives\RenameObjectResponse.cs" />
@@ -72,9 +75,8 @@
     <Compile Include="Primitives\SetDescriptionResponse.cs" />
     <Compile Include="Primitives\VerifyRegistrationEmailResponse.cs" />
     <Compile Include="Statuses\AddToMyBoxStatus.cs" />
-    <Compile Include="Statuses\AuthorizeStatus.cs" />
-    <Compile Include="Statuses\CreateFolderStatus.cs" />
     <Compile Include="Statuses\AuthenticationStatus.cs" />
+    <Compile Include="Statuses\CreateFolderStatus.cs" />
     <Compile Include="Statuses\CopyObjectStatus.cs" />
     <Compile Include="Statuses\DeleteObjectStatus.cs" />
     <Compile Include="Statuses\ExportTagsStatus.cs" />
@@ -82,6 +84,8 @@
     <Compile Include="Primitives\ImageFile.cs" />
     <Compile Include="Statuses\LogoutStatus.cs" />
     <Compile Include="Statuses\MoveObjectStatus.cs" />
+    <Compile Include="Statuses\FileNewCopyStatus.cs" />
+    <Compile Include="Statuses\OverwriteFileStatus.cs" />
     <Compile Include="Statuses\PrivateShareStatus.cs" />
     <Compile Include="Statuses\PublicShareStatus.cs" />
     <Compile Include="Statuses\PublicUnshareStatus.cs" />

@@ -8,12 +8,12 @@ namespace BoxSync.Core
 	/// </summary>
 	internal static class StatusMessageParser
 	{
-		internal static AuthorizeStatus ParseAuthorizeStatus(string status)
+		internal static AuthenticationStatus ParseAuthorizeStatus(string status)
 		{
 			switch (status)
 			{
 				default:
-					return AuthorizeStatus.Unknown;
+					return AuthenticationStatus.Unknown;
 			}
 		}
 

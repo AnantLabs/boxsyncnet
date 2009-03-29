@@ -39,6 +39,11 @@ namespace BoxSync.Core
 			return ParseFolderElement(messageDocument.Root, materializeTag);
 		}
 
+		internal OverwriteFileResponse ParseOverwriteFileResponseMessage(string message)
+		{
+			return new OverwriteFileResponse();
+		}
+
 		internal UploadFileResponse ParseUploadResponseMessage(string message)
 		{
 			UploadFileResponse response = new UploadFileResponse();

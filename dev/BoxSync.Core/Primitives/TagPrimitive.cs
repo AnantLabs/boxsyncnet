@@ -14,6 +14,11 @@ namespace BoxSync.Core.Primitives
 		private string _text;
 		private readonly Expression<Func<long, TagPrimitive>> _materialize;
 
+		/// <summary>
+		/// Initializes tag object
+		/// </summary>
+		/// <param name="id">Tag ID</param>
+		/// <param name="materialize">Expression which will be executed to get full information about tag object</param>
 		public TagPrimitive(long id, Expression<Func<long, TagPrimitive>> materialize)
 		{
 			_id = id;
@@ -21,6 +26,11 @@ namespace BoxSync.Core.Primitives
 			_materialize = materialize;
 		}
 
+		/// <summary>
+		/// Initializes tag object
+		/// </summary>
+		/// <param name="id">Tag ID</param>
+		/// <param name="text">Tag text</param>
 		public TagPrimitive(long id, string text)
 		{
 			_id = id;

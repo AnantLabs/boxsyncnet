@@ -17,6 +17,11 @@
 		Successful = 1,
 
 		/// <summary>
+		/// An error occured during execution.
+		/// </summary>
+		Failed = 2,
+
+		/// <summary>
 		/// An invalid API key was provided, or the API key is restricted from calling this function.
 		/// Represents 'application_restricted' status string.
 		/// </summary>

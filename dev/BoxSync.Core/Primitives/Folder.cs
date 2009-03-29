@@ -13,6 +13,9 @@ namespace BoxSync.Core.Primitives
 	[DebuggerDisplay("ID = {ID}, Name = {Name}, Folders = {Folders.Count}, Files = {Files.Count}, Tags = {Tags.Count}, IsShared = {IsShared}")]
 	public sealed class Folder : FolderBase
 	{
+		/// <summary>
+		/// Initializes folder object
+		/// </summary>
 		public Folder()
 		{
 		}
