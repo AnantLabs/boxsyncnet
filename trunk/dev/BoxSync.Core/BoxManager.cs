@@ -273,7 +273,7 @@ namespace BoxSync.Core
 
 			GetAuthenticationTokenStatus status;
 
-			if(e.Error != null)
+			if(e.Error == null)
 			{
 				status = StatusMessageParser.ParseGetAuthenticationTokenStatus(e.Result);
 
