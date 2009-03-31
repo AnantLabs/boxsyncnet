@@ -41,13 +41,31 @@ namespace BoxSync.Core
 
 		internal OverwriteFileResponse ParseOverwriteFileResponseMessage(string message)
 		{
-			return new OverwriteFileResponse();
+			OverwriteFileResponse response = new OverwriteFileResponse();
+			XDocument doc = XDocument.Parse(message);
+
+			XElement filesElement = GetFilesElement(doc.Root);
+			XElement statusElement = GetStatusElement(doc.Root);
+
+			IEnumerable<XElement> fileElements = GetFileElements(filesElement);
+
+			File file;
+			UploadFileError error;
+			foreach (XElement fileElement in fileElements)
+			{
+				ParseFileElement(fileElement, out file, out error);
+
+				response.UploadedFileStatus.Add(file, error);
+			}
+
+			response.Status = ParseOverwriteFileStatus(statusElement.Value);
+
+			return response;
 		}
 
 		internal UploadFileResponse ParseUploadResponseMessage(string message)
 		{
 			UploadFileResponse response = new UploadFileResponse();
-
 			XDocument doc = XDocument.Parse(message);
 
 			XElement filesElement = GetFilesElement(doc.Root);
@@ -416,6 +434,31 @@ namespace BoxSync.Core
 			if ((((int)toReturn) & 127) > 0)
 			{
 				toReturn = toReturn ^ UserPermissionFlags.None;
+			}
+
+			return toReturn;
+		}
+		private OverwriteFileStatus ParseOverwriteFileStatus(string status)
+		{
+			OverwriteFileStatus toReturn;
+
+			switch (status)
+			{
+				case "upload_ok":
+					toReturn = OverwriteFileStatus.Successful;
+					break;
+				case "upload_some_files_failed":
+					toReturn = OverwriteFileStatus.Failed;
+					break;
+				case "not_logged_id":
+					toReturn = OverwriteFileStatus.NotLoggedID;
+					break;
+				case "application_restricted":
+					toReturn = OverwriteFileStatus.ApplicationRestricted;
+					break;
+				default:
+					toReturn = OverwriteFileStatus.Unknown;
+					break;
 			}
 
 			return toReturn;

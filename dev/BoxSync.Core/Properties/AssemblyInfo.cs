@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("BoxSync.NET is a .Net Library for accessing the Box.NET API")]
 [assembly: AssemblyCompany("Volodymyr Usarskyy")]
 [assembly: AssemblyProduct("BoxSync.Core")]
-[assembly: AssemblyCopyright("Copyright ©  2009")]
+[assembly: AssemblyCopyright("Volodymyr Usarskyy ©  2009")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -19,7 +19,11 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("3e7b454b-2ed0-456b-a793-648ba020cd03")]
 
-[assembly: AssemblyVersion("0.2.1.*")]
-[assembly: AssemblyFileVersion("0.2.1.*")]
+[assembly: AssemblyVersion("0.2.1.0")]
 [assembly: InternalsVisibleTo("BoxSync.Core.UnitTests")]
 [assembly: InternalsVisibleTo("BoxSync.Core.Extensions")]
+
+
+
+
+
