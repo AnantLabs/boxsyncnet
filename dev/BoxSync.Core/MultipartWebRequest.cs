@@ -142,6 +142,9 @@ namespace BoxSync.Core
 					resultStream.Write(buffer, 0, buffer.Length);
 				}
 
+				buffer = GetFormattedBoundary(true);
+				resultStream.Write(buffer, 0, buffer.Length);
+
 				resultStream.Flush();
 				buffer = resultStream.ToArray();
 			}
@@ -212,6 +215,9 @@ namespace BoxSync.Core
 					buffer = AssembleEmailsBlock(emailsToNotify);
 					resultStream.Write(buffer, 0, buffer.Length);
 				}
+
+				buffer = GetFormattedBoundary(true);
+				resultStream.Write(buffer, 0, buffer.Length);
 
 				resultStream.Flush();
 				buffer = resultStream.ToArray();

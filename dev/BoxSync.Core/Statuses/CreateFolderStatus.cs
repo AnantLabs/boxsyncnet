@@ -17,10 +17,9 @@
 		Successful = 1,
 
 		/// <summary>
-		/// The folder ID provided is not valid for the user's account.
-		/// Represents 'e_no_parent_folder' status string.
+		/// An error ocured during folder creation process
 		/// </summary>
-		NoParentFolder = 2,
+		Failed = 2,
 
 		/// <summary>
 		/// The user did not successfully authenticate.
@@ -32,6 +31,12 @@
 		/// An invalid API key was provided, or the API key is restricted from calling this function.
 		/// Represents 'application_restricted' status string.
 		/// </summary>
-		ApplicationRestricted = 4
+		ApplicationRestricted = 4,
+
+		/// <summary>
+		/// The folder ID provided is not valid for the user's account.
+		/// Represents 'e_no_parent_folder' status string.
+		/// </summary>
+		NoParentFolder = 5
 	}
 }

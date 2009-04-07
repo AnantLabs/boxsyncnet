@@ -25,6 +25,6 @@
 		/// An invalid API key was provided, or the API key is restricted from calling this function.
 		/// Represents 'application_restricted' status string.
 		/// </summary>
-		ApplicationRestricted = 3
+		ApplicationRestricted = 4
 	}
 }

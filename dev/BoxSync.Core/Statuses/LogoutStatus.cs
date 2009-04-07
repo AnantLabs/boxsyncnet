@@ -16,16 +16,21 @@
 		Successful = 1,
 
 		/// <summary>
+		/// An error ocured during logout process
+		/// </summary>
+		Failed = 2,
+
+		/// <summary>
 		/// The user is already no longer logged into Box for your application.
 		/// Represents 'not_logged_id' status string.
 		/// </summary>
-		NotLoggedID = 2,
+		NotLoggedID = 3,
 
 		/// <summary>
 		/// Provided authentication token is invalid.
 		/// Represents 'invalid_auth_token' status string.
 		/// </summary>
-		InvalidAuthToken = 3,
+		InvalidAuthToken = 5,
 
 		/// <summary>
 		/// An invalid API key was provided, or the API key is restricted from calling this function.

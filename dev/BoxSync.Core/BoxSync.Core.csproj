@@ -58,6 +58,7 @@
     <Compile Include="Primitives\CreateFolderResponse.cs" />
     <Compile Include="Primitives\DeleteObjectResponse.cs" />
     <Compile Include="Primitives\ExportTagsResponse.cs" />
+    <Compile Include="Primitives\FileNewCopyResponse.cs" />
     <Compile Include="Primitives\FolderBase.cs" />
     <Compile Include="Primitives\GetFolderStructureResponse.cs" />
     <Compile Include="Primitives\GetTicketResponse.cs" />

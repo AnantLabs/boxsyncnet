@@ -39,6 +39,18 @@ namespace BoxSync.Core
 			return ParseFolderElement(messageDocument.Root, materializeTag);
 		}
 
+		internal FileNewCopyResponse ParseFileNewCopyResponseMessage(string message)
+		{
+			FileNewCopyResponse response = new FileNewCopyResponse();
+			XDocument doc = XDocument.Parse(message);
+
+			XElement statusElement = GetStatusElement(doc.Root);
+
+			response.Status = ParseFileNewCopyStatus(statusElement.Value);
+
+			return response;
+		}
+
 		internal OverwriteFileResponse ParseOverwriteFileResponseMessage(string message)
 		{
 			OverwriteFileResponse response = new OverwriteFileResponse();
@@ -311,12 +323,8 @@ namespace BoxSync.Core
 			XAttribute errorAttribute = fileElement.Attribute(XName.Get("error"));
 
 			file = ParseFileElement(fileElement);
-			error = UploadFileError.Unknown;
-
-			if (errorAttribute != null)
-			{
-				error = ParseUploadFileError(errorAttribute.Value);
-			}
+			
+			error = errorAttribute != null ? ParseUploadFileError(errorAttribute.Value) : UploadFileError.None;
 		}
 
 		private TagPrimitive ParseTagElement(XElement tagElement, Expression<Func<long, TagPrimitive>> materializeTag)
@@ -434,6 +442,31 @@ namespace BoxSync.Core
 			if ((((int)toReturn) & 127) > 0)
 			{
 				toReturn = toReturn ^ UserPermissionFlags.None;
+			}
+
+			return toReturn;
+		}
+		private FileNewCopyStatus ParseFileNewCopyStatus(string status)
+		{
+			FileNewCopyStatus toReturn;
+
+			switch (status)
+			{
+				case "upload_ok":
+					toReturn = FileNewCopyStatus.Successful;
+					break;
+				case "upload_some_files_failed":
+					toReturn = FileNewCopyStatus.Failed;
+					break;
+				case "not_logged_id":
+					toReturn = FileNewCopyStatus.NotLoggedID;
+					break;
+				case "application_restricted":
+					toReturn = FileNewCopyStatus.ApplicationRestricted;
+					break;
+				default:
+					toReturn = FileNewCopyStatus.Unknown;
+					break;
 			}
 
 			return toReturn;

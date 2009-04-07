@@ -17,21 +17,26 @@
 		Successful = 1,
 
 		/// <summary>
+		/// An error ocured during operation execution
+		/// </summary>
+		Failed = 2,
+
+		/// <summary>
 		/// The user did not successfully authenticate.
 		/// Represents 'not_logged_id' status string.
 		/// </summary>
-		NotLoggedID = 2,
-
-		/// <summary>
-		/// Folder ID and/or method params are invalid.
-		/// Represents 'e_folder_id' status string
-		/// </summary>
-		FolderIDError = 3,
+		NotLoggedID = 3,
 
 		/// <summary>
 		/// An invalid API key was provided, or the API key is restricted from calling this function.
 		/// Represents 'application_restricted' status string.
 		/// </summary>
-		ApplicationRestricted = 4
+		ApplicationRestricted = 4,
+
+		/// <summary>
+		/// Folder ID and/or method params are invalid.
+		/// Represents 'e_folder_id' status string
+		/// </summary>
+		FolderIDError = 5
 	}
 }
