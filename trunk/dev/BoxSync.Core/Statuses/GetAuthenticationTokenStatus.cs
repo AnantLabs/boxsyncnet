@@ -17,15 +17,15 @@
 		Successful = 1,
 
 		/// <summary>
+		/// Represents 'get_auth_token_error' status string
+		/// </summary>
+		Failed = 2,
+
+		/// <summary>
 		/// The user did not successfully authenticate.
 		/// Represents 'not_logged_id' status string.
 		/// </summary>
-		NotLoggedID = 2,
-
-		/// <summary>
-		/// Represents 'get_auth_token_error' status string
-		/// </summary>
-		Failed = 3,
+		NotLoggedID = 3,
 
 		/// <summary>
 		/// An invalid API key was provided, or the API key is restricted from calling this function.

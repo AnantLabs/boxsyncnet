@@ -24,6 +24,11 @@
 		/// <summary>
 		/// Access to account is denied
 		/// </summary>
-		AccessDenied = 3
+		AccessDenied = 3,
+
+		/// <summary>
+		/// No errors
+		/// </summary>
+		None = 4
 	}
 }
