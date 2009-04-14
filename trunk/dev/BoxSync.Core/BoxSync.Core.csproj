@@ -111,6 +111,7 @@
     <Compile Include="ServiceReference\boxnetService.cs" />
     <Compile Include="StatusMessageParser.cs" />
     <Compile Include="TagPrimitiveCollection.cs" />
+    <Compile Include="UnknownOperationStatusException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

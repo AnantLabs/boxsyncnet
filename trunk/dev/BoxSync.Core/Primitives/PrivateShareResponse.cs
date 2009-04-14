@@ -6,24 +6,8 @@ namespace BoxSync.Core.Primitives
 	/// <summary>
 	/// Represents response from 'PrivateShare' method
 	/// </summary>
-	public sealed class PrivateShareResponse
+	public sealed class PrivateShareResponse : ResponseBase<PrivateShareStatus>
 	{
-		/// <summary>
-		/// Final operation status
-		/// </summary>
-		public PrivateShareStatus Status
-		{
-			get; 
-			internal set;
-		}
-
-		/// <summary>
-		/// User object
-		/// </summary>
-		public object UserState
-		{
-			get;
-			internal set;
-		}
+		
 	}
 }

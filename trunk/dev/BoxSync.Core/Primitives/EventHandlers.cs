@@ -18,8 +18,7 @@
 	/// </summary>
 	/// <typeparam name="TResponseType">Type of operation status</typeparam>
 	/// <param name="response">Response information</param>
-	/// <param name="errorData">Error data</param>
-	public delegate void OperationFinished<TResponseType>(TResponseType response, object errorData);
+	public delegate void OperationFinished<TResponseType>(TResponseType response);
 
 	/// <summary>
 	/// Represents the callback method to invoke when operation is finished
@@ -28,8 +27,7 @@
 	/// <typeparam name="TResultType">Type of object which is returned by the operation as a execution result</typeparam>
 	/// <param name="status">Operation status</param>
 	/// <param name="result">Execution result</param>
-	/// <param name="errorData">Error data</param>
-	internal delegate void OperationFinished<TStatusType, TResultType>(TStatusType status, TResultType result, object errorData);
+	internal delegate void OperationFinished<TStatusType, TResultType>(TStatusType status, TResultType result);
 
 	/// <summary>
 	/// Defines helper methods to work with delegates of UpdateStatus type

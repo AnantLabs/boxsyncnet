@@ -3,7 +3,6 @@ using System.Net;
 using System.Threading;
 
 using BoxSync.Core.Primitives;
-using BoxSync.Core.ServiceReference;
 using BoxSync.Core.Statuses;
 
 
@@ -116,7 +115,7 @@ namespace BoxSync.Core.Extensions
 
 		}
 
-		private static void GetTicket(GetTicketResponse result, object errorData)
+		private static void GetTicket(GetTicketResponse result)
 		{
 			AuthenticationInformation authenticationInformation = (AuthenticationInformation)result.UserState;
 
@@ -133,7 +132,7 @@ namespace BoxSync.Core.Extensions
 			authenticationInformation.CurrentOperationCompleted(authenticationInformation);
 		}
 
-		private static void GetAuthenticationTokenFinished(GetAuthenticationTokenResponse result, object errorData)
+		private static void GetAuthenticationTokenFinished(GetAuthenticationTokenResponse result)
 		{
 			AuthenticationInformation authenticationInformation = (AuthenticationInformation)result.UserState;
 
