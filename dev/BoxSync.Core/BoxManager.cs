@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Net;
@@ -10,6 +11,7 @@ using BoxSync.Core.ServiceReference;
 using BoxSync.Core.Statuses;
 
 using ICSharpCode.SharpZipLib.Zip;
+using File=BoxSync.Core.Primitives.File;
 
 
 namespace BoxSync.Core
@@ -166,39 +168,38 @@ namespace BoxSync.Core
 
 		private void AuthorizationFinished(object sender, authorizationCompletedEventArgs e)
 		{
-			object[] state = (object[])e.UserState;
+			object[] state = (object[]) e.UserState;
 
 			OperationFinished<AuthenticateUserResponse> authenticateUserCompleted =
-				(OperationFinished<AuthenticateUserResponse>)state[0];
+				(OperationFinished<AuthenticateUserResponse>) state[0];
 
-			AuthenticationStatus status = StatusMessageParser.ParseAuthorizeStatus(e.Result);
-			AuthenticateUserResponse response;
+			AuthenticateUserResponse response = new AuthenticateUserResponse
+			                                    	{
+			                                    		UserState = state[1]
+			                                    	};
 
-			switch (status)
+			if (e.Error != null)
+			{
+				response.Status = AuthenticationStatus.Failed;
+				response.Error = e.Error;
+			}
+			else
+			{
+				response.Status = StatusMessageParser.ParseAuthorizeStatus(e.Result);
+			}
+
+			switch (response.Status)
 			{
 				case AuthenticationStatus.Successful:
-					User authenticatedUser = new User(e.user);
-					response = new AuthenticateUserResponse
-					           	{
-					           		AuthenticatedUser = authenticatedUser,
-					           		Status = status,
-					           		Token = e.auth_token,
-					           		UserState = state[1]
-					           	};
-					authenticateUserCompleted(response, null);
+					response.AuthenticatedUser = new User(e.user);
+					response.Token = e.auth_token;
 					break;
-				case AuthenticationStatus.Failed:
-					response = new AuthenticateUserResponse
-					           	{
-									Status = status,
-					           		UserState = state[1]
-					           	};
-					authenticateUserCompleted(response, null);
-					break;
-				default:
-					authenticateUserCompleted(null, e.Result);
+				case AuthenticationStatus.Unknown:
+					response.Error = new UnknownOperationStatusException(e.Result);
 					break;
 			}
+
+			authenticateUserCompleted(response);
 		}
 
 		#endregion
@@ -266,54 +267,45 @@ namespace BoxSync.Core
 
 		private void GetAuthenticationTokenFinished(object sender, get_auth_tokenCompletedEventArgs e)
 		{
-			object[] state = (object[])e.UserState;
-			object errorData = null;
-			
+			object[] state = (object[]) e.UserState;
+			Exception error = null;
+
 			OperationFinished<GetAuthenticationTokenResponse> getAuthenticationTokenCompleted =
-				(OperationFinished<GetAuthenticationTokenResponse>)state[0];
+				(OperationFinished<GetAuthenticationTokenResponse>) state[0];
 
 			GetAuthenticationTokenStatus status;
 
-			if(e.Error == null)
+			if (e.Error == null)
 			{
 				status = StatusMessageParser.ParseGetAuthenticationTokenStatus(e.Result);
 
 				if (status == GetAuthenticationTokenStatus.Unknown)
 				{
-					errorData = e.Result;
+					error = new UnknownOperationStatusException(e.Result);
 				}
 			}
 			else
 			{
 				status = GetAuthenticationTokenStatus.Failed;
-				errorData = e.Error;
+				error = e.Error;
 			}
 
 			GetAuthenticationTokenResponse response = new GetAuthenticationTokenResponse
 			                                          	{
 			                                          		Status = status,
-			                                          		UserState = state[1]
+			                                          		UserState = state[1],
+			                                          		Error = error
 			                                          	};
 
-			switch (response.Status)
+			if (response.Status == GetAuthenticationTokenStatus.Successful)
 			{
-				case GetAuthenticationTokenStatus.Successful:
-					User authenticatedUser = new User(e.user);
-					response.AuthenticatedUser = authenticatedUser;
-					response.AuthenticationToken = e.auth_token;
-					_token = e.auth_token;
-
-					getAuthenticationTokenCompleted(response, null);
-					break;
-				case GetAuthenticationTokenStatus.NotLoggedID:
-				case GetAuthenticationTokenStatus.ApplicationRestricted:
-				case GetAuthenticationTokenStatus.Failed:
-					getAuthenticationTokenCompleted(response, errorData);
-					break;
-				default:
-					getAuthenticationTokenCompleted(response, e.Result);
-					break;
+				User authenticatedUser = new User(e.user);
+				response.AuthenticatedUser = authenticatedUser;
+				response.AuthenticationToken = e.auth_token;
+				_token = e.auth_token;
 			}
+
+			getAuthenticationTokenCompleted(response);
 		}
 
 		#endregion
@@ -369,33 +361,36 @@ namespace BoxSync.Core
 			object[] data = (object[]) e.UserState;
 			OperationFinished<GetTicketResponse> getAuthenticationTicketCompleted = (OperationFinished<GetTicketResponse>)data[0];
 			GetTicketResponse response;
-			object errorData;
-
+			
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new GetTicketResponse
 				           	{
 				           		Status = GetTicketStatus.Failed,
-				           		UserState = data[1]
+				           		UserState = data[1],
+								Error = e.Error
 				           	};
 			}
 			else
 			{
 				GetTicketStatus status = StatusMessageParser.ParseGetTicketStatus(e.Result);
 
-				errorData = status == GetTicketStatus.Unknown ? e.Result : null;
+				Exception error = status == GetTicketStatus.Unknown
+				                  	?
+				                  		new UnknownOperationStatusException(e.Result)
+				                  	:
+				                  		null;
 
 				response = new GetTicketResponse
 				           	{
 				           		Status = status,
 				           		Ticket = e.ticket,
-				           		UserState = data[1]
+				           		UserState = data[1],
+								Error = error
 				           	};
 			}
 
-			getAuthenticationTicketCompleted(response, errorData);
+			getAuthenticationTicketCompleted(response);
 		}
 
 		#endregion
@@ -486,10 +481,23 @@ namespace BoxSync.Core
 			string[] emailsToNotify)
 		{
 			MultipartWebRequest request = new MultipartWebRequest(string.Format(UPLOAD_FILE_URI_TEMPLATE, _token, destinationFolderID), Proxy);
+			UploadFileResponse response;
+			
+			try
+			{
+				string serverResponse = request.SubmitFiles(files, isFilesShared, message, emailsToNotify);
+				response = MessageParser.Instance.ParseUploadResponseMessage(serverResponse);
+			}
+			catch (Exception ex)
+			{
+				response = new UploadFileResponse
+				           	{
+				           		Error = ex,
+				           		Status = UploadFileStatus.Failed,
+				           		UploadedFileStatus = new Dictionary<File, UploadFileError>()
+				           	};
+			}
 
-			string serverResponse = request.SubmitFiles(files, isFilesShared, message, emailsToNotify);
-
-			UploadFileResponse response = MessageParser.Instance.ParseUploadResponseMessage(serverResponse);
 			response.FolderID = destinationFolderID;
 
 			return response;
@@ -548,23 +556,24 @@ namespace BoxSync.Core
 		}
 
 
-		private void UploadFilesFinished(MultipartRequestUploadResponse uploadFilesResponse, object errorData)
+		private void UploadFilesFinished(MultipartRequestUploadResponse uploadFilesResponse)
 		{
 			object[] state = (object[]) uploadFilesResponse.UserState;
 			OperationFinished<UploadFileResponse> filesUploadCompleted = (OperationFinished<UploadFileResponse>) state[0];
 
-			UploadFileResponse response = errorData != null
-			           	?
-			           		MessageParser.Instance.ParseUploadResponseMessage(uploadFilesResponse.Status)
-			           	:
-			           		new UploadFileResponse();
+			UploadFileResponse response = uploadFilesResponse.Error == null
+			                              	?
+			                              		MessageParser.Instance.ParseUploadResponseMessage(uploadFilesResponse.Status)
+			                              	:
+			                              		new UploadFileResponse();
 
-			response.FolderID = (int) state[2];
+			response.FolderID = (long) state[2];
 			response.UserState = state[1];
+			response.Error = uploadFilesResponse.Error;
 
-			filesUploadCompleted(response, errorData);
+			filesUploadCompleted(response);
 		}
-		
+
 		#endregion
 
 		#region Overwrite file
@@ -599,10 +608,24 @@ namespace BoxSync.Core
 			string[] emailsToNotify)
 		{
 			MultipartWebRequest request = new MultipartWebRequest(string.Format(OVERWRITE_FILE_URI_TEMPLATE, _token, fileID), Proxy);
+			OverwriteFileResponse response;
 
-			string response = request.SubmitFiles(new[] { filePath }, isFileShared, message, emailsToNotify);
+			try
+			{
+				string serverResponse = request.SubmitFiles(new[] { filePath }, isFileShared, message, emailsToNotify);
+				response = MessageParser.Instance.ParseOverwriteFileResponseMessage(serverResponse);
+			}
+			catch (Exception ex)
+			{
+				response = new OverwriteFileResponse
+				           	{
+				           		Error = ex,
+				           		Status = OverwriteFileStatus.Failed,
+				           		UploadedFileStatus = new Dictionary<File, UploadFileError>()
+				           	};
+			}
 
-			return MessageParser.Instance.ParseOverwriteFileResponseMessage(response);
+			return response;
 		}
 
 		/// <summary>
@@ -651,22 +674,24 @@ namespace BoxSync.Core
 			request.SubmitFiles(new[] { filePath }, isFileShared, message, emailsToNotify, OverwriteFileFinished, state);
 		}
 
-		private void OverwriteFileFinished(MultipartRequestUploadResponse uploadFilesResponse, object errorData)
+		private void OverwriteFileFinished(MultipartRequestUploadResponse uploadFilesResponse)
 		{
-			object[] state = (object[])uploadFilesResponse.UserState;
-			OperationFinished<OverwriteFileResponse> overwriteFileCompleted = (OperationFinished<OverwriteFileResponse>)state[0];
+			object[] state = (object[]) uploadFilesResponse.UserState;
+			OperationFinished<OverwriteFileResponse> overwriteFileCompleted = (OperationFinished<OverwriteFileResponse>) state[0];
 
-			OverwriteFileResponse overwriteFileResponse = errorData != null
-						?
-							MessageParser.Instance.ParseOverwriteFileResponseMessage(uploadFilesResponse.Status)
-						:
-							new OverwriteFileResponse();
+			OverwriteFileResponse overwriteFileResponse = uploadFilesResponse.Error == null
+			                                              	?
+			                                              		MessageParser.Instance.ParseOverwriteFileResponseMessage(
+			                                              			uploadFilesResponse.Status)
+			                                              	:
+			                                              		new OverwriteFileResponse();
 
 			overwriteFileResponse.UserState = state[1];
+			overwriteFileResponse.Error = uploadFilesResponse.Error;
 
-			overwriteFileCompleted(overwriteFileResponse, errorData);
+			overwriteFileCompleted(overwriteFileResponse);
 		}
-		
+
 		#endregion
 
 		#region FileNewCopy
@@ -703,12 +728,24 @@ namespace BoxSync.Core
 			string[] emailsToNotify)
 		{
 			string destinationUrl = string.Format(FILE_NEW_COPY_URI_TEMPLATE, _token, fileID);
-
 			MultipartWebRequest request = new MultipartWebRequest(destinationUrl, Proxy);
+			FileNewCopyResponse response;
 
-			string response = request.SubmitFiles(new[] {filePath}, isFileShared, message, emailsToNotify);
+			try
+			{
+				string serverResponse = request.SubmitFiles(new[] { filePath }, isFileShared, message, emailsToNotify);
+				response = MessageParser.Instance.ParseFileNewCopyResponseMessage(serverResponse);
+			}
+			catch (Exception ex)
+			{
+				response = new FileNewCopyResponse
+				           	{
+				           		Error = ex,
+				           		Status = FileNewCopyStatus.Failed
+				           	};
+			}
 
-			return MessageParser.Instance.ParseFileNewCopyResponseMessage(response);
+			return response;
 		}
 
 		/// <summary>
@@ -760,20 +797,22 @@ namespace BoxSync.Core
 			request.SubmitFiles(new[] { filePath }, isFileShared, message, emailsToNotify, FileNewCopyFinished, state);
 		}
 
-		private void FileNewCopyFinished(MultipartRequestUploadResponse uploadFilesResponse, object errorData)
+		private void FileNewCopyFinished(MultipartRequestUploadResponse uploadFilesResponse)
 		{
-			object[] state = (object[])uploadFilesResponse.UserState;
-			OperationFinished<FileNewCopyResponse> fileNewCopyCompleted = (OperationFinished<FileNewCopyResponse>)state[0];
+			object[] state = (object[]) uploadFilesResponse.UserState;
+			OperationFinished<FileNewCopyResponse> fileNewCopyCompleted = (OperationFinished<FileNewCopyResponse>) state[0];
 
-			FileNewCopyResponse fileNewCopyResponse = errorData != null
-						?
-							MessageParser.Instance.ParseFileNewCopyResponseMessage(uploadFilesResponse.Status)
-						:
-							new FileNewCopyResponse();
+			FileNewCopyResponse fileNewCopyResponse = uploadFilesResponse.Error == null
+			                                          	?
+			                                          		MessageParser.Instance.ParseFileNewCopyResponseMessage(
+			                                          			uploadFilesResponse.Status)
+			                                          	:
+			                                          		new FileNewCopyResponse();
 
 			fileNewCopyResponse.UserState = state[1];
+			fileNewCopyResponse.Error = uploadFilesResponse.Error;
 
-			fileNewCopyCompleted(fileNewCopyResponse, errorData);
+			fileNewCopyCompleted(fileNewCopyResponse);
 		}
 
 		#endregion
@@ -853,17 +892,15 @@ namespace BoxSync.Core
 			OperationFinished<CreateFolderResponse> createFolderFinishedHandler =
 				(OperationFinished<CreateFolderResponse>) state[0];
 			CreateFolderResponse response;
-			object errorData;
 
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new CreateFolderResponse
-				           	{
-				           		Status = CreateFolderStatus.Failed,
-				           		UserState = state[1]
-				           	};
+							{
+								Status = CreateFolderStatus.Failed,
+								UserState = state[1],
+								Error = e.Error
+							};
 			}
 			else
 			{
@@ -878,10 +915,14 @@ namespace BoxSync.Core
 					response.Folder = new FolderBase(e.folder);
 				}
 
-				errorData = response.Status == CreateFolderStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == CreateFolderStatus.Unknown
+				                  	?
+				                  		new UnknownOperationStatusException(e.Result)
+				                  	:
+				                  		null;
 			}
 
-			createFolderFinishedHandler(response, errorData);
+			createFolderFinishedHandler(response);
 		}
 
 		#endregion
@@ -950,16 +991,14 @@ namespace BoxSync.Core
 			OperationFinished<DeleteObjectResponse> deleteObjectCompleted =
 				(OperationFinished<DeleteObjectResponse>)state[0];
 			DeleteObjectResponse response;
-			object errorData;
 
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new DeleteObjectResponse
 							{
 								Status = DeleteObjectStatus.Failed,
-								UserState = state[1]
+								UserState = state[1],
+								Error = e.Error
 							};
 			}
 			else
@@ -970,10 +1009,14 @@ namespace BoxSync.Core
 				           		UserState = state[1]
 				           	};
 
-				errorData = response.Status == DeleteObjectStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == DeleteObjectStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
 			}
 
-			deleteObjectCompleted(response, errorData);
+			deleteObjectCompleted(response);
 		}
 		
 		#endregion
@@ -1111,16 +1154,14 @@ namespace BoxSync.Core
 			RetrieveFolderStructureOptions retrieveOptions = (RetrieveFolderStructureOptions)state[1];
 			OperationFinished<GetFolderStructureResponse> getFolderStructureCompleted = (OperationFinished<GetFolderStructureResponse>)state[0];
 			GetFolderStructureResponse response;
-			object errorData = null;
 
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new GetFolderStructureResponse
 							{
 								Status = GetAccountTreeStatus.Failed,
-								UserState = state[2]
+								UserState = state[2],
+								Error = e.Error
 							};
 			}
 			else
@@ -1152,12 +1193,12 @@ namespace BoxSync.Core
 				}
 				else if (response.Status == GetAccountTreeStatus.Unknown)
 				{
-					errorData = e.Result;
+					response.Error = new UnknownOperationStatusException(e.Result);
 				}
 
 			}
 
-			getFolderStructureCompleted(response, errorData);
+			getFolderStructureCompleted(response);
 		}
 		
 		#endregion
@@ -1216,32 +1257,38 @@ namespace BoxSync.Core
 		{
 			object[] state = (object[]) e.UserState;
 			OperationFinished<ExportTagsResponse> exportTagsFinishedHandler =
-				(OperationFinished<ExportTagsResponse>)state[0];
-
+				(OperationFinished<ExportTagsResponse>) state[0];
 			ExportTagsResponse response = new ExportTagsResponse
 			                              	{
-			                              		Status = StatusMessageParser.ParseExportTagStatus(e.Result),
-												UserState = state[1]
+			                              		UserState = state[1]
 			                              	};
 
-			switch (response.Status)
+			if (e.Error != null)
 			{
-				case ExportTagsStatus.Successful:
-					response.TagsList = MessageParser.Instance.ParseExportTagsMessage(Encoding.ASCII.GetString(e.tag_xml));
-
-					exportTagsFinishedHandler(response, null);
-					break;
-				case ExportTagsStatus.ApplicationRestricted:
-				case ExportTagsStatus.NotLoggedID:
-					response.TagsList = new TagPrimitiveCollection();
-					exportTagsFinishedHandler(response, null);
-					break;
-				default:
-					exportTagsFinishedHandler(response, e.Result);
-					break;
+				response.Error = e.Error;
 			}
+			else
+			{
+				response.Status = StatusMessageParser.ParseExportTagStatus(e.Result);
+
+				switch (response.Status)
+				{
+					case ExportTagsStatus.Successful:
+						response.TagsList = MessageParser.Instance.ParseExportTagsMessage(Encoding.ASCII.GetString(e.tag_xml));
+						break;
+					case ExportTagsStatus.Unknown:
+						response.TagsList = new TagPrimitiveCollection();
+						response.Error = new UnknownOperationStatusException(e.Result);
+						break;
+					default:
+						response.TagsList = new TagPrimitiveCollection();
+						break;
+				}
+			}
+
+			exportTagsFinishedHandler(response);
 		}
-		
+
 		#endregion
 
 		#region GetTag
@@ -1251,7 +1298,7 @@ namespace BoxSync.Core
 			ManualResetEvent wait = new ManualResetEvent(false);
 			TagPrimitive result = new TagPrimitive();
 
-			OperationFinished<ExportTagsStatus, TagPrimitive> getTagFinishedHandler = (status, tag, errorData) =>
+			OperationFinished<ExportTagsStatus, TagPrimitive> getTagFinishedHandler = (status, tag) =>
 			                                                                          	{
 			                                                                          		result = tag;
 			                                                                          		wait.Reset();
@@ -1267,18 +1314,18 @@ namespace BoxSync.Core
 			if (_tagCollection == null || _tagCollection.IsEmpty)
 			{
 				OperationFinished<ExportTagsResponse> exportTagsFinishedHandler =
-					(response, errorData) =>
+					(response) =>
 						{
 							_tagCollection = response.TagsList;
 
-							getTagFinishedHandler(response.Status, response.TagsList.GetTag(id), errorData);
+							getTagFinishedHandler(response.Status, response.TagsList.GetTag(id));
 						};
 
 				ExportTags(exportTagsFinishedHandler);
 			}
 			else
 			{
-				getTagFinishedHandler(ExportTagsStatus.Successful, _tagCollection.GetTag(id), null);
+				getTagFinishedHandler(ExportTagsStatus.Successful, _tagCollection.GetTag(id));
 			}
 		}
 
@@ -1357,16 +1404,14 @@ namespace BoxSync.Core
 			OperationFinished<SetDescriptionResponse> setDescriptionFinishedHandler =
 				(OperationFinished<SetDescriptionResponse>)state[0];
 			SetDescriptionResponse response;
-			object errorData;
-
+			
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new SetDescriptionResponse
 							{
 								Status = SetDescriptionStatus.Failed,
-								UserState = state[1]
+								UserState = state[1],
+								Error = e.Error
 							};
 			}
 			else
@@ -1377,10 +1422,14 @@ namespace BoxSync.Core
 				           		UserState = state[1]
 				           	};
 
-				errorData = response.Status == SetDescriptionStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == SetDescriptionStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
 			}
 
-			setDescriptionFinishedHandler(response, errorData);
+			setDescriptionFinishedHandler(response);
 		}
 
 		#endregion
@@ -1461,16 +1510,14 @@ namespace BoxSync.Core
 			object[] state = (object[])e.UserState;
 			OperationFinished<RenameObjectResponse> renameObjectFinishedHandler = (OperationFinished<RenameObjectResponse>)state[0];
 			RenameObjectResponse response;
-			object errorData;
-
+			
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new RenameObjectResponse
 				           	{
 								Status = RenameObjectStatus.Failed,
-				           		UserState = state[1]
+				           		UserState = state[1],
+								Error = e.Error
 				           	};
 			}
 			else
@@ -1481,10 +1528,14 @@ namespace BoxSync.Core
 								UserState = state[1]
 							};
 
-				errorData = response.Status == RenameObjectStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == RenameObjectStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
 			}
 
-			renameObjectFinishedHandler(response, errorData);
+			renameObjectFinishedHandler(response);
 		}
 		
 		#endregion
@@ -1558,19 +1609,17 @@ namespace BoxSync.Core
 		private void MoveObjectFinished(object sender, moveCompletedEventArgs e)
 		{
 			object[] state = (object[]) e.UserState;
-			OperationFinished<MoveObjectResponse> moveObjectFinishedHandler = (OperationFinished<MoveObjectResponse>)state[0];
+			OperationFinished<MoveObjectResponse> moveObjectFinishedHandler = (OperationFinished<MoveObjectResponse>) state[0];
 			MoveObjectResponse response;
-			object errorData;
 
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new MoveObjectResponse
-							{
-								Status = MoveObjectStatus.Failed,
-								UserState = state[1]
-							};
+				           	{
+				           		Status = MoveObjectStatus.Failed,
+				           		UserState = state[1],
+				           		Error = e.Error
+				           	};
 			}
 			else
 			{
@@ -1580,12 +1629,16 @@ namespace BoxSync.Core
 				           		UserState = state[1]
 				           	};
 
-				errorData = response.Status == MoveObjectStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == MoveObjectStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
 			}
 
-			moveObjectFinishedHandler(response, errorData);
+			moveObjectFinishedHandler(response);
 		}
-		
+
 		#endregion
 
 		#region Logout
@@ -1635,16 +1688,14 @@ namespace BoxSync.Core
 			object[] state = (object[])e.UserState;
 			OperationFinished<LogoutResponse> logoutFinishedHandler = (OperationFinished<LogoutResponse>)state[0];
 			LogoutResponse response;
-			object errorData;
-
+			
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new LogoutResponse
 							{
 								Status = LogoutStatus.Failed,
-								UserState = state[1]
+								UserState = state[1],
+								Error = e.Error
 							};
 			}
 			else
@@ -1655,10 +1706,14 @@ namespace BoxSync.Core
 				           		UserState = state[1]
 				           	};
 
-				errorData = response.Status == LogoutStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == LogoutStatus.Unknown
+				        	?
+				        		new UnknownOperationStatusException(e.Result)
+				        	:
+				        		null;
 			}
 
-			logoutFinishedHandler(response, errorData);
+			logoutFinishedHandler(response);
 		}
 		#endregion
 
@@ -1729,16 +1784,14 @@ namespace BoxSync.Core
 			OperationFinished<RegisterNewUserResponse> registerNewUserFinishedHandler =
 				(OperationFinished<RegisterNewUserResponse>) state[0];
 			RegisterNewUserResponse response;
-			object errorData;
 
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new RegisterNewUserResponse
 							{
 								Status = RegisterNewUserStatus.Failed,
-								UserState = state[1]
+								UserState = state[1],
+								Error = e.Error
 							};
 			}
 			else
@@ -1751,10 +1804,14 @@ namespace BoxSync.Core
 				           		UserState = state[1]
 				           	};
 
-				errorData = response.Status == RegisterNewUserStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == RegisterNewUserStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
 			}
 
-			registerNewUserFinishedHandler(response, errorData);
+			registerNewUserFinishedHandler(response);
 		}
 
 		#endregion
@@ -1816,16 +1873,14 @@ namespace BoxSync.Core
 			OperationFinished<VerifyRegistrationEmailResponse> verifyRegistrationEmailFinishedHandler =
 				(OperationFinished<VerifyRegistrationEmailResponse>) state[0];
 			VerifyRegistrationEmailResponse response;
-			object errorData;
 
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new VerifyRegistrationEmailResponse
 							{
 								Status = VerifyRegistrationEmailStatus.Failed,
-								UserState = state[1]
+								UserState = state[1],
+								Error = e.Error
 							};
 			}
 			else
@@ -1837,11 +1892,15 @@ namespace BoxSync.Core
 				           		UserState = state[1]
 				           	};
 
-				errorData = response.Status == VerifyRegistrationEmailStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == VerifyRegistrationEmailStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
 			}
 
 
-			verifyRegistrationEmailFinishedHandler(response, errorData);
+			verifyRegistrationEmailFinishedHandler(response);
 		}
 
 		#endregion
@@ -1978,30 +2037,32 @@ namespace BoxSync.Core
 			object[] state = (object[]) e.UserState;
 			OperationFinished<AddToMyBoxResponse> addToMyBoxCompleted = (OperationFinished<AddToMyBoxResponse>)state[0];
 			AddToMyBoxResponse response;
-			object errorData;
 
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new AddToMyBoxResponse
-				           	{
-				           		Status = AddToMyBoxStatus.Failed,
-				           		UserState = state
-				           	};
+							{
+								Status = AddToMyBoxStatus.Failed,
+								UserState = state,
+								Error = e.Error
+							};
 			}
 			else
 			{
 				response = new AddToMyBoxResponse
-							{
-								Status = StatusMessageParser.ParseAddToMyBoxStatus(e.Result),
-								UserState = state
-							};
+				           	{
+				           		Status = StatusMessageParser.ParseAddToMyBoxStatus(e.Result),
+				           		UserState = state
+				           	};
 
-				errorData = response.Status == AddToMyBoxStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == AddToMyBoxStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
 			}
 
-			addToMyBoxCompleted(response, errorData);
+			addToMyBoxCompleted(response);
 		}
 
 		#endregion
@@ -2111,17 +2172,15 @@ namespace BoxSync.Core
 			object[] state = (object[]) e.UserState;
 			OperationFinished<PublicShareResponse> publicShareCompleted = (OperationFinished<PublicShareResponse>) state[0];
 			PublicShareResponse response;
-			object errorData;
 
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new PublicShareResponse
-				           	{
-				           		Status = PublicShareStatus.Failed,
-				           		UserState = state[1]
-				           	};
+							{
+								Status = PublicShareStatus.Failed,
+								UserState = state[1],
+								Error = e.Error
+							};
 			}
 			else
 			{
@@ -2132,10 +2191,14 @@ namespace BoxSync.Core
 				           		UserState = state[1]
 				           	};
 
-				errorData = response.Status == PublicShareStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == PublicShareStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
 			}
 
-			publicShareCompleted(response, errorData);
+			publicShareCompleted(response);
 		}
 
 		#endregion
@@ -2202,16 +2265,14 @@ namespace BoxSync.Core
 			object[] state = (object[]) e.UserState;
 			OperationFinished<PublicUnshareResponse> publicUnshareCompleted = (OperationFinished<PublicUnshareResponse>)state[0];
 			PublicUnshareResponse response;
-			object errorData;
 
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new PublicUnshareResponse
 							{
 								Status = PublicUnshareStatus.Failed,
-								UserState = state[1]
+								UserState = state[1],
+								Error = e.Error
 							};
 			}
 			else
@@ -2222,11 +2283,15 @@ namespace BoxSync.Core
 				           		UserState = state[1]
 				           	};
 
-				errorData = response.Status == PublicUnshareStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == PublicUnshareStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
 			}
 
 
-			publicUnshareCompleted(response, errorData);
+			publicUnshareCompleted(response);
 		}
 
 		#endregion
@@ -2322,16 +2387,14 @@ namespace BoxSync.Core
 			OperationFinished<PrivateShareResponse> privateShareCompleted =
 				(OperationFinished<PrivateShareResponse>) userState[1];
 			PrivateShareResponse response;
-			object errorData;
 
 			if (e.Error != null)
 			{
-				errorData = e.Error;
-
 				response = new PrivateShareResponse
 				           	{
 				           		Status = PrivateShareStatus.Failed,
-				           		UserState = userState[0]
+				           		UserState = userState[0],
+				           		Error = e.Error
 				           	};
 			}
 			else
@@ -2342,10 +2405,14 @@ namespace BoxSync.Core
 				           		UserState = userState[0]
 				           	};
 
-				errorData = response.Status == PrivateShareStatus.Unknown ? e.Result : null;
+				response.Error = response.Status == PrivateShareStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
 			}
 
-			privateShareCompleted(response, errorData);
+			privateShareCompleted(response);
 		}
 
 		#endregion

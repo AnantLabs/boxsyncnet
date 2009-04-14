@@ -9,13 +9,5 @@ namespace BoxSync.Core.Primitives
 	/// </summary>
 	public sealed class FileNewCopyResponse : ResponseBase<FileNewCopyStatus>
 	{
-		/// <summary>
-		/// Gets or sets the ID of the folder to which file(s) was (were) uploaded
-		/// </summary>
-		public long FolderID
-		{
-			get;
-			internal set;
-		}
 	}
 }

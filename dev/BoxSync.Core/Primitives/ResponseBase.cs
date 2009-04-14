@@ -1,4 +1,6 @@
-﻿namespace BoxSync.Core.Primitives
+﻿using System;
+
+namespace BoxSync.Core.Primitives
 {
 	/// <summary>
 	/// Base type for all operation response types
@@ -10,6 +12,15 @@
 		/// Gets operation status
 		/// </summary>
 		public TStatusType Status
+		{
+			get; 
+			internal set;
+		}
+
+		/// <summary>
+		/// Gets a value indicating which error occured during an operation execution
+		/// </summary>
+		public Exception Error
 		{
 			get; 
 			internal set;

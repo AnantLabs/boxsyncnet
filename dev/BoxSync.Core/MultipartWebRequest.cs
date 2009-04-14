@@ -255,7 +255,6 @@ namespace BoxSync.Core
 		private void UploadCompleted(IAsyncResult asyncResult)
 		{
 			State state = (State) asyncResult.AsyncState;
-			object errorData = null;
 			bool stopExecution = false;
 
 			MultipartRequestUploadResponse response = new MultipartRequestUploadResponse
@@ -269,7 +268,7 @@ namespace BoxSync.Core
 			}
 			catch(Exception ex)
 			{
-				errorData = ex;
+				response.Error = ex;
 				stopExecution = true;
 			}
 			finally
@@ -300,7 +299,7 @@ namespace BoxSync.Core
 				}
 				catch (Exception ex)
 				{
-					errorData = ex;
+					response.Error = ex;
 				}
 				finally
 				{
@@ -317,7 +316,7 @@ namespace BoxSync.Core
 				}
 			}
 
-			state.CallbackMethod(response, errorData);
+			state.CallbackMethod(response);
 		}
 
 		private HttpWebRequest CreateRequest(long contentLength)
