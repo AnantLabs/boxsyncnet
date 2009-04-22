@@ -11,6 +11,7 @@ using BoxSync.Core.ServiceReference;
 using BoxSync.Core.Statuses;
 
 using ICSharpCode.SharpZipLib.Zip;
+
 using File=BoxSync.Core.Primitives.File;
 
 
@@ -119,6 +120,7 @@ namespace BoxSync.Core
 			string result = _service.authorization(_apiKey, login, password, method, out authenticationToken, out user);
 			
 			authenticatedUser = new User(user);
+			_token = authenticationToken;
 
 			return StatusMessageParser.ParseAuthorizeStatus(result);
 		}
@@ -193,6 +195,7 @@ namespace BoxSync.Core
 				case AuthenticationStatus.Successful:
 					response.AuthenticatedUser = new User(e.user);
 					response.Token = e.auth_token;
+					_token = e.auth_token;
 					break;
 				case AuthenticationStatus.Unknown:
 					response.Error = new UnknownOperationStatusException(e.Result);
@@ -1079,7 +1082,7 @@ namespace BoxSync.Core
 
 			byte[] folderInfoXml;
 
-			string result = _service.get_account_tree(_apiKey, _token, folderID, new string[0], out folderInfoXml);
+			string result = _service.get_account_tree(_apiKey, _token, folderID, retrieveOptions.ToStringArray(), out folderInfoXml);
 			GetAccountTreeStatus status = StatusMessageParser.ParseGetAccountTreeStatus(result);
 
 			switch (status)
