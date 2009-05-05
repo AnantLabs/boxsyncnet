@@ -1,0 +1,202 @@
+#summary Article shows how to retrieve structure of the user's folders
+#labels Phase-Implementation
+
+= General overview =
+
+In order to retrieve folder structure you can use one of two available methods:
+ * BoxManager.GetFolderStructure(...) - allows you to get a tree representing all of the user's files and folders by folder ID
+ * BoxManager.GetRootFolderStructure(...) - allows you to get a tree representing all of the user's files and folders inside root directory. This method is based on BoxManager.GetFolderStructure(...) and could be replaced by calling BoxManager.GetFolderStructure(...) with FolderID="0" parameter
+
+To impove performance of your application and decrease amount of transfered data you can use one of the following retrieving options:
+ * RetrieveFolderStructureOptions.NoFiles - by specifying this option only folders will be included in the user account tree. This will decreases amount of transfered data
+ * RetrieveFolderStructureOptions.NoZip - the data transfered between Box.NET service and you application won't be ziped, which means that traffic will increase, but application doesn't need to spend additional resources on unzipping received information. It's not recomended to use it in desktop applications
+ * RetrieveFolderStructureOptions.OneLevel - specifies that the retrieved folder information will contain only fildes and folders which are in the folder of the FolderID you have provided
+
+= Implementation =
+*The following code shows how BoxManager.GetFolderStructure(...) method could be used in your application:*
+
+{{{
+	public class BoxProvider
+	{
+		private readonly BoxManager _manager;
+		private string _ticket;
+
+		/// <summary>
+		/// Initializes BoxProvider type instance
+		/// </summary>
+		/// <param name="applicationApiKey"></param>
+		public BoxProvider(string applicationApiKey)
+		{
+			_manager = new BoxManager(applicationApiKey, "http://box.net/api/soap", null);
+		}
+
+		/// <summary>
+		/// Asynchronously gets authorization ticket 
+		/// and opens web browser to logging on Box.NET portal
+		/// </summary>
+		public void StartAuthentication()
+		{
+			_manager.GetTicket(GetTicketCompleted);
+		}
+
+		/// <summary>
+		/// Finishes authorization process after user has 
+		/// successfully finished loggin process on Box.NET portal
+		/// </summary>
+		/// <param name="printUserInfoCallback">Callback method which will be invoked after operation completes</param>
+		public void FinishAuthentication(Action<User> printUserInfoCallback)
+		{
+			_manager.GetAuthenticationToken(_ticket, GetAuthenticationTokenCompleted, printUserInfoCallback);
+		}
+
+		
+		/// <summary>
+		/// Retrieves information about structure of the folder by its ID
+		/// </summary>
+		/// <param name="folderID">Folder ID</param>
+		/// <param name="options">Retrieving options</param>
+		/// <returns>Instance of <see cref="Folder"/> type which represents user's folder</returns>
+		public Folder GetFolderStructure(long folderID, RetrieveFolderStructureOptions options)
+		{
+			Folder folder;
+
+			GetAccountTreeStatus status = _manager.GetFolderStructure(folderID, options, out folder);
+			
+			if (status != GetAccountTreeStatus.Successful)
+			{
+				throw new ApplicationException(string.Format("Failed to retrieve folder tree. FolderID=[{0}], OperationStatus={1}", folderID, status));
+			}
+
+			return folder;
+		}
+
+
+
+		private void GetAuthenticationTokenCompleted(GetAuthenticationTokenResponse response)
+		{
+			Action<User> printUserInfoCallback = (Action<User>)response.UserState;
+
+			printUserInfoCallback(response.AuthenticatedUser);
+		}
+
+		private void GetTicketCompleted(GetTicketResponse response)
+		{
+			if (response.Status == GetTicketStatus.Successful)
+			{
+				_ticket = response.Ticket;
+
+				string url = string.Format("www.box.net/api/1.0/auth/{0}", response.Ticket);
+
+				BrowserLauncher.OpenUrl(url);
+			}
+			else
+			{
+				Exception error = response.Error ??
+								  new ApplicationException(
+									string.Format("Can't get an authorization ticket. Operation status is {0}",
+												  response.Status));
+
+				throw error;
+			}
+		}
+
+	}
+}}}
+
+*The following code uses BoxProvider class to retrieve folder tree and prints this information:*
+
+{{{
+	class Program
+	{
+		private readonly static BoxProvider _boxProvider = new BoxProvider("YOUR_APP_API_KEY");
+
+		static void Main(string[] args)
+		{
+			Console.WriteLine("Press ENTER to start...");
+			Console.ReadLine();
+
+			_boxProvider.StartAuthentication();
+
+			//Now new instance of user's default browser should be opened.
+			//Please, use web-form which you see in your browser to login on Box.NET portal
+
+			Console.WriteLine(@"Type ""1"" and press ENTER after successful logging on Box.NET portal...");
+
+			while (Console.ReadLine() != "1")
+			{ }
+
+			_boxProvider.FinishAuthentication(PrintAccountInformation);
+
+			Console.ReadLine();
+		}
+
+		private static void PrintFolderStructure(Folder folder, int indent)
+		{
+			for (int i = 0; i < indent; i++)
+			{
+				Console.Write(" ");
+			}
+
+			Console.Write(string.Format("{0}{1}", folder.Name, Environment.NewLine));
+
+			foreach (Folder subFolder in folder.Folders)
+			{
+				PrintFolderStructure(subFolder, indent + 1);
+			}
+		}
+
+		/// <summary>
+		/// Prints account information and asks for confirmation to upload files
+		/// </summary>
+		/// <param name="user">Account information</param>
+		private static void PrintAccountInformation(User user)
+		{
+			Console.WriteLine(string.Format("Login: {0}", user.Login));
+			Console.WriteLine(string.Format("Email: {0}", user.Email));
+			Console.WriteLine(string.Format("Available space: {0}", user.SpaceAmount));
+			Console.WriteLine(string.Format("Used space: {0}", user.SpaceUsed));
+			Console.WriteLine();
+
+			RetrieveFolderStructureOptions options = RetrieveFolderStructureOptions.NoFiles |
+			                                         RetrieveFolderStructureOptions.NoZip;
+
+			Folder folder = _boxProvider.GetFolderStructure(0, options);
+
+			Console.WriteLine(@"Retrieving options: {0}", options);
+			Console.WriteLine(@"Folder structure:");
+			PrintFolderStructure(folder, 0);
+		}
+	}
+}}}
+
+*To open a web page you can use code from [http://dotnetpulse.blogspot.com/2006/04/opening-url-from-within-c-program.html http://dotnetpulse.blogspot.com/2006/04/opening-url-from-within-c-program.html] :*
+
+{{{
+internal static class BrowserLauncher
+	{
+		/// <summary>
+		/// Reads path of default browser from registry
+		/// </summary>
+		/// <returns>Path to the default web browser executable file</returns>
+		private static string GetDefaultBrowserPath()
+		{
+			string key = @"htmlfile\shell\open\command";
+
+			RegistryKey registryKey = Registry.ClassesRoot.OpenSubKey(key, false);
+
+			return ((string)registryKey.GetValue(null, null)).Split('"')[1];
+
+		}
+
+		/// <summary>
+		/// Opens <paramref name="url"/> in a default web browser
+		/// </summary>
+		/// <param name="url">Destination URL</param>
+		public static void OpenUrl(string url)
+		{
+			string defaultBrowserPath = GetDefaultBrowserPath();
+
+			Process.Start(defaultBrowserPath, url);
+		}
+	}
+}}}
