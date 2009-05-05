@@ -13,6 +13,8 @@ To impove performance of your application and decrease amount of transfered data
  * `RetrieveFolderStructureOptions.OneLevel` - specifies that the retrieved folder information will contain only fildes and folders which are in the folder of the FolderID you have provided
 
 = Implementation =
+_Sample application could be found [http://boxsyncnet.googlecode.com/files/BoxSync.Sample.GetFolderStructureApp.zip here]_
+
 *The following code shows how `BoxManager.GetFolderStructure(...)` method could be used in your application:*
 
 {{{
