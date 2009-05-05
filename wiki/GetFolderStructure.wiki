@@ -13,7 +13,7 @@ To impove performance of your application and decrease amount of transfered data
  * `RetrieveFolderStructureOptions.OneLevel` - specifies that the retrieved folder information will contain only fildes and folders which are in the folder of the FolderID you have provided
 
 = Implementation =
-*The following code shows how BoxManager.GetFolderStructure(...) method could be used in your application:*
+*The following code shows how `BoxManager.GetFolderStructure(...)` method could be used in your application:*
 
 {{{
 	public class BoxProvider
