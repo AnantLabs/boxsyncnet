@@ -14,7 +14,7 @@ It's highly recomended to use asynchronous versions of `AddFile(...)` and `AddFi
 
 = Implementation =
 
-Source code could be found [http://boxsyncnet.googlecode.com/files/BoxSync.Sample.FileUploaderApp.zip here]
+_Source code could be found [http://boxsyncnet.googlecode.com/files/BoxSync.Sample.FileUploaderApp.zip here]_
 
 *The following code shows you how to use synchronous and asynchronous versions of `BoxManager.AddFiles(...)` method:*
 
