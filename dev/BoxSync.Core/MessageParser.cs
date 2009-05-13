@@ -133,26 +133,26 @@ namespace BoxSync.Core
 			XAttribute updatedAttribute = folderElement.Attribute(XName.Get("updated"));
 
 
-			folder.Description = descriptionAttribute.Value;
+			folder.Description = descriptionAttribute == null ? null : descriptionAttribute.Value;
 			folder.ID = long.Parse(idAttribute.Value);
-			folder.IsShared = sharedAttribute.Value.Equals("1");
+			folder.IsShared = sharedAttribute == null ? null : (bool?)sharedAttribute.Value.Equals("1");
 			folder.Name = nameAttribute.Value;
-			folder.SharedLink = sharedLinkAttribute.Value;
-			folder.OwnerID = long.Parse(userIdAttribute.Value);
-			folder.Size = long.Parse(sizeAttribute.Value);
-			folder.PermissionFlags = ParsePermissionString(permissionsAttribute.Value);
+			folder.SharedLink = sharedLinkAttribute == null ? null : sharedLinkAttribute.Value;
+			folder.OwnerID = userIdAttribute == null ? null : (long?)long.Parse(userIdAttribute.Value);
+			folder.Size = sizeAttribute == null ? null : (long?)long.Parse(sizeAttribute.Value);
+			folder.PermissionFlags = permissionsAttribute == null ? null : (UserPermissionFlags?)ParsePermissionString(permissionsAttribute.Value);
 
-			if (!string.IsNullOrEmpty(createdAttribute.Value))
+			if (createdAttribute != null && !string.IsNullOrEmpty(createdAttribute.Value))
 			{
 				folder.Created = _unixStartDate.AddSeconds(double.Parse(createdAttribute.Value));
 			}
 
-			if (!string.IsNullOrEmpty(updatedAttribute.Value))
+			if (updatedAttribute != null && !string.IsNullOrEmpty(updatedAttribute.Value))
 			{
 				folder.Updated = _unixStartDate.AddSeconds(double.Parse(updatedAttribute.Value));
 			}
 
-			if (!string.IsNullOrEmpty(fileCountAttribute.Value))
+			if (fileCountAttribute != null && !string.IsNullOrEmpty(fileCountAttribute.Value))
 			{
 				folder.FileCount = int.Parse(fileCountAttribute.Value);
 			}

@@ -45,7 +45,8 @@ namespace BoxSync.Core.UnitTests
 			StringAssert.IsMatch(password, folder.Password);
 			StringAssert.IsMatch(path, folder.Path);
 			StringAssert.IsMatch(publicName, folder.PublicName);
-			Assert.IsTrue(folder.IsShared);
+			Assert.IsTrue(folder.IsShared.HasValue);
+			Assert.IsTrue(folder.IsShared.Value);
 			Assert.AreEqual(userID, folder.OwnerID);
 		}
 	}

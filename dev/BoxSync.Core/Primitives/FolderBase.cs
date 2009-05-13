@@ -53,7 +53,7 @@ namespace BoxSync.Core.Primitives
 		/// <summary>
 		/// The ID of the user who owns the folder
 		/// </summary>
-		public long OwnerID
+		public long? OwnerID
 		{
 			get;
 			set;
@@ -110,7 +110,7 @@ namespace BoxSync.Core.Primitives
 		/// <summary>
 		/// Indicates if folder is shared
 		/// </summary>
-		public bool IsShared
+		public bool? IsShared
 		{
 			get; 
 			set;

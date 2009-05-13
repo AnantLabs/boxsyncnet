@@ -17,14 +17,13 @@ namespace BoxSync.Core.Primitives
 		None = 0,
 
 		/// <summary>
-		/// Indicates that only folders must be included in result tree, 
+		/// Indicates that only folders must be included in the result tree, 
 		/// no files
 		/// </summary>
 		NoFiles = 1,
 
 		/// <summary>
-		/// Indicates that XML that contains folder structure tree 
-		/// should not be zipped
+		/// Indicates that XML folder structure tree should not be compressed
 		/// </summary>
 		NoZip = 2,
 
@@ -33,7 +32,14 @@ namespace BoxSync.Core.Primitives
 		/// should be retrieved, so you will get only files and 
 		/// folders stored in folder which FolderID you have provided
 		/// </summary>
-		OneLevel = 4
+		OneLevel = 4,
+
+		/// <summary>
+		/// Indicates that XML folder structure tree shouldn't contain
+		/// all the details (thumbnails, shared status, tags, and other attributes are left out).
+		/// Recomended to use in mobile applications
+		/// </summary>
+		Simple = 8
 	}
 
 	/// <summary>
@@ -74,6 +80,11 @@ namespace BoxSync.Core.Primitives
 			if ((folderStructureOptions & RetrieveFolderStructureOptions.OneLevel) == RetrieveFolderStructureOptions.OneLevel)
 			{
 				result.Add("onelevel");
+			}
+
+			if ((folderStructureOptions & RetrieveFolderStructureOptions.Simple) == RetrieveFolderStructureOptions.Simple)
+			{
+				result.Add("simple");
 			}
 
 			return result.ToArray();

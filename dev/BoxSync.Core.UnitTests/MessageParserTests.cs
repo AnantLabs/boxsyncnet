@@ -1,12 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+
 using BoxSync.Core.Primitives;
 using BoxSync.Core.ServiceReference;
 using BoxSync.Core.Statuses;
+
 using NUnit.Framework;
+
 using File=BoxSync.Core.Primitives.File;
 
 
@@ -20,7 +21,6 @@ namespace BoxSync.Core.UnitTests
 		{
 			string data = System.IO.File.ReadAllText(@"..\..\Data\folder_structure.xml");
 			
-			Expression<Func<User>> materializeUser = () => GetUser(1);
 			Expression<Func<long, TagPrimitive>> materializeTag = tagID => GetTag(tagID);
 
 			Folder folder = MessageParser.Instance.ParseFolderStructureMessage(data, materializeTag);
@@ -36,7 +36,8 @@ namespace BoxSync.Core.UnitTests
 			Assert.AreEqual("somename", folder.Folders[0].Name);
 			Assert.AreEqual(23001888, folder.Folders[0].ID);
 			Assert.AreEqual(4497082, folder.Folders[0].OwnerID);
-			Assert.IsTrue(folder.Folders[0].IsShared);
+			Assert.IsTrue(folder.Folders[0].IsShared.HasValue);
+			Assert.IsTrue(folder.Folders[0].IsShared.Value);
 			Assert.AreEqual(0, folder.Folders[0].Size);
 			Assert.AreEqual(0, folder.Folders[0].FileCount);
 			StringAssert.IsMatch("some stupid desription", folder.Folders[0].Description);
@@ -50,7 +51,8 @@ namespace BoxSync.Core.UnitTests
 			Assert.AreEqual("somename2", folder.Folders[0].Folders[0].Name);
 			Assert.AreEqual(23001890, folder.Folders[0].Folders[0].ID);
 			Assert.AreEqual(4497083, folder.Folders[0].Folders[0].OwnerID);
-			Assert.IsFalse(folder.Folders[0].Folders[0].IsShared);
+			Assert.IsTrue(folder.Folders[0].Folders[0].IsShared.HasValue);
+			Assert.IsFalse(folder.Folders[0].Folders[0].IsShared.Value);
 			Assert.AreEqual(0, folder.Folders[0].Folders[0].Size);
 			Assert.AreEqual(0, folder.Folders[0].Folders[0].FileCount);
 			Assert.AreEqual(0, folder.Folders[0].Folders[0].Tags.Count);
@@ -58,10 +60,54 @@ namespace BoxSync.Core.UnitTests
 			Assert.AreEqual("avatar.jpg", folder.Files[0].Name);
 			Assert.AreEqual(238458103, folder.Files[0].ID);
 			Assert.AreEqual(4497083, folder.Files[0].OwnerID);
-			Assert.IsTrue(folder.Files[0].IsShared);
+			Assert.IsTrue(folder.Files[0].IsShared.HasValue);
+			Assert.IsTrue(folder.Files[0].IsShared.Value);
 			Assert.AreEqual(8193, folder.Files[0].Size);
 			Assert.AreEqual(0, folder.Files[0].Tags.Count);
 		}
+
+		[Test]
+		public void TestParseFolderSimpleStructureMessage()
+		{
+			string data = System.IO.File.ReadAllText(@"..\..\Data\folder_structure_simple.xml");
+
+			Expression<Func<long, TagPrimitive>> materializeTag = tagID => GetTag(tagID);
+
+			Folder folder = MessageParser.Instance.ParseFolderStructureMessage(data, materializeTag);
+
+			Assert.IsNotNull(folder);
+			Assert.AreEqual(0, folder.ID);
+			Assert.AreEqual(2, folder.Files.Count);
+			Assert.AreEqual(1, folder.Folders.Count);
+			Assert.IsFalse(folder.Size.HasValue);
+			Assert.IsFalse(folder.OwnerID.HasValue);
+			Assert.AreEqual(0, folder.Tags.Count);
+
+			Assert.AreEqual("test_1", folder.Folders[0].Name);
+			Assert.AreEqual(26935530, folder.Folders[0].ID);
+			Assert.IsFalse(folder.Folders[0].OwnerID.HasValue);
+			Assert.IsFalse(folder.Folders[0].IsShared.HasValue);
+			Assert.IsFalse(folder.Folders[0].Size.HasValue);
+			Assert.AreEqual(0, folder.Folders[0].FileCount);
+			Assert.IsNull(folder.Folders[0].Description);
+
+			Assert.AreEqual(0, folder.Folders[0].Tags.Count);
+
+			Assert.AreEqual("3.1237931098.jpg", folder.Files[0].Name);
+			Assert.AreEqual(276668870, folder.Files[0].ID);
+			Assert.IsFalse(folder.Files[0].OwnerID.HasValue);
+			Assert.IsFalse(folder.Files[0].IsShared.HasValue);
+			Assert.AreEqual(50854, folder.Files[0].Size);
+			Assert.AreEqual(0, folder.Files[0].Tags.Count);
+
+			Assert.AreEqual("comedy.png", folder.Files[1].Name);
+			Assert.AreEqual(276668886, folder.Files[1].ID);
+			Assert.IsFalse(folder.Files[1].OwnerID.HasValue);
+			Assert.IsFalse(folder.Files[1].IsShared.HasValue);
+			Assert.AreEqual(896, folder.Files[1].Size);
+			Assert.AreEqual(0, folder.Files[1].Tags.Count);
+		}
+
 
 		[Test]
 		public void TestSuccessParseUploadResponseMessage()
@@ -77,9 +123,10 @@ namespace BoxSync.Core.UnitTests
 
 			Assert.AreEqual(5996, fp1.ID);
 			Assert.AreEqual("read_me.txt", fp1.Name);
-			Assert.IsFalse(fp1.IsShared);
+			Assert.IsTrue(fp1.IsShared.HasValue);
+			Assert.IsFalse(fp1.IsShared.Value);
 
-			Assert.AreEqual(UploadFileError.Unknown, response.UploadedFileStatus[fp1]);
+			Assert.AreEqual(UploadFileError.None, response.UploadedFileStatus[fp1]);
 
 			File fp2 = response.UploadedFileStatus.Keys.ElementAt(1);
 
@@ -87,9 +134,9 @@ namespace BoxSync.Core.UnitTests
 
 			Assert.AreEqual("Rally.avi", fp2.Name);
 			Assert.AreEqual(0, fp2.ID);
-			Assert.AreEqual(0, fp2.OwnerID);
+			Assert.IsFalse(fp2.OwnerID.HasValue);
 			Assert.IsNull(fp2.SharedLink);
-			Assert.AreEqual(0, (int)fp2.PermissionFlags);
+			Assert.IsFalse(fp2.PermissionFlags.HasValue);
 		}
 
 		[Test]
@@ -128,7 +175,7 @@ namespace BoxSync.Core.UnitTests
 
 			Assert.AreEqual(0, fp1.ID);
 			Assert.AreEqual("Rally.avi", fp1.Name);
-			Assert.IsFalse(fp1.IsShared);
+			Assert.IsFalse(fp1.IsShared.HasValue);
 			Assert.AreEqual(UploadFileError.FileSizeLimitExceeded, response.UploadedFileStatus[fp1]);
 		}
 
@@ -146,7 +193,7 @@ namespace BoxSync.Core.UnitTests
 
 			Assert.AreEqual(0, fp1.ID);
 			Assert.AreEqual("Rally2.avi", fp1.Name);
-			Assert.IsFalse(fp1.IsShared);
+			Assert.IsFalse(fp1.IsShared.HasValue);
 			Assert.AreEqual(UploadFileError.NotEnoughFreeSpace, response.UploadedFileStatus[fp1]);
 		}
 
@@ -164,7 +211,7 @@ namespace BoxSync.Core.UnitTests
 
 			Assert.AreEqual(0, fp1.ID);
 			Assert.AreEqual("Rally4.avi", fp1.Name);
-			Assert.IsFalse(fp1.IsShared);
+			Assert.IsFalse(fp1.IsShared.HasValue);
 			Assert.AreEqual(UploadFileError.AccessDenied, response.UploadedFileStatus[fp1]);
 		}
 
@@ -182,7 +229,7 @@ namespace BoxSync.Core.UnitTests
 
 			Assert.AreEqual(0, fp1.ID);
 			Assert.AreEqual("Rally5.avi", fp1.Name);
-			Assert.IsFalse(fp1.IsShared);
+			Assert.IsFalse(fp1.IsShared.HasValue);
 			Assert.AreEqual(UploadFileError.Unknown, response.UploadedFileStatus[fp1]);
 		}
 
