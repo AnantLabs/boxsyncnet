@@ -100,7 +100,7 @@ namespace BoxSync.Core.Primitives
 		/// <summary>
 		/// Folder permissions
 		/// </summary>
-		public UserPermissionFlags PermissionFlags
+		public UserPermissionFlags? PermissionFlags
 		{
 			get; 
 			set;
@@ -118,7 +118,7 @@ namespace BoxSync.Core.Primitives
 		/// <summary>
 		/// Size of the folder
 		/// </summary>
-		public long Size
+		public long? Size
 		{
 			get; 
 			set;

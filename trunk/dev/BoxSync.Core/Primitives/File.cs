@@ -41,7 +41,7 @@ namespace BoxSync.Core.Primitives
 		/// <summary>
 		/// Gets or sets ID of the folder's owner
 		/// </summary>
-		public long OwnerID
+		public long? OwnerID
 		{
 			get; 
 			set;
@@ -59,7 +59,7 @@ namespace BoxSync.Core.Primitives
 		/// <summary>
 		/// Indicates if folder is shared
 		/// </summary>
-		public bool IsShared
+		public bool? IsShared
 		{
 			get; 
 			set;
@@ -86,7 +86,7 @@ namespace BoxSync.Core.Primitives
 		/// <summary>
 		/// Date when file was updated
 		/// </summary>
-		public DateTime Updated
+		public DateTime? Updated
 		{
 			get; 
 			set;
@@ -104,7 +104,7 @@ namespace BoxSync.Core.Primitives
 		/// <summary>
 		/// User permissions for file
 		/// </summary>
-		public UserPermissionFlags PermissionFlags
+		public UserPermissionFlags? PermissionFlags
 		{
 			get; 
 			set;

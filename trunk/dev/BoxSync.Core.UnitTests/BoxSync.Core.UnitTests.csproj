@@ -59,6 +59,7 @@
     <Content Include="Data\export_tags.xml" />
     <Content Include="Data\folder_structure.xml" />
     <Content Include="Data\upload_file_response\application_restricted.xml" />
+    <Content Include="Data\folder_structure_simple.xml" />
     <Content Include="Data\upload_file_response\not_logged_id.xml" />
     <Content Include="Data\upload_file_response\no_files_element.xml" />
     <Content Include="Data\upload_file_response\unknown_status.xml" />
