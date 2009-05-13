@@ -17,7 +17,7 @@ The second way requires to apply the following steps:
 
 *The following code shows how the authentication methods could be used in your application:*
 {{{
-public class BoxProvider
+	public class BoxProvider
 	{
 		private readonly BoxManager _manager;
 		private string _ticket;
@@ -46,14 +46,14 @@ public class BoxProvider
 			_manager.GetAuthenticationToken(_ticket, GetAuthenticationTokenCompleted, printUserInfoCallback);
 		}
 
-		private void GetAuthenticationTokenCompleted(GetAuthenticationTokenResponse response, object errorData)
+		private void GetAuthenticationTokenCompleted(GetAuthenticationTokenResponse response)
 		{
 			Action<User> printUserInfoCallback = (Action<User>)response.UserState;
 
 			printUserInfoCallback(response.AuthenticatedUser);
 		}
 
-		private void GetTicketCompleted(GetTicketResponse response, object errorData)
+		private void GetTicketCompleted(GetTicketResponse response)
 		{
 			if (response.Status == GetTicketStatus.Successful)
 			{
@@ -64,7 +64,6 @@ public class BoxProvider
 				BrowserLauncher.OpenUrl(url);
 			}
 		}
-
 	}
 }}}
 
