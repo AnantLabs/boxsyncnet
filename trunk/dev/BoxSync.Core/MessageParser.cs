@@ -218,6 +218,7 @@ namespace BoxSync.Core
 			XAttribute sharedAttribute = fileElement.Attribute(XName.Get("shared"));
 			XAttribute sha1Attribute = fileElement.Attribute(XName.Get("sha1"));
 			XAttribute sharedLinkAttribute = fileElement.Attribute(XName.Get("shared_link"));
+			XAttribute publicNameAttribute = fileElement.Attribute(XName.Get("public_name"));
 			
 
 			if (idAttribute != null)
@@ -273,6 +274,11 @@ namespace BoxSync.Core
 			if (sharedLinkAttribute != null)
 			{
 				file.SharedLink = sharedLinkAttribute.Value;
+			}
+
+			if (publicNameAttribute != null)
+			{
+				file.PublicName = publicNameAttribute.Value;
 			}
 
 			return file;

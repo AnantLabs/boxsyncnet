@@ -26,10 +26,12 @@
 			Name = file.Name;
 			OwnerID = file.OwnerID;
 			PermissionFlags = file.PermissionFlags;
+			PublicName = file.PublicName;
 			SHA1Hash = file.SHA1Hash;
 			SharedLink = file.SharedLink;
 			Size = file.Size;
 			Updated = file.Updated;
+			
 
 			Tags.AddRange(file.Tags);
 		}
