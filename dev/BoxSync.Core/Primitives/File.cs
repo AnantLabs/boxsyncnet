@@ -39,7 +39,7 @@ namespace BoxSync.Core.Primitives
 		}
 
 		/// <summary>
-		/// Gets or sets ID of the folder's owner
+		/// Gets or sets ID of the file's owner
 		/// </summary>
 		public long? OwnerID
 		{
@@ -57,7 +57,7 @@ namespace BoxSync.Core.Primitives
 		}
 
 		/// <summary>
-		/// Indicates if folder is shared
+		/// Indicates if file is shared
 		/// </summary>
 		public bool? IsShared
 		{
@@ -66,9 +66,18 @@ namespace BoxSync.Core.Primitives
 		}
 
 		/// <summary>
-		/// Link to shared folder
+		/// Link to shared file
 		/// </summary>
 		public string SharedLink
+		{
+			get; 
+			set;
+		}
+
+		/// <summary>
+		/// Gets or sets public name of the file (if file is shared)
+		/// </summary>
+		public string PublicName
 		{
 			get; 
 			set;
