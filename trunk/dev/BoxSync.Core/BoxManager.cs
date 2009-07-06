@@ -697,6 +697,100 @@ namespace BoxSync.Core
 
 		#endregion
 
+		#region Copy
+
+		/// <summary>
+		/// Copies file into specific folder
+		/// </summary>
+		/// <param name="targetFileID">ID of the file to copy</param>
+		/// <param name="destinationFolderID">Destination folder ID</param>
+		/// <returns>Operation status</returns>
+		public CopyObjectStatus CopyFile(
+			long targetFileID, 
+			long destinationFolderID)
+		{
+			string type = ObjectType2String(ObjectType.File);
+			string response = _service.copy(_apiKey, _token, type, targetFileID, destinationFolderID);
+
+			return StatusMessageParser.ParseCopyObjectStatus(response);
+		}
+
+		/// <summary>
+		/// Copies file into specific folder
+		/// </summary>
+		/// <param name="targetFileID">ID of the file to copy</param>
+		/// <param name="destinationFolderID">Destination folder ID</param>
+		/// <param name="copyFileCompleted">Callback method which will be invoked after operation completes</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="copyFileCompleted"/> is null</exception>
+		public void CopyFile(
+			long targetFileID,
+			long destinationFolderID,
+			OperationFinished<CopyFileResponse> copyFileCompleted)
+		{
+			CopyFile(targetFileID, destinationFolderID, copyFileCompleted, null);
+		}
+
+		/// <summary>
+		/// Copies file into specific folder
+		/// </summary>
+		/// <param name="targetFileID">ID of the file to copy</param>
+		/// <param name="destinationFolderID">Destination folder ID</param>
+		/// <param name="copyFileCompleted">Callback method which will be invoked after operation completes</param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="copyFileCompleted"/> delegate as a part of response when the operation is completed</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="copyFileCompleted"/> is null</exception>
+		public void CopyFile(
+			long targetFileID,
+			long destinationFolderID,
+			OperationFinished<CopyFileResponse> copyFileCompleted,
+			object userState)
+		{
+			ThrowIfParameterIsNull(copyFileCompleted, "copyFileCompleted");
+
+			string type = ObjectType2String(ObjectType.File);
+
+			_service.copyCompleted += CopyFileFinished;
+
+			object[] state = {copyFileCompleted, userState};
+
+			_service.copyAsync(_apiKey, _token, type, targetFileID, destinationFolderID, state);
+		}
+
+		private void CopyFileFinished(object sender, copyCompletedEventArgs e)
+		{
+			object[] state = (object[]) e.UserState;
+			OperationFinished<CopyFileResponse> copyFileCompleted = (OperationFinished<CopyFileResponse>) state[0];
+			CopyFileResponse copyFileResponse;
+
+			if (e.Error != null)
+			{
+				copyFileResponse = new CopyFileResponse
+				                   	{
+				                   		Error = e.Error,
+				                   		Status = CopyObjectStatus.Failed,
+				                   		UserState = state[1]
+				                   	};
+			}
+			else
+			{
+				copyFileResponse = new CopyFileResponse
+				                   	{
+				                   		Status = StatusMessageParser.ParseCopyObjectStatus(e.Result),
+				                   		UserState = state[1]
+				                   	};
+
+				copyFileResponse.Error = copyFileResponse.Status == CopyObjectStatus.Unknown
+				                         	?
+				                         		new UnknownOperationStatusException(e.Result)
+				                         	:
+				                         		null;
+			}
+
+			copyFileCompleted(copyFileResponse);
+		}
+
+		#endregion
+
 		#region FileNewCopy
 
 		/// <summary>
@@ -706,6 +800,7 @@ namespace BoxSync.Core
 		/// <param name="filePath">Path to file on local hard drive</param>
 		/// <param name="fileID">ID of the file for which additional copy should be created</param>
 		/// <returns>Operation status</returns>
+		[Obsolete("Use CopyFile(long, long) method instead")]
 		public FileNewCopyResponse FileNewCopy(
 			string filePath,
 			long fileID)
@@ -723,6 +818,7 @@ namespace BoxSync.Core
 		/// <param name="message">Message to send to all emails in <paramref name="emailsToNotify"/> list</param>
 		/// <param name="emailsToNotify">List of emails which should be notified about newly created copy of the file</param>
 		/// <returns>Operation status</returns>
+		[Obsolete("Use CopyFile(long, long) method instead")]
 		public FileNewCopyResponse FileNewCopy(
 			string filePath,
 			long fileID,
@@ -759,6 +855,7 @@ namespace BoxSync.Core
 		/// <param name="fileID">ID of the file for which additional copy should be created</param>
 		/// <param name="fileNewCopyCompleted">Callback method which will be invoked after operation completes</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="fileNewCopyCompleted"/> is null</exception>
+		[Obsolete("Use CopyFile(long, long, OperationFinished<CopyFileResponse>) method instead")]
 		public void FileNewCopy(
 			string filePath,
 			long fileID,
@@ -780,6 +877,7 @@ namespace BoxSync.Core
 		/// <param name="userState">A user-defined object containing state information. 
 		/// This object is passed to the <paramref name="fileNewCopyCompleted"/> delegate as a part of response when the operation is completed</param>
 		/// <exception cref="ArgumentException">Thrown if <paramref name="fileNewCopyCompleted"/> is null</exception>
+		[Obsolete("Use CopyFile(long, long, OperationFinished<CopyFileResponse>) method instead")]
 		public void FileNewCopy(
 			string filePath,
 			long fileID,

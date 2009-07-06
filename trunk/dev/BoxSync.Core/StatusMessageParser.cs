@@ -185,6 +185,10 @@ namespace BoxSync.Core
 					return CopyObjectStatus.Successful;
 				case "e_copy_node":
 					return CopyObjectStatus.Failed;
+				case "not_logged_in":
+					return CopyObjectStatus.NotLoggedIn;
+				case "application_restricted":
+					return CopyObjectStatus.ApplicationRestricted;
 				default:
 					return CopyObjectStatus.Unknown;
 			}
