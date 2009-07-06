@@ -59,6 +59,7 @@
     <Compile Include="NotSupportedObjectTypeException.cs" />
     <Compile Include="Primitives\AddToMyBoxResponse.cs" />
     <Compile Include="Primitives\AuthenticateUserResponse.cs" />
+    <Compile Include="Primitives\CopyFileResponse.cs" />
     <Compile Include="Primitives\CreateFolderResponse.cs" />
     <Compile Include="Primitives\DeleteObjectResponse.cs" />
     <Compile Include="Primitives\ExportTagsResponse.cs" />
