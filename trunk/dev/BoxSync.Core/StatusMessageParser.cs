@@ -322,5 +322,20 @@ namespace BoxSync.Core
 					return AddToMyBoxStatus.Unknown;
 			}
 		}
+
+		internal static GetAccountInfoStatus ParseGetAccountInfoStatus(string status)
+		{
+			switch (status)
+			{
+				case "get_account_info_ok":
+					return GetAccountInfoStatus.Successful;
+				case "not_logged_in":
+					return GetAccountInfoStatus.NotLoggedIn;
+				case "application_restricted":
+					return GetAccountInfoStatus.ApplicationRestricted;
+				default:
+					return GetAccountInfoStatus.Unknown;
+			}
+		}
 	}
 }

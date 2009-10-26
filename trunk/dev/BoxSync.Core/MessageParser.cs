@@ -25,8 +25,6 @@ namespace BoxSync.Core
 			}
 		}
 
-		private readonly static DateTime _unixStartDate = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-
 		internal Folder ParseFolderStructureMessage(string message, Expression<Func<long, TagPrimitive>> materializeTag)
 		{
 			if(string.IsNullOrEmpty(message))
@@ -144,12 +142,12 @@ namespace BoxSync.Core
 
 			if (createdAttribute != null && !string.IsNullOrEmpty(createdAttribute.Value))
 			{
-				folder.Created = _unixStartDate.AddSeconds(double.Parse(createdAttribute.Value));
+				folder.Created = UnixTimeConverter.Instance.FromUnixTime(double.Parse(createdAttribute.Value));
 			}
 
 			if (updatedAttribute != null && !string.IsNullOrEmpty(updatedAttribute.Value))
 			{
-				folder.Updated = _unixStartDate.AddSeconds(double.Parse(updatedAttribute.Value));
+				folder.Updated = UnixTimeConverter.Instance.FromUnixTime(double.Parse(updatedAttribute.Value));
 			}
 
 			if (fileCountAttribute != null && !string.IsNullOrEmpty(fileCountAttribute.Value))
@@ -243,12 +241,12 @@ namespace BoxSync.Core
 
 			if (createdAttribute != null)
 			{
-				file.Created = _unixStartDate.AddSeconds(double.Parse(createdAttribute.Value));
+				file.Created = UnixTimeConverter.Instance.FromUnixTime(double.Parse(createdAttribute.Value));
 			}
 
 			if (updatedAttribute != null)
 			{
-				file.Updated = _unixStartDate.AddSeconds(double.Parse(updatedAttribute.Value));
+				file.Updated = UnixTimeConverter.Instance.FromUnixTime(double.Parse(updatedAttribute.Value));
 			}
 
 			if (sizeAttribute != null)
