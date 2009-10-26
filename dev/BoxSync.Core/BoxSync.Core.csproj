@@ -65,6 +65,7 @@
     <Compile Include="Primitives\ExportTagsResponse.cs" />
     <Compile Include="Primitives\FileNewCopyResponse.cs" />
     <Compile Include="Primitives\FolderBase.cs" />
+    <Compile Include="Primitives\GetAccountInfoResponse.cs" />
     <Compile Include="Primitives\GetFolderStructureResponse.cs" />
     <Compile Include="Primitives\GetTicketResponse.cs" />
     <Compile Include="Primitives\GetAuthenticationTokenResponse.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Statuses\ExportTagsStatus.cs" />
     <Compile Include="Primitives\File.cs" />
     <Compile Include="Primitives\ImageFile.cs" />
+    <Compile Include="Statuses\GetAccountInfoStatus.cs" />
     <Compile Include="Statuses\LogoutStatus.cs" />
     <Compile Include="Statuses\MoveObjectStatus.cs" />
     <Compile Include="Statuses\FileNewCopyStatus.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="ServiceReference\boxnetService.cs" />
     <Compile Include="StatusMessageParser.cs" />
     <Compile Include="TagPrimitiveCollection.cs" />
+    <Compile Include="UnixTimeConverter.cs" />
     <Compile Include="UnknownOperationStatusException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

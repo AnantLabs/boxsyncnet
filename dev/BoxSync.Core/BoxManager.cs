@@ -108,6 +108,7 @@ namespace BoxSync.Core
 		/// <param name="authenticationToken">Authentication token</param>
 		/// <param name="authenticatedUser">Authenticated user information</param>
 		/// <returns>Operation result</returns>
+		[Obsolete("Use AuthenticateUser(string, string, string) method instead")]
 		public AuthenticationStatus AuthenticateUser(
 			string login, 
 			string password, 
@@ -123,6 +124,33 @@ namespace BoxSync.Core
 			_token = authenticationToken;
 
 			return StatusMessageParser.ParseAuthorizeStatus(result);
+		}
+
+		/// <summary>
+		/// Authenticates user
+		/// </summary>
+		/// <param name="login">Account login</param>
+		/// <param name="password">Account password</param>
+		/// <param name="method"></param>
+		/// <returns>Operation result</returns>
+		public AuthenticateUserResponse AuthenticateUser(
+			string login,
+			string password,
+			string method)
+		{
+			SOAPUser user;
+			AuthenticateUserResponse response = new AuthenticateUserResponse();
+			string authenticationToken;
+
+			string result = _service.authorization(_apiKey, login, password, method, out authenticationToken, out user);
+
+			_token = authenticationToken;
+
+			response.AuthenticatedUser = user == null ? null : new User(user);
+			response.Token = authenticationToken;
+			response.Status = StatusMessageParser.ParseAuthorizeStatus(result);
+
+			return response;
 		}
 
 		/// <summary>
@@ -226,7 +254,8 @@ namespace BoxSync.Core
 
 			string result = _service.get_auth_token(_apiKey, authenticationTicket, out authenticationToken, out user);
 
-			authenticatedUser = new User(user);
+			authenticatedUser = user == null ? null : new User(user);
+			_token = authenticationToken;
 
 			return StatusMessageParser.ParseGetAuthenticationTokenStatus(result);
 		}
@@ -297,7 +326,8 @@ namespace BoxSync.Core
 			                                          	{
 			                                          		Status = status,
 			                                          		UserState = state[1],
-			                                          		Error = error
+			                                          		Error = error,
+															AuthenticationToken = string.Empty
 			                                          	};
 
 			if (response.Status == GetAuthenticationTokenStatus.Successful)
@@ -333,6 +363,7 @@ namespace BoxSync.Core
 		/// for the user to login
 		/// </summary>
 		/// <param name="getAuthenticationTicketCompleted">Call back method which will be invoked when operation completes</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="getAuthenticationTicketCompleted"/> is <c>null</c></exception>
 		public void GetTicket(OperationFinished<GetTicketResponse> getAuthenticationTicketCompleted)
 		{
 			GetTicket(getAuthenticationTicketCompleted, null);
@@ -345,6 +376,7 @@ namespace BoxSync.Core
 		/// <param name="getAuthenticationTicketCompleted">Call back method which will be invoked when operation completes</param>
 		/// <param name="userState">A user-defined object containing state information. 
 		/// This object is passed to the <paramref name="getAuthenticationTicketCompleted"/> delegate as a part of response when the operation is completed</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="getAuthenticationTicketCompleted"/> is <c>null</c></exception>
 		public void GetTicket(
 			OperationFinished<GetTicketResponse> getAuthenticationTicketCompleted, 
 			object userState)
@@ -419,7 +451,7 @@ namespace BoxSync.Core
 		/// <param name="filePath">Path to the file which needs to be uploaded</param>
 		/// <param name="destinationFolderID">ID of the destination folder</param>
 		/// <param name="fileUploadCompleted">Callback method which will be invoked after file-upload operation completes</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is <c>null</c></exception>
 		public void AddFile(
 			string filePath,
 			long destinationFolderID,
@@ -436,7 +468,7 @@ namespace BoxSync.Core
 		/// <param name="fileUploadCompleted">Callback method which will be invoked after file-upload operation completes</param>
 		/// <param name="userState">A user-defined object containing state information. 
 		/// This object is passed to the <paramref name="fileUploadCompleted"/> delegate as a part of response when the operation is completed</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="fileUploadCompleted"/> is <c>null</c></exception>
 		public void AddFile(
 			string filePath,
 			long destinationFolderID,
@@ -515,7 +547,7 @@ namespace BoxSync.Core
 		/// <param name="message">Text of the message to send in a notification email to all addresses in the <paramref name="emailsToNotify"/> list</param>
 		/// <param name="emailsToNotify">List of email addresses to notify about newly uploaded files</param>
 		/// <param name="filesUploadCompleted">Callback method which will be invoked after operation completes</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="filesUploadCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="filesUploadCompleted"/> is <c>null</c></exception>
 		public void AddFiles(
 			string[] files, 
 			long destinationFolderID, 
@@ -538,7 +570,7 @@ namespace BoxSync.Core
 		/// <param name="filesUploadCompleted">Callback method which will be invoked after operation completes</param>
 		/// <param name="userState">A user-defined object containing state information. 
 		/// This object is passed to the <paramref name="filesUploadCompleted"/> delegate as a part of response when the operation is completed</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="filesUploadCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="filesUploadCompleted"/> is <c>null</c></exception>
 		public void AddFiles(
 			string[] files,
 			long destinationFolderID,
@@ -637,7 +669,7 @@ namespace BoxSync.Core
 		/// <param name="filePath">Path to new file</param>
 		/// <param name="fileID">ID of the old file to overwrite</param>
 		/// <param name="overwriteFileCompleted">Callback method which will be invoked after file-overwrite operation completes</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="overwriteFileCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="overwriteFileCompleted"/> is <c>null</c></exception>
 		public void OverwriteFile(
 			string filePath, 
 			long fileID,
@@ -657,7 +689,7 @@ namespace BoxSync.Core
 		/// <param name="overwriteFileCompleted">Callback method which will be invoked after file-overwrite operation completes</param>
 		/// <param name="userState">A user-defined object containing state information. 
 		/// This object is passed to the <paramref name="overwriteFileCompleted"/> delegate as a part of response when the operation is completed</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="overwriteFileCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="overwriteFileCompleted"/> is <c>null</c></exception>
 		public void OverwriteFile(
 			string filePath,
 			long fileID,
@@ -710,7 +742,9 @@ namespace BoxSync.Core
 			long destinationFolderID)
 		{
 			string type = ObjectType2String(ObjectType.File);
-			string response = _service.copy(_apiKey, _token, type, targetFileID, destinationFolderID);
+			long newID;
+
+			string response = _service.copy(_apiKey, _token, type, targetFileID, destinationFolderID, out newID);
 
 			return StatusMessageParser.ParseCopyObjectStatus(response);
 		}
@@ -968,7 +1002,7 @@ namespace BoxSync.Core
 		/// <param name="createFolderCompleted">Callback method which will be invoked after operation completes</param>
 		/// <param name="userState">A user-defined object containing state information. 
 		/// This object is passed to the <paramref name="createFolderCompleted"/> delegate as a part of response when the operation is completed</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="createFolderCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="createFolderCompleted"/> is <c>null</c></exception>
 		public void CreateFolder(
 			string folderName, 
 			long parentFolderID, 
@@ -2326,7 +2360,7 @@ namespace BoxSync.Core
 		/// <param name="targetObjectID">ID of the object to be unshared</param>
 		/// <param name="targetObjectType">Type of the object</param>
 		/// <param name="publicUnshareCompleted">Callback method which will be invoked after operation completes</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="publicUnshareCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="publicUnshareCompleted"/> is <c>null</c></exception>
 		public void PublicUnshare(
 			long targetObjectID, 
 			ObjectType targetObjectType,
@@ -2343,7 +2377,7 @@ namespace BoxSync.Core
 		/// <param name="publicUnshareCompleted">Callback method which will be invoked after operation completes</param>
 		/// <param name="userState">A user-defined object containing state information. 
 		/// This object is passed to the <paramref name="publicUnshareCompleted"/> delegate as a part of response when the operation is completed</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="publicUnshareCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="publicUnshareCompleted"/> is <c>null</c></exception>
 		public void PublicUnshare(
 			long targetObjectID,
 			ObjectType targetObjectType,
@@ -2433,7 +2467,7 @@ namespace BoxSync.Core
 		/// <param name="emailList">Array of emails for which to notify users about a newly shared file or folder</param>
 		/// <param name="sendNotification">Indicates if the notification about object sharing must be send</param>
 		/// <param name="privateShareCompleted">Callback method which will be invoked after operation completes</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="privateShareCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="privateShareCompleted"/> is <c>null</c></exception>
 		public void PrivateShare(
 			long targetObjectID, 
 			ObjectType targetObjectType, 
@@ -2459,7 +2493,7 @@ namespace BoxSync.Core
 		/// <param name="privateShareCompleted">Callback method which will be invoked after operation completes</param>
 		/// <param name="userState">A user-defined object containing state information. 
 		/// This object is passed to the <paramref name="privateShareCompleted"/> delegate as a part of response when the operation is completed</param>
-		/// <exception cref="ArgumentException">Thrown if <paramref name="privateShareCompleted"/> is null</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="privateShareCompleted"/> is <c>null</c></exception>
 		public void PrivateShare(
 			long targetObjectID, 
 			ObjectType targetObjectType, 
@@ -2516,6 +2550,88 @@ namespace BoxSync.Core
 			privateShareCompleted(response);
 		}
 
+		#endregion
+
+		#region GetAccountInfo
+		/// <summary>
+		/// Gets information about current logged in user
+		/// </summary>
+		/// <returns>Operation response</returns>
+		public GetAccountInfoResponse GetAccountInfo()
+		{
+			GetAccountInfoResponse response = new GetAccountInfoResponse();
+			SOAPUser user;
+
+			string result = _service.get_account_info(_apiKey, _token, out user);
+
+			response.User = new User(user);
+			response.Status = StatusMessageParser.ParseGetAccountInfoStatus(result);
+
+			return response;
+		}
+
+        /// <summary>
+		/// Gets information about current logged in user
+        /// </summary>
+		/// <param name="getAccountInfoCompleted">Callback method which will be invoked after operation completes</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="getAccountInfoCompleted"/> is <c>null</c></exception>
+		public void GetAccountInfo(OperationFinished<GetAccountInfoResponse> getAccountInfoCompleted)
+		{
+			GetAccountInfo(getAccountInfoCompleted, null);
+		}
+
+		/// <summary>
+		/// Gets information about current logged in user
+		/// </summary>
+		/// <param name="getAccountInfoCompleted">Callback method which will be invoked after operation completes</param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="getAccountInfoCompleted"/> delegate as a part of response when the operation is completed</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="getAccountInfoCompleted"/> is <c>null</c></exception>
+		public void GetAccountInfo(OperationFinished<GetAccountInfoResponse> getAccountInfoCompleted, object userState)
+		{
+			ThrowIfParameterIsNull(getAccountInfoCompleted, "getAccountInfoCompleted");
+
+			_service.get_account_infoCompleted += GetAccountInfoCompleted;
+
+			object[] data = { userState, getAccountInfoCompleted };
+
+			_service.get_account_infoAsync(_apiKey, _token, data);
+		}
+
+		private void GetAccountInfoCompleted(object sender, get_account_infoCompletedEventArgs e)
+		{
+			object[] userState = (object[])e.UserState;
+			OperationFinished<GetAccountInfoResponse> getAccountInfoCompleted =
+				(OperationFinished<GetAccountInfoResponse>) userState[1];
+			GetAccountInfoResponse response;
+
+			if (e.Error != null)
+			{
+				response = new GetAccountInfoResponse
+							{
+								Status = GetAccountInfoStatus.Failed,
+								UserState = userState[0],
+								Error = e.Error
+							};
+			}
+			else
+			{
+				response = new GetAccountInfoResponse
+				           	{
+				           		Status = StatusMessageParser.ParseGetAccountInfoStatus(e.Result),
+				           		UserState = userState[0],
+								User = new User(e.user)
+				           	};
+
+				response.Error = response.Status == GetAccountInfoStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
+			}
+
+			getAccountInfoCompleted(response);
+		}
 		#endregion
 
 
