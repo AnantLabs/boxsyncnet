@@ -18,7 +18,7 @@ namespace BoxSync.Core.Primitives
 		}
 
 		/// <summary>
-		/// Gets a value indicating which error occured during an operation execution
+		/// Gets a value indicating which error occurred during an operation execution
 		/// </summary>
 		public Exception Error
 		{

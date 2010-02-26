@@ -25,6 +25,7 @@ namespace BoxSync.Core.ServiceReference {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name="boxnetBinding", Namespace="urn:boxnet")]
+    [System.Xml.Serialization.SoapIncludeAttribute(typeof(SOAPComment))]
     [System.Xml.Serialization.SoapIncludeAttribute(typeof(SOAPCollaborator))]
     public partial class boxnetService : System.Web.Services.Protocols.SoapHttpClientProtocol {
         
@@ -51,8 +52,6 @@ namespace BoxSync.Core.ServiceReference {
         private System.Threading.SendOrPostCallback create_folderOperationCompleted;
         
         private System.Threading.SendOrPostCallback copyOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback copy_and_renameOperationCompleted;
         
         private System.Threading.SendOrPostCallback moveOperationCompleted;
         
@@ -124,15 +123,9 @@ namespace BoxSync.Core.ServiceReference {
         
         private System.Threading.SendOrPostCallback get_server_timeOperationCompleted;
         
-        private System.Threading.SendOrPostCallback get_updates_rss_urlOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback create_discussionOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback get_app_folder_idOperationCompleted;
-        
         /// <remarks/>
         public boxnetService() {
-            this.Url = "http://www.box.net/api/1.0/soap";
+            this.Url = "http://box.net/api/soap";
         }
         
         /// <remarks/>
@@ -170,9 +163,6 @@ namespace BoxSync.Core.ServiceReference {
         
         /// <remarks/>
         public event copyCompletedEventHandler copyCompleted;
-        
-        /// <remarks/>
-        public event copy_and_renameCompletedEventHandler copy_and_renameCompleted;
         
         /// <remarks/>
         public event moveCompletedEventHandler moveCompleted;
@@ -278,15 +268,6 @@ namespace BoxSync.Core.ServiceReference {
         
         /// <remarks/>
         public event get_server_timeCompletedEventHandler get_server_timeCompleted;
-        
-        /// <remarks/>
-        public event get_updates_rss_urlCompletedEventHandler get_updates_rss_urlCompleted;
-        
-        /// <remarks/>
-        public event create_discussionCompletedEventHandler create_discussionCompleted;
-        
-        /// <remarks/>
-        public event get_app_folder_idCompletedEventHandler get_app_folder_idCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#authorization", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
@@ -840,14 +821,13 @@ namespace BoxSync.Core.ServiceReference {
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#copy", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
         [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string copy(string api_key, string auth_token, string target, long target_id, long destination_id, out long new_id) {
+        public string copy(string api_key, string auth_token, string target, long target_id, long destination_id) {
             object[] results = this.Invoke("copy", new object[] {
                         api_key,
                         auth_token,
                         target,
                         target_id,
                         destination_id});
-            new_id = ((long)(results[1]));
             return ((string)(results[0]));
         }
         
@@ -862,9 +842,8 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public string Endcopy(System.IAsyncResult asyncResult, out long new_id) {
+        public string Endcopy(System.IAsyncResult asyncResult) {
             object[] results = this.EndInvoke(asyncResult);
-            new_id = ((long)(results[1]));
             return ((string)(results[0]));
         }
         
@@ -890,65 +869,6 @@ namespace BoxSync.Core.ServiceReference {
             if ((this.copyCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.copyCompleted(this, new copyCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#copy_and_rename", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string copy_and_rename(string api_key, string auth_token, string target, long target_id, long destination_id, string new_name, out long new_id) {
-            object[] results = this.Invoke("copy_and_rename", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        destination_id,
-                        new_name});
-            new_id = ((long)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Begincopy_and_rename(string api_key, string auth_token, string target, long target_id, long destination_id, string new_name, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("copy_and_rename", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        destination_id,
-                        new_name}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endcopy_and_rename(System.IAsyncResult asyncResult, out long new_id) {
-            object[] results = this.EndInvoke(asyncResult);
-            new_id = ((long)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void copy_and_renameAsync(string api_key, string auth_token, string target, long target_id, long destination_id, string new_name) {
-            this.copy_and_renameAsync(api_key, auth_token, target, target_id, destination_id, new_name, null);
-        }
-        
-        /// <remarks/>
-        public void copy_and_renameAsync(string api_key, string auth_token, string target, long target_id, long destination_id, string new_name, object userState) {
-            if ((this.copy_and_renameOperationCompleted == null)) {
-                this.copy_and_renameOperationCompleted = new System.Threading.SendOrPostCallback(this.Oncopy_and_renameOperationCompleted);
-            }
-            this.InvokeAsync("copy_and_rename", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        destination_id,
-                        new_name}, this.copy_and_renameOperationCompleted, userState);
-        }
-        
-        private void Oncopy_and_renameOperationCompleted(object arg) {
-            if ((this.copy_and_renameCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.copy_and_renameCompleted(this, new copy_and_renameCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -2665,23 +2585,23 @@ namespace BoxSync.Core.ServiceReference {
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_comments", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
         [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_comments(string api_key, string auth_token, long target_id, string target, out SOAPComment[] comments) {
+        public string get_comments(string api_key, string auth_token, long item_id, string item_type, out SOAPComment[] comments) {
             object[] results = this.Invoke("get_comments", new object[] {
                         api_key,
                         auth_token,
-                        target_id,
-                        target});
+                        item_id,
+                        item_type});
             comments = ((SOAPComment[])(results[1]));
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public System.IAsyncResult Beginget_comments(string api_key, string auth_token, long target_id, string target, System.AsyncCallback callback, object asyncState) {
+        public System.IAsyncResult Beginget_comments(string api_key, string auth_token, long item_id, string item_type, System.AsyncCallback callback, object asyncState) {
             return this.BeginInvoke("get_comments", new object[] {
                         api_key,
                         auth_token,
-                        target_id,
-                        target}, callback, asyncState);
+                        item_id,
+                        item_type}, callback, asyncState);
         }
         
         /// <remarks/>
@@ -2692,20 +2612,20 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public void get_commentsAsync(string api_key, string auth_token, long target_id, string target) {
-            this.get_commentsAsync(api_key, auth_token, target_id, target, null);
+        public void get_commentsAsync(string api_key, string auth_token, long item_id, string item_type) {
+            this.get_commentsAsync(api_key, auth_token, item_id, item_type, null);
         }
         
         /// <remarks/>
-        public void get_commentsAsync(string api_key, string auth_token, long target_id, string target, object userState) {
+        public void get_commentsAsync(string api_key, string auth_token, long item_id, string item_type, object userState) {
             if ((this.get_commentsOperationCompleted == null)) {
                 this.get_commentsOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_commentsOperationCompleted);
             }
             this.InvokeAsync("get_comments", new object[] {
                         api_key,
                         auth_token,
-                        target_id,
-                        target}, this.get_commentsOperationCompleted, userState);
+                        item_id,
+                        item_type}, this.get_commentsOperationCompleted, userState);
         }
         
         private void Onget_commentsOperationCompleted(object arg) {
@@ -2718,49 +2638,49 @@ namespace BoxSync.Core.ServiceReference {
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#add_comment", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
         [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string add_comment(string api_key, string auth_token, long target_id, string target, string message, out SOAPComment comment) {
+        public string add_comment(string api_key, string auth_token, long item_id, string item_type, string message, out SOAPComment[] comments) {
             object[] results = this.Invoke("add_comment", new object[] {
                         api_key,
                         auth_token,
-                        target_id,
-                        target,
+                        item_id,
+                        item_type,
                         message});
-            comment = ((SOAPComment)(results[1]));
+            comments = ((SOAPComment[])(results[1]));
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public System.IAsyncResult Beginadd_comment(string api_key, string auth_token, long target_id, string target, string message, System.AsyncCallback callback, object asyncState) {
+        public System.IAsyncResult Beginadd_comment(string api_key, string auth_token, long item_id, string item_type, string message, System.AsyncCallback callback, object asyncState) {
             return this.BeginInvoke("add_comment", new object[] {
                         api_key,
                         auth_token,
-                        target_id,
-                        target,
+                        item_id,
+                        item_type,
                         message}, callback, asyncState);
         }
         
         /// <remarks/>
-        public string Endadd_comment(System.IAsyncResult asyncResult, out SOAPComment comment) {
+        public string Endadd_comment(System.IAsyncResult asyncResult, out SOAPComment[] comments) {
             object[] results = this.EndInvoke(asyncResult);
-            comment = ((SOAPComment)(results[1]));
+            comments = ((SOAPComment[])(results[1]));
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void add_commentAsync(string api_key, string auth_token, long target_id, string target, string message) {
-            this.add_commentAsync(api_key, auth_token, target_id, target, message, null);
+        public void add_commentAsync(string api_key, string auth_token, long item_id, string item_type, string message) {
+            this.add_commentAsync(api_key, auth_token, item_id, item_type, message, null);
         }
         
         /// <remarks/>
-        public void add_commentAsync(string api_key, string auth_token, long target_id, string target, string message, object userState) {
+        public void add_commentAsync(string api_key, string auth_token, long item_id, string item_type, string message, object userState) {
             if ((this.add_commentOperationCompleted == null)) {
                 this.add_commentOperationCompleted = new System.Threading.SendOrPostCallback(this.Onadd_commentOperationCompleted);
             }
             this.InvokeAsync("add_comment", new object[] {
                         api_key,
                         auth_token,
-                        target_id,
-                        target,
+                        item_id,
+                        item_type,
                         message}, this.add_commentOperationCompleted, userState);
         }
         
@@ -2774,20 +2694,20 @@ namespace BoxSync.Core.ServiceReference {
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#delete_comment", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
         [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string delete_comment(string api_key, string auth_token, long target_id) {
+        public string delete_comment(string api_key, string auth_token, long message_id) {
             object[] results = this.Invoke("delete_comment", new object[] {
                         api_key,
                         auth_token,
-                        target_id});
+                        message_id});
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public System.IAsyncResult Begindelete_comment(string api_key, string auth_token, long target_id, System.AsyncCallback callback, object asyncState) {
+        public System.IAsyncResult Begindelete_comment(string api_key, string auth_token, long message_id, System.AsyncCallback callback, object asyncState) {
             return this.BeginInvoke("delete_comment", new object[] {
                         api_key,
                         auth_token,
-                        target_id}, callback, asyncState);
+                        message_id}, callback, asyncState);
         }
         
         /// <remarks/>
@@ -2797,19 +2717,19 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public void delete_commentAsync(string api_key, string auth_token, long target_id) {
-            this.delete_commentAsync(api_key, auth_token, target_id, null);
+        public void delete_commentAsync(string api_key, string auth_token, long message_id) {
+            this.delete_commentAsync(api_key, auth_token, message_id, null);
         }
         
         /// <remarks/>
-        public void delete_commentAsync(string api_key, string auth_token, long target_id, object userState) {
+        public void delete_commentAsync(string api_key, string auth_token, long message_id, object userState) {
             if ((this.delete_commentOperationCompleted == null)) {
                 this.delete_commentOperationCompleted = new System.Threading.SendOrPostCallback(this.Ondelete_commentOperationCompleted);
             }
             this.InvokeAsync("delete_comment", new object[] {
                         api_key,
                         auth_token,
-                        target_id}, this.delete_commentOperationCompleted, userState);
+                        message_id}, this.delete_commentOperationCompleted, userState);
         }
         
         private void Ondelete_commentOperationCompleted(object arg) {
@@ -2913,156 +2833,6 @@ namespace BoxSync.Core.ServiceReference {
             if ((this.get_server_timeCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.get_server_timeCompleted(this, new get_server_timeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_updates_rss_url", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_updates_rss_url(string api_key, string auth_token, out string rss_link) {
-            object[] results = this.Invoke("get_updates_rss_url", new object[] {
-                        api_key,
-                        auth_token});
-            rss_link = ((string)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginget_updates_rss_url(string api_key, string auth_token, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("get_updates_rss_url", new object[] {
-                        api_key,
-                        auth_token}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endget_updates_rss_url(System.IAsyncResult asyncResult, out string rss_link) {
-            object[] results = this.EndInvoke(asyncResult);
-            rss_link = ((string)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void get_updates_rss_urlAsync(string api_key, string auth_token) {
-            this.get_updates_rss_urlAsync(api_key, auth_token, null);
-        }
-        
-        /// <remarks/>
-        public void get_updates_rss_urlAsync(string api_key, string auth_token, object userState) {
-            if ((this.get_updates_rss_urlOperationCompleted == null)) {
-                this.get_updates_rss_urlOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_updates_rss_urlOperationCompleted);
-            }
-            this.InvokeAsync("get_updates_rss_url", new object[] {
-                        api_key,
-                        auth_token}, this.get_updates_rss_urlOperationCompleted, userState);
-        }
-        
-        private void Onget_updates_rss_urlOperationCompleted(object arg) {
-            if ((this.get_updates_rss_urlCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.get_updates_rss_urlCompleted(this, new get_updates_rss_urlCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#create_discussion", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string create_discussion(string api_key, string auth_token, long parent_id, string name, string description, out SOAPDiscussion discussion) {
-            object[] results = this.Invoke("create_discussion", new object[] {
-                        api_key,
-                        auth_token,
-                        parent_id,
-                        name,
-                        description});
-            discussion = ((SOAPDiscussion)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Begincreate_discussion(string api_key, string auth_token, long parent_id, string name, string description, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("create_discussion", new object[] {
-                        api_key,
-                        auth_token,
-                        parent_id,
-                        name,
-                        description}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endcreate_discussion(System.IAsyncResult asyncResult, out SOAPDiscussion discussion) {
-            object[] results = this.EndInvoke(asyncResult);
-            discussion = ((SOAPDiscussion)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void create_discussionAsync(string api_key, string auth_token, long parent_id, string name, string description) {
-            this.create_discussionAsync(api_key, auth_token, parent_id, name, description, null);
-        }
-        
-        /// <remarks/>
-        public void create_discussionAsync(string api_key, string auth_token, long parent_id, string name, string description, object userState) {
-            if ((this.create_discussionOperationCompleted == null)) {
-                this.create_discussionOperationCompleted = new System.Threading.SendOrPostCallback(this.Oncreate_discussionOperationCompleted);
-            }
-            this.InvokeAsync("create_discussion", new object[] {
-                        api_key,
-                        auth_token,
-                        parent_id,
-                        name,
-                        description}, this.create_discussionOperationCompleted, userState);
-        }
-        
-        private void Oncreate_discussionOperationCompleted(object arg) {
-            if ((this.create_discussionCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.create_discussionCompleted(this, new create_discussionCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_app_folder_id", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_app_folder_id(string api_key, string auth_token, out long folder_id) {
-            object[] results = this.Invoke("get_app_folder_id", new object[] {
-                        api_key,
-                        auth_token});
-            folder_id = ((long)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginget_app_folder_id(string api_key, string auth_token, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("get_app_folder_id", new object[] {
-                        api_key,
-                        auth_token}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endget_app_folder_id(System.IAsyncResult asyncResult, out long folder_id) {
-            object[] results = this.EndInvoke(asyncResult);
-            folder_id = ((long)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void get_app_folder_idAsync(string api_key, string auth_token) {
-            this.get_app_folder_idAsync(api_key, auth_token, null);
-        }
-        
-        /// <remarks/>
-        public void get_app_folder_idAsync(string api_key, string auth_token, object userState) {
-            if ((this.get_app_folder_idOperationCompleted == null)) {
-                this.get_app_folder_idOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_app_folder_idOperationCompleted);
-            }
-            this.InvokeAsync("get_app_folder_id", new object[] {
-                        api_key,
-                        auth_token}, this.get_app_folder_idOperationCompleted, userState);
-        }
-        
-        private void Onget_app_folder_idOperationCompleted(object arg) {
-            if ((this.get_app_folder_idCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.get_app_folder_idCompleted(this, new get_app_folder_idCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -3171,110 +2941,27 @@ namespace BoxSync.Core.ServiceReference {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:boxnet")]
-    public partial class SOAPDiscussion {
-        
-        private long discussion_idField;
-        
-        private string discussion_nameField;
-        
-        private long user_idField;
-        
-        private long createdField;
-        
-        private long updatedField;
-        
-        private string descriptionField;
-        
-        /// <remarks/>
-        public long discussion_id {
-            get {
-                return this.discussion_idField;
-            }
-            set {
-                this.discussion_idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string discussion_name {
-            get {
-                return this.discussion_nameField;
-            }
-            set {
-                this.discussion_nameField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public long user_id {
-            get {
-                return this.user_idField;
-            }
-            set {
-                this.user_idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public long created {
-            get {
-                return this.createdField;
-            }
-            set {
-                this.createdField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public long updated {
-            get {
-                return this.updatedField;
-            }
-            set {
-                this.updatedField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string description {
-            get {
-                return this.descriptionField;
-            }
-            set {
-                this.descriptionField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:boxnet")]
     public partial class SOAPComment {
         
-        private long comment_idField;
+        private long message_idField;
         
         private string messageField;
         
-        private string user_nameField;
+        private string from_userField;
         
-        private long user_idField;
+        private long from_user_idField;
         
-        private long createdField;
+        private string dateField;
         
-        private string avatar_urlField;
-        
-        private SOAPComment[] reply_commentsField;
+        private string timeField;
         
         /// <remarks/>
-        public long comment_id {
+        public long message_id {
             get {
-                return this.comment_idField;
+                return this.message_idField;
             }
             set {
-                this.comment_idField = value;
+                this.message_idField = value;
             }
         }
         
@@ -3289,52 +2976,42 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public string user_name {
+        public string from_user {
             get {
-                return this.user_nameField;
+                return this.from_userField;
             }
             set {
-                this.user_nameField = value;
+                this.from_userField = value;
             }
         }
         
         /// <remarks/>
-        public long user_id {
+        public long from_user_id {
             get {
-                return this.user_idField;
+                return this.from_user_idField;
             }
             set {
-                this.user_idField = value;
+                this.from_user_idField = value;
             }
         }
         
         /// <remarks/>
-        public long created {
+        public string date {
             get {
-                return this.createdField;
+                return this.dateField;
             }
             set {
-                this.createdField = value;
+                this.dateField = value;
             }
         }
         
         /// <remarks/>
-        public string avatar_url {
+        public string time {
             get {
-                return this.avatar_urlField;
+                return this.timeField;
             }
             set {
-                this.avatar_urlField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPComment[] reply_comments {
-            get {
-                return this.reply_commentsField;
-            }
-            set {
-                this.reply_commentsField = value;
+                this.timeField = value;
             }
         }
     }
@@ -4118,48 +3795,6 @@ namespace BoxSync.Core.ServiceReference {
             get {
                 this.RaiseExceptionIfNecessary();
                 return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public long new_id {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((long)(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void copy_and_renameCompletedEventHandler(object sender, copy_and_renameCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class copy_and_renameCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal copy_and_renameCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public long new_id {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((long)(this.results[1]));
             }
         }
     }
@@ -5164,10 +4799,10 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public SOAPComment comment {
+        public SOAPComment[] comments {
             get {
                 this.RaiseExceptionIfNecessary();
-                return ((SOAPComment)(this.results[1]));
+                return ((SOAPComment[])(this.results[1]));
             }
         }
     }
@@ -5259,108 +4894,6 @@ namespace BoxSync.Core.ServiceReference {
         
         /// <remarks/>
         public long time {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((long)(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void get_updates_rss_urlCompletedEventHandler(object sender, get_updates_rss_urlCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class get_updates_rss_urlCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal get_updates_rss_urlCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public string rss_link {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void create_discussionCompletedEventHandler(object sender, create_discussionCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class create_discussionCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal create_discussionCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPDiscussion discussion {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPDiscussion)(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void get_app_folder_idCompletedEventHandler(object sender, get_app_folder_idCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class get_app_folder_idCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal get_app_folder_idCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public long folder_id {
             get {
                 this.RaiseExceptionIfNecessary();
                 return ((long)(this.results[1]));

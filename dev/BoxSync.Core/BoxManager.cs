@@ -744,7 +744,9 @@ namespace BoxSync.Core
 			string type = ObjectType2String(ObjectType.File);
 			long newID;
 
-			string response = _service.copy(_apiKey, _token, type, targetFileID, destinationFolderID, out newID);
+			//string response = _service.copy(_apiKey, _token, type, targetFileID, destinationFolderID, out newID);
+
+			string response = "";
 
 			return StatusMessageParser.ParseCopyObjectStatus(response);
 		}
@@ -2634,6 +2636,42 @@ namespace BoxSync.Core
 		}
 		#endregion
 
+		#region GetComments
+		
+		#endregion
+
+		#region AddComment
+		#endregion
+
+		#region GetUpdates
+		public GetUpdatesResponse GetUpdates(DateTime fromDate, DateTime toDate, GetUpdatesOptions options)
+		{
+			const string invalidDateTimeArgumentExceptionText =
+				"Argument can not be equal to DateTime.MinValue or DateTime.MaxValue";
+
+			if(fromDate == DateTime.MinValue || fromDate == DateTime.MaxValue)
+			{
+				throw new ArgumentException(invalidDateTimeArgumentExceptionText, "fromDate");
+			}
+
+			if (toDate == DateTime.MinValue || toDate == DateTime.MaxValue)
+			{
+				throw new ArgumentException(invalidDateTimeArgumentExceptionText, "toDate");
+			}
+
+			byte[] updates;
+
+			double fromDateUnixConverted = UnixTimeConverter.Instance.ToUnixTime(fromDate);
+			double toDateUnixConverted = UnixTimeConverter.Instance.ToUnixTime(toDate);
+
+			string status = _service.get_updates(_apiKey, _token, (long)fromDateUnixConverted, (long)toDateUnixConverted, new string[0], out updates);
+
+			return new GetUpdatesResponse
+			       	{
+			       		Status = StatusMessageParser.ParseGetUpdatesStatus(status)
+			       	};
+		}
+		#endregion
 
 		#region Helper method
 

@@ -337,5 +337,22 @@ namespace BoxSync.Core
 					return GetAccountInfoStatus.Unknown;
 			}
 		}
+
+		internal static GetUpdatesStatus ParseGetUpdatesStatus(string status)
+		{
+			switch (status)
+			{
+				case "s_get_updates":
+					return GetUpdatesStatus.Successful;
+				case "application_restricted":
+					return GetUpdatesStatus.ApplicationRestricted;
+				case "not_logged_in":
+					return GetUpdatesStatus.NotLoggedIn;
+				case "e_invalid_timestamp":
+					return GetUpdatesStatus.InvalidTimestamp;
+				default:
+					return GetUpdatesStatus.Unknown;
+			}
+		}
 	}
 }
