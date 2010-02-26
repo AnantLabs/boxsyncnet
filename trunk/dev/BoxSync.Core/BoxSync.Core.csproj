@@ -69,6 +69,8 @@
     <Compile Include="Primitives\GetFolderStructureResponse.cs" />
     <Compile Include="Primitives\GetTicketResponse.cs" />
     <Compile Include="Primitives\GetAuthenticationTokenResponse.cs" />
+    <Compile Include="Primitives\GetUpdatesOptions.cs" />
+    <Compile Include="Primitives\GetUpdatesResponse.cs" />
     <Compile Include="Primitives\LogoutResponse.cs" />
     <Compile Include="Primitives\MoveObjectResponse.cs" />
     <Compile Include="Primitives\MultipartRequestUploadResponse.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="Primitives\File.cs" />
     <Compile Include="Primitives\ImageFile.cs" />
     <Compile Include="Statuses\GetAccountInfoStatus.cs" />
+    <Compile Include="Statuses\GetUpdatesStatus.cs" />
     <Compile Include="Statuses\LogoutStatus.cs" />
     <Compile Include="Statuses\MoveObjectStatus.cs" />
     <Compile Include="Statuses\FileNewCopyStatus.cs" />

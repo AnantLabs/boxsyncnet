@@ -43,14 +43,14 @@ namespace BoxSync.Core.Primitives
 	}
 
 	/// <summary>
-	/// Provides helper methods for RetrieveFolderStructureOptions enumeration list
+	/// Provides helper methods for <see cref="RetrieveFolderStructureOptions"/> enumeration list
 	/// </summary>
 	public static class FolderStructureRetrieveModeExtensions
 	{
 		/// <summary>
 		/// Checks if <paramref name="folderStructureOptions"/> contains <paramref name="options"/>
 		/// </summary>
-		/// <param name="folderStructureOptions">Set of RetrieveFolderStructureOptions flags</param>
+		/// <param name="folderStructureOptions">Set of <see cref="RetrieveFolderStructureOptions"/> flags</param>
 		/// <param name="options">Single folder structure retrieve option</param>
 		/// <returns>True if set of flags <paramref name="folderStructureOptions"/> contains <paramref name="options"/></returns>
 		public static bool Contains(this RetrieveFolderStructureOptions folderStructureOptions, RetrieveFolderStructureOptions options)
@@ -67,22 +67,22 @@ namespace BoxSync.Core.Primitives
 		{
 			List<string> result = new List<string>(3);
 			
-			if((folderStructureOptions & RetrieveFolderStructureOptions.NoFiles) == RetrieveFolderStructureOptions.NoFiles)
+			if(folderStructureOptions.Contains(RetrieveFolderStructureOptions.NoFiles))
 			{
 				result.Add("nofiles");
 			}
 
-			if ((folderStructureOptions & RetrieveFolderStructureOptions.NoZip) == RetrieveFolderStructureOptions.NoZip)
+			if (folderStructureOptions.Contains(RetrieveFolderStructureOptions.NoZip))
 			{
 				result.Add("nozip");
 			}
 
-			if ((folderStructureOptions & RetrieveFolderStructureOptions.OneLevel) == RetrieveFolderStructureOptions.OneLevel)
+			if (folderStructureOptions.Contains(RetrieveFolderStructureOptions.OneLevel))
 			{
 				result.Add("onelevel");
 			}
 
-			if ((folderStructureOptions & RetrieveFolderStructureOptions.Simple) == RetrieveFolderStructureOptions.Simple)
+			if (folderStructureOptions.Contains(RetrieveFolderStructureOptions.Simple))
 			{
 				result.Add("simple");
 			}

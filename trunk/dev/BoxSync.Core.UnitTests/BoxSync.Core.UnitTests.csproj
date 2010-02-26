@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="FolderBaseTests.cs" />
     <Compile Include="MessageParserTests.cs" />
+    <Compile Include="Primitives\FolderStructureRetrieveModeExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TagPrimitiveCollectionTests.cs" />
   </ItemGroup>

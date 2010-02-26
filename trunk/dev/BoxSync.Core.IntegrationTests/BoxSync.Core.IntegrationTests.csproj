@@ -47,6 +47,7 @@
     <Compile Include="GetAccountInfoTests.cs" />
     <Compile Include="GetTicketTests.cs" />
     <Compile Include="GetAuthenticationTokenTests.cs" />
+    <Compile Include="GetUpdatesTests.cs" />
     <Compile Include="IntegrationTestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
