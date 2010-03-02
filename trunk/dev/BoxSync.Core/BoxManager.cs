@@ -2664,11 +2664,36 @@ namespace BoxSync.Core
 			double fromDateUnixConverted = UnixTimeConverter.Instance.ToUnixTime(fromDate);
 			double toDateUnixConverted = UnixTimeConverter.Instance.ToUnixTime(toDate);
 
-			string status = _service.get_updates(_apiKey, _token, (long)fromDateUnixConverted, (long)toDateUnixConverted, new string[0], out updates);
+			string status = _service.get_updates(_apiKey, _token, (long)fromDateUnixConverted, (long)toDateUnixConverted, options.ToStringArray(), out updates);
 
 			return new GetUpdatesResponse
 			       	{
 			       		Status = StatusMessageParser.ParseGetUpdatesStatus(status)
+			       	};
+		}
+		#endregion
+
+		#region test 
+		/// <summary>
+		/// Gets the time on server
+		/// </summary>
+		/// <returns>Response from server which includes web-method call status and server time</returns>
+		public GetServerTimeResponse GetServerTime()
+		{
+			long unixServerTime;
+
+			string status = _service.get_server_time(_apiKey, _token, out unixServerTime);
+
+			GetServerTimeStatus parsedStatus = StatusMessageParser.ParseGetServerTimeStatus(status);
+			DateTime serverTime = parsedStatus == GetServerTimeStatus.Successful
+			                      	?
+			                      		UnixTimeConverter.Instance.FromUnixTime(unixServerTime)
+			                      	: 
+										DateTime.MinValue;
+
+			return new GetServerTimeResponse(serverTime)
+			       	{
+                        Status = parsedStatus
 			       	};
 		}
 		#endregion

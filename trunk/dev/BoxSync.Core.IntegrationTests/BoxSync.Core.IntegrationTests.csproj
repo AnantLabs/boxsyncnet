@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GetAccountInfoTests.cs" />
+    <Compile Include="GetServerTimeTests.cs" />
     <Compile Include="GetTicketTests.cs" />
     <Compile Include="GetAuthenticationTokenTests.cs" />
     <Compile Include="GetUpdatesTests.cs" />

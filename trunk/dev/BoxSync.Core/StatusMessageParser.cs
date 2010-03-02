@@ -354,5 +354,20 @@ namespace BoxSync.Core
 					return GetUpdatesStatus.Unknown;
 			}
 		}
+
+		internal static GetServerTimeStatus ParseGetServerTimeStatus(string status)
+		{
+			switch (status)
+			{
+				case "get_server_time":
+					return GetServerTimeStatus.Successful;
+				case "application_restricted":
+					return GetServerTimeStatus.ApplicationRestricted;
+				case "not_logged_in":
+					return GetServerTimeStatus.NotLoggedIn;
+				default:
+					return GetServerTimeStatus.Unknown;
+			}
+		}
 	}
 }

@@ -67,6 +67,7 @@
     <Compile Include="Primitives\FolderBase.cs" />
     <Compile Include="Primitives\GetAccountInfoResponse.cs" />
     <Compile Include="Primitives\GetFolderStructureResponse.cs" />
+    <Compile Include="Primitives\GetServerTimeResponse.cs" />
     <Compile Include="Primitives\GetTicketResponse.cs" />
     <Compile Include="Primitives\GetAuthenticationTokenResponse.cs" />
     <Compile Include="Primitives\GetUpdatesOptions.cs" />
@@ -82,6 +83,9 @@
     <Compile Include="Primitives\PrivateShareResponse.cs" />
     <Compile Include="Primitives\RegisterNewUserResponse.cs" />
     <Compile Include="Primitives\SetDescriptionResponse.cs" />
+    <Compile Include="Primitives\UpdatedFile.cs" />
+    <Compile Include="Primitives\UpdateItem.cs" />
+    <Compile Include="Primitives\UpdateType.cs" />
     <Compile Include="Primitives\VerifyRegistrationEmailResponse.cs" />
     <Compile Include="Statuses\AddToMyBoxStatus.cs" />
     <Compile Include="Statuses\AuthenticationStatus.cs" />
@@ -92,6 +96,7 @@
     <Compile Include="Primitives\File.cs" />
     <Compile Include="Primitives\ImageFile.cs" />
     <Compile Include="Statuses\GetAccountInfoStatus.cs" />
+    <Compile Include="Statuses\GetServerTimeStatus.cs" />
     <Compile Include="Statuses\GetUpdatesStatus.cs" />
     <Compile Include="Statuses\LogoutStatus.cs" />
     <Compile Include="Statuses\MoveObjectStatus.cs" />
