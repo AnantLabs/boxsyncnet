@@ -10,32 +10,45 @@ using File=BoxSync.Core.Primitives.File;
 
 namespace BoxSync.Core.IntegrationTests
 {
+	/// <summary>
+	/// Set of tests for "GetUpdates" web method
+	/// </summary>
 	[TestFixture]
 	public class GetUpdatesTests : IntegrationTestBase
 	{
+		/// <summary>
+		/// Tests successful scenario of "GetUpdates" method call
+		/// </summary>
 		[Test]
-		public void Test()
+		public void TestGetUpdates()
 		{
 			BoxManager manager = new BoxManager(ApplicationKey, ServiceUrl, null);
 			string ticket;
 			string token;
+			User user;
 			
 			manager.GetTicket(out ticket);
 
 			SubmitAuthenticationInformation(ticket);
 
-			DateTime fromDate = DateTime.UtcNow;
-			UploadFileResponse uploadResponse = UploadTemporaryFile(manager);
-			DateTime toDate = DateTime.UtcNow;
+			manager.GetAuthenticationToken(ticket, out token, out user);
 
-			GetUpdatesResponse getUpdatesResponse = manager.GetUpdates(fromDate, toDate, GetUpdatesOptions.None);
+			DateTime fromDate = manager.GetServerTime().ServerTime;
+			UploadFileResponse uploadResponse = UploadTemporaryFile(manager);
+			DateTime toDate = manager.GetServerTime().ServerTime;
+
+			Assert.AreEqual(UploadFileStatus.Successful, uploadResponse.Status);
+
+			GetUpdatesResponse getUpdatesResponse = manager.GetUpdates(fromDate, toDate, GetUpdatesOptions.NoZip);
+
+			DeleteTemporaryFile(manager, uploadResponse.UploadedFileStatus.Keys.ToArray()[0].ID);
 
 			Assert.IsNull(getUpdatesResponse.Error);
 			Assert.IsNull(getUpdatesResponse.UserState);
 			Assert.AreEqual(GetUpdatesStatus.Successful, getUpdatesResponse.Status);
 		}
 
-		public UploadFileResponse UploadTemporaryFile(BoxManager manager)
+		private static UploadFileResponse UploadTemporaryFile(BoxManager manager)
 		{
 			string tempFileName = Path.GetTempFileName();
 
@@ -44,7 +57,7 @@ namespace BoxSync.Core.IntegrationTests
 			return manager.AddFile(tempFileName, 0);
 		}
 
-		public void DeleteTemporaryFile(BoxManager manager, long objectID)
+		private static void DeleteTemporaryFile(BoxManager manager, long objectID)
 		{
 			manager.DeleteObject(objectID, ObjectType.File);
 		}
