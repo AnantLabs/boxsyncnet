@@ -22,44 +22,20 @@ namespace BoxSync.Core.IntegrationTests
 		[Test]
 		public void TestGetUpdates()
 		{
-			BoxManager manager = new BoxManager(ApplicationKey, ServiceUrl, null);
-			string ticket;
-			string token;
-			User user;
+			UploadFileResponse uploadResponse = UploadTemporaryFile(Context.Manager);
+			DateTime createdDate = uploadResponse.UploadedFileStatus.Keys.ElementAt(0).Created;
 			
-			manager.GetTicket(out ticket);
-
-			SubmitAuthenticationInformation(ticket);
-
-			manager.GetAuthenticationToken(ticket, out token, out user);
-
-			DateTime fromDate = manager.GetServerTime().ServerTime;
-			UploadFileResponse uploadResponse = UploadTemporaryFile(manager);
-			DateTime toDate = manager.GetServerTime().ServerTime;
-
 			Assert.AreEqual(UploadFileStatus.Successful, uploadResponse.Status);
 
-			GetUpdatesResponse getUpdatesResponse = manager.GetUpdates(fromDate, toDate, GetUpdatesOptions.NoZip);
+			GetUpdatesResponse getUpdatesResponse = Context.Manager.GetUpdates(createdDate.AddSeconds(-1), createdDate.AddSeconds(1), GetUpdatesOptions.NoZip);
 
-			DeleteTemporaryFile(manager, uploadResponse.UploadedFileStatus.Keys.ToArray()[0].ID);
+			DeleteTemporaryFile(Context.Manager, uploadResponse.UploadedFileStatus.Keys.ToArray()[0].ID);
 
 			Assert.IsNull(getUpdatesResponse.Error);
 			Assert.IsNull(getUpdatesResponse.UserState);
 			Assert.AreEqual(GetUpdatesStatus.Successful, getUpdatesResponse.Status);
 		}
 
-		private static UploadFileResponse UploadTemporaryFile(BoxManager manager)
-		{
-			string tempFileName = Path.GetTempFileName();
-
-			System.IO.File.WriteAllText(tempFileName, Guid.Empty.ToString());
-
-			return manager.AddFile(tempFileName, 0);
-		}
-
-		private static void DeleteTemporaryFile(BoxManager manager, long objectID)
-		{
-			manager.DeleteObject(objectID, ObjectType.File);
-		}
+		
 	}
 }

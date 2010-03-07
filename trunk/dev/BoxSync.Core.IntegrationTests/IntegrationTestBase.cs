@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Configuration;
+using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading;
+using BoxSync.Core.Primitives;
 using NUnit.Framework;
 
 
@@ -13,6 +16,32 @@ namespace BoxSync.Core.IntegrationTests
 	[TestFixture]
 	public abstract class IntegrationTestBase
 	{
+		protected TestContext Context
+		{
+			get; 
+			set;
+		}
+
+		[SetUp]
+		public void SetUp()
+		{
+			InitializeContext();
+		}
+
+		[TearDown]
+		public void CleanUp()
+		{
+			if (Context != null)
+			{
+				if (Context.Manager != null)
+				{
+					Context.Manager.Logout();
+				}
+
+				Context = null;
+			}
+		}
+
 		/// <summary>
 		/// Service login
 		/// </summary>
@@ -57,6 +86,28 @@ namespace BoxSync.Core.IntegrationTests
 			}
 		}
 
+		protected void InitializeContext()
+		{
+			BoxManager manager = new BoxManager(ApplicationKey, ServiceUrl, null);
+			string ticket;
+			string token;
+			User user;
+
+			manager.GetTicket(out ticket);
+
+			SubmitAuthenticationInformation(ticket);
+
+			manager.GetAuthenticationToken(ticket, out token, out user);
+
+			Context = new TestContext
+			          	{
+			          		AuthenticatedUser = user,
+			          		Manager = manager,
+			          		Ticket = ticket,
+			          		Token = token
+			          	};
+		}
+
 		protected string SubmitAuthenticationInformation(string ticket)
 		{
 			string uploadResult = null;
@@ -94,6 +145,32 @@ namespace BoxSync.Core.IntegrationTests
 			}
 
 			return uploadResult;
+		}
+
+		protected static UploadFileResponse UploadTemporaryFile(BoxManager manager)
+		{
+			byte[] fileContent = Encoding.UTF8.GetBytes(Guid.Empty.ToString());
+
+			return UploadTemporaryFile(manager, fileContent, 0);
+		}
+
+		protected static UploadFileResponse UploadTemporaryFile(BoxManager manager, byte[] fileContent, long folderID)
+		{
+			string tempFileName = Path.GetTempFileName();
+
+			System.IO.File.WriteAllBytes(tempFileName, fileContent);
+
+			return manager.AddFile(tempFileName, 0);
+		}
+
+		protected static void DeleteTemporaryFile(BoxManager manager, long objectID)
+		{
+			manager.DeleteObject(objectID, ObjectType.File);
+		}
+
+		protected static void DeleteFolder(BoxManager manager, long folderID)
+		{
+			manager.DeleteObject(folderID, ObjectType.Folder);
 		}
 	}
 }

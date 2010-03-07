@@ -66,6 +66,7 @@
     <Compile Include="Primitives\FileNewCopyResponse.cs" />
     <Compile Include="Primitives\FolderBase.cs" />
     <Compile Include="Primitives\GetAccountInfoResponse.cs" />
+    <Compile Include="Primitives\GetFileInfoResponse.cs" />
     <Compile Include="Primitives\GetFolderStructureResponse.cs" />
     <Compile Include="Primitives\GetServerTimeResponse.cs" />
     <Compile Include="Primitives\GetTicketResponse.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Primitives\File.cs" />
     <Compile Include="Primitives\ImageFile.cs" />
     <Compile Include="Statuses\GetAccountInfoStatus.cs" />
+    <Compile Include="Statuses\GetFileInfoStatus.cs" />
     <Compile Include="Statuses\GetServerTimeStatus.cs" />
     <Compile Include="Statuses\GetUpdatesStatus.cs" />
     <Compile Include="Statuses\LogoutStatus.cs" />

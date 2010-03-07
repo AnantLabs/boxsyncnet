@@ -962,8 +962,32 @@ namespace BoxSync.Core
 		/// <param name="folderName">Folder name</param>
 		/// <param name="parentFolderID">ID of the parent folder where new folder needs to be created or '0'</param>
 		/// <param name="isShared">Indicates if new folder will be publicly shared</param>
+		/// <returns>Operation status</returns>
+		public CreateFolderResponse CreateFolder(
+			string folderName,
+			long parentFolderID,
+			bool isShared)
+		{
+			SOAPFolder soapFolder;
+			string response = _service.create_folder(_apiKey, _token, parentFolderID, folderName, isShared ? 1 : 0,
+			                                         out soapFolder);
+
+			return new CreateFolderResponse
+			       	{
+			       		Folder = new Folder(soapFolder),
+			       		Status = StatusMessageParser.ParseAddFolderStatus(response)
+			       	};
+		}
+
+		/// <summary>
+		/// Creates folder
+		/// </summary>
+		/// <param name="folderName">Folder name</param>
+		/// <param name="parentFolderID">ID of the parent folder where new folder needs to be created or '0'</param>
+		/// <param name="isShared">Indicates if new folder will be publicly shared</param>
 		/// <param name="folder">Contains all information about newly created folder</param>
 		/// <returns>Operation status</returns>
+		[Obsolete("Use CreateFolder(string, long, bool):CreateFolderResponse")]
 		public CreateFolderStatus CreateFolder(
 			string folderName, 
 			long parentFolderID, 
@@ -1164,8 +1188,19 @@ namespace BoxSync.Core
 		/// Retrieves a user's root folder structure
 		/// </summary>
 		/// <param name="retrieveOptions">Retrieve options</param>
+		/// <returns>Operation status</returns>
+		public GetFolderStructureResponse GetRootFolderStructure(RetrieveFolderStructureOptions retrieveOptions)
+		{
+			return GetFolderStructure(0, retrieveOptions);
+		}
+
+		/// <summary>
+		/// Retrieves a user's root folder structure
+		/// </summary>
+		/// <param name="retrieveOptions">Retrieve options</param>
 		/// <param name="folder">Root folder</param>
 		/// <returns>Operation status</returns>
+		[Obsolete("Use GetRootFolderStructure(RetrieveFolderStructureOptions):GetFolderStructureResponse")]
 		public GetAccountTreeStatus GetRootFolderStructure(RetrieveFolderStructureOptions retrieveOptions, out Folder folder)
 		{
 			return GetFolderStructure(0, retrieveOptions, out folder);
@@ -1205,8 +1240,51 @@ namespace BoxSync.Core
 		/// </summary>
 		/// <param name="folderID">ID of the folder to retrieve</param>
 		/// <param name="retrieveOptions">Retrieve options</param>
+		/// <returns>Operation status</returns>
+		public GetFolderStructureResponse GetFolderStructure(
+			long folderID,
+			RetrieveFolderStructureOptions retrieveOptions)
+		{
+			Folder folder = null;
+
+			byte[] folderInfoXml;
+
+			string result = _service.get_account_tree(_apiKey, _token, folderID, retrieveOptions.ToStringArray(),
+			                                          out folderInfoXml);
+			GetAccountTreeStatus status = StatusMessageParser.ParseGetAccountTreeStatus(result);
+
+			if (status == GetAccountTreeStatus.Successful)
+			{
+				string folderInfo = null;
+
+				if (!retrieveOptions.Contains(RetrieveFolderStructureOptions.NoZip))
+				{
+					folderInfoXml = Unzip(folderInfoXml);
+				}
+
+				if (folderInfoXml != null)
+				{
+					folderInfo = Encoding.ASCII.GetString(folderInfoXml);
+				}
+
+				folder = ParseFolderStructureXmlMessage(folderInfo);
+			}
+
+			return new GetFolderStructureResponse
+			       	{
+			       		Folder = folder,
+			       		Status = status
+			       	};
+		}
+
+		/// <summary>
+		/// Retrieves a user's folder structure by ID
+		/// </summary>
+		/// <param name="folderID">ID of the folder to retrieve</param>
+		/// <param name="retrieveOptions">Retrieve options</param>
 		/// <param name="folder">Folder object</param>
 		/// <returns>Operation status</returns>
+		[Obsolete("Use GetFolderStructure(long, RetrieveFolderStructureOptions):GetFolderStructureResponse")]
 		public GetAccountTreeStatus GetFolderStructure(
 			long folderID, 
 			RetrieveFolderStructureOptions retrieveOptions, 
@@ -1215,7 +1293,7 @@ namespace BoxSync.Core
 			folder = null;
 
 			byte[] folderInfoXml;
-
+			
 			string result = _service.get_account_tree(_apiKey, _token, folderID, retrieveOptions.ToStringArray(), out folderInfoXml);
 			GetAccountTreeStatus status = StatusMessageParser.ParseGetAccountTreeStatus(result);
 
@@ -2214,8 +2292,43 @@ namespace BoxSync.Core
 		/// <param name="password">Password to protect shared object or Null</param>
 		/// <param name="notificationMessage">Message to be included in a notification email</param>
 		/// <param name="emailList">Array of emails for which to notify users about a newly shared file or folder</param>
+		/// <returns>Operation status</returns>
+		public PublicShareResponse PublicShare(
+			long targetObjectID,
+			ObjectType targetObjectType,
+			string password,
+			string notificationMessage,
+			string[] emailList)
+		{
+			string publicName;
+			string type = ObjectType2String(targetObjectType);
+			string result = _service.public_share(_apiKey,
+			                                      _token,
+			                                      type,
+			                                      targetObjectID,
+			                                      password ?? string.Empty,
+			                                      notificationMessage ?? string.Empty,
+			                                      emailList ?? new string[0],
+			                                      out publicName);
+
+			return new PublicShareResponse
+			       	{
+			       		PublicName = publicName,
+			       		Status = StatusMessageParser.ParsePublicShareStatus(result)
+			       	};
+		}
+
+		/// <summary>
+		/// Publicly shares a file or folder
+		/// </summary>
+		/// <param name="targetObjectID">ID of the object to be shared</param>
+		/// <param name="targetObjectType">Type of the object</param>
+		/// <param name="password">Password to protect shared object or Null</param>
+		/// <param name="notificationMessage">Message to be included in a notification email</param>
+		/// <param name="emailList">Array of emails for which to notify users about a newly shared file or folder</param>
 		/// <param name="publicName">Unique identifier of a publicly shared object</param>
 		/// <returns>Operation status</returns>
+		[Obsolete("Use PublicShare(long, ObjectType, string, string, string[]):PublicShareResponse")]
 		public PublicShareStatus PublicShare(
 			long targetObjectID, 
 			ObjectType targetObjectType, 
@@ -2673,7 +2786,40 @@ namespace BoxSync.Core
 		}
 		#endregion
 
-		#region test 
+		#region GetFileInfo
+		/// <summary>
+		/// Retrieves the details for a specified file by its ID
+		/// </summary>
+		/// <param name="fileID">File ID</param>
+		/// <returns>Information about a file</returns>
+		public GetFileInfoResponse GetFileInfo(long fileID)
+		{
+			SOAPFileInfo fileInfo;
+			
+			string status = _service.get_file_info(_apiKey, _token, fileID, out fileInfo);
+
+			File file = new File
+			            	{
+			            		Created = UnixTimeConverter.Instance.FromUnixTime(fileInfo.created),
+			            		Description = fileInfo.description,
+			            		ID = fileInfo.file_id,
+								IsShared = fileInfo.shared == 1,
+								Name = fileInfo.file_name,
+								PublicName = fileInfo.public_name,
+								SHA1Hash = fileInfo.sha1,
+								Size = fileInfo.size,
+                                Updated = UnixTimeConverter.Instance.FromUnixTime(fileInfo.updated)
+			            	};
+
+			return new GetFileInfoResponse
+			       	{
+						Status = StatusMessageParser.ParseGetFileInfoStatus(status),
+						File = file
+			       	};
+		}
+		#endregion
+
+		#region GetServerTime
 		/// <summary>
 		/// Gets the time on server
 		/// </summary>
