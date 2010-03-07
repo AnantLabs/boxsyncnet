@@ -91,6 +91,8 @@ namespace BoxSync.Core
 					return SetDescriptionStatus.Successful;
 				case "e_set_description":
 					return SetDescriptionStatus.Failed;
+				case "not_logged_id":
+					return SetDescriptionStatus.NotLoggedID;
 				default:
 					return SetDescriptionStatus.Unknown;
 			}
@@ -367,6 +369,23 @@ namespace BoxSync.Core
 					return GetServerTimeStatus.NotLoggedIn;
 				default:
 					return GetServerTimeStatus.Unknown;
+			}
+		}
+
+		internal static GetFileInfoStatus ParseGetFileInfoStatus(string status)
+		{
+			switch (status)
+			{
+				case "s_get_file_info":
+					return GetFileInfoStatus.Successful;
+				case "application_restricted":
+					return GetFileInfoStatus.ApplicationRestricted;
+				case "not_logged_in":
+					return GetFileInfoStatus.NotLoggedIn;
+				case "e_access_denied":
+					return GetFileInfoStatus.AccessDenied;
+				default:
+					return GetFileInfoStatus.Unknown;
 			}
 		}
 	}

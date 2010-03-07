@@ -22,6 +22,12 @@
 		Failed = 2,
 
 		/// <summary>
+		/// The user did not successfully authenticate or has logged out.
+		/// Represents 'not_logged_id' status string.
+		/// </summary>
+		NotLoggedID = 3,
+
+		/// <summary>
 		/// An invalid API key was provided, or the API key is restricted from calling this function.
 		/// Represents 'application_restricted' status string.
 		/// </summary>

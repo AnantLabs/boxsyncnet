@@ -45,12 +45,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GetAccountInfoTests.cs" />
+    <Compile Include="GetFileInfoTests.cs" />
     <Compile Include="GetServerTimeTests.cs" />
     <Compile Include="GetTicketTests.cs" />
     <Compile Include="GetAuthenticationTokenTests.cs" />
     <Compile Include="GetUpdatesTests.cs" />
     <Compile Include="IntegrationTestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SetDescriptionTests.cs" />
+    <Compile Include="TestContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

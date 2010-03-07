@@ -41,7 +41,7 @@ namespace BoxSync.Core.IntegrationTests
 			
 			Assert.AreEqual(user.AccessID, response.User.AccessID);
 			Assert.AreEqual(user.ID, response.User.ID);
-			//Assert.AreEqual(user.MaxUploadSize, response.User.MaxUploadSize);
+			Assert.AreEqual(user.MaxUploadSize, response.User.MaxUploadSize);
 			Assert.AreEqual(user.SpaceAmount, response.User.SpaceAmount);
 			Assert.AreEqual(user.SpaceUsed, response.User.SpaceUsed);
 
