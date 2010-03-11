@@ -108,7 +108,8 @@ namespace BoxSync.Core
 		/// <param name="authenticationToken">Authentication token</param>
 		/// <param name="authenticatedUser">Authenticated user information</param>
 		/// <returns>Operation result</returns>
-		[Obsolete("Use AuthenticateUser(string, string, string) method instead")]
+		/// <exception cref="NotSupportedException">The exception is thrown every time you call the method</exception>
+		[Obsolete("This method is no longer supported by Box.NET API")]
 		public AuthenticationStatus AuthenticateUser(
 			string login, 
 			string password, 
@@ -116,14 +117,7 @@ namespace BoxSync.Core
 			out string authenticationToken, 
 			out User authenticatedUser)
 		{
-			SOAPUser user;
-			
-			string result = _service.authorization(_apiKey, login, password, method, out authenticationToken, out user);
-			
-			authenticatedUser = new User(user);
-			_token = authenticationToken;
-
-			return StatusMessageParser.ParseAuthorizeStatus(result);
+			throw new NotSupportedException("This method is no longer supported by Box.NET API");
 		}
 
 		/// <summary>
@@ -133,24 +127,14 @@ namespace BoxSync.Core
 		/// <param name="password">Account password</param>
 		/// <param name="method"></param>
 		/// <returns>Operation result</returns>
+		/// <exception cref="NotSupportedException">The exception is thrown every time you call the method</exception>
+		[Obsolete("This method is no longer supported by Box.NET API")]
 		public AuthenticateUserResponse AuthenticateUser(
 			string login,
 			string password,
 			string method)
 		{
-			SOAPUser user;
-			AuthenticateUserResponse response = new AuthenticateUserResponse();
-			string authenticationToken;
-
-			string result = _service.authorization(_apiKey, login, password, method, out authenticationToken, out user);
-
-			_token = authenticationToken;
-
-			response.AuthenticatedUser = user == null ? null : new User(user);
-			response.Token = authenticationToken;
-			response.Status = StatusMessageParser.ParseAuthorizeStatus(result);
-
-			return response;
+			throw new NotSupportedException("This method is no longer supported by Box.NET API");
 		}
 
 		/// <summary>
@@ -160,7 +144,8 @@ namespace BoxSync.Core
 		/// <param name="password">Account password</param>
 		/// <param name="method"></param>
 		/// <param name="authenticateUserCompleted">Callback method which will be invoked when operation completes</param>
-		/// <exception cref="ArgumentNullException">Thrown if <paramref name="authenticateUserCompleted"/> is null</exception>
+		/// <exception cref="NotSupportedException">The exception is thrown every time you call the method</exception>
+		[Obsolete("This method is no longer supported by Box.NET API")]
 		public void AuthenticateUser(
 			string login,
 			string password,
@@ -179,7 +164,8 @@ namespace BoxSync.Core
 		/// <param name="authenticateUserCompleted">Callback method which will be invoked when operation completes</param>
 		/// <param name="userState">A user-defined object containing state information. 
 		/// This object is passed to the <paramref name="authenticateUserCompleted"/> delegate as a part of response when the operation is completed</param>
-		/// <exception cref="ArgumentNullException">Thrown if <paramref name="authenticateUserCompleted"/> is null</exception>
+		/// <exception cref="NotSupportedException">The exception is thrown every time you call the method</exception>
+		[Obsolete("This method is no longer supported by Box.NET API")]
 		public void AuthenticateUser(
 			string login,
 			string password,
@@ -187,50 +173,7 @@ namespace BoxSync.Core
 			OperationFinished<AuthenticateUserResponse> authenticateUserCompleted,
 			object userState)
 		{
-			ThrowIfParameterIsNull(authenticateUserCompleted, "authenticateUserCompleted");
-
-			_service.authorizationCompleted += AuthorizationFinished;
-
-			object[] state = {authenticateUserCompleted, userState};
-
-			_service.authorizationAsync(_apiKey, login, password, method, state);
-		}
-
-		private void AuthorizationFinished(object sender, authorizationCompletedEventArgs e)
-		{
-			object[] state = (object[]) e.UserState;
-
-			OperationFinished<AuthenticateUserResponse> authenticateUserCompleted =
-				(OperationFinished<AuthenticateUserResponse>) state[0];
-
-			AuthenticateUserResponse response = new AuthenticateUserResponse
-			                                    	{
-			                                    		UserState = state[1]
-			                                    	};
-
-			if (e.Error != null)
-			{
-				response.Status = AuthenticationStatus.Failed;
-				response.Error = e.Error;
-			}
-			else
-			{
-				response.Status = StatusMessageParser.ParseAuthorizeStatus(e.Result);
-			}
-
-			switch (response.Status)
-			{
-				case AuthenticationStatus.Successful:
-					response.AuthenticatedUser = new User(e.user);
-					response.Token = e.auth_token;
-					_token = e.auth_token;
-					break;
-				case AuthenticationStatus.Unknown:
-					response.Error = new UnknownOperationStatusException(e.Result);
-					break;
-			}
-
-			authenticateUserCompleted(response);
+			throw new NotSupportedException("This method is no longer supported by Box.NET API");
 		}
 
 		#endregion
@@ -2750,7 +2693,12 @@ namespace BoxSync.Core
 		#endregion
 
 		#region GetComments
-		
+		public void GetComments(long objectID, ObjectType objectType)
+		{
+			SOAPComment[] comments;
+
+			string status = _service.get_comments(_apiKey, _token, objectID, objectType.ToString(), out comments);
+		}
 		#endregion
 
 		#region AddComment
@@ -2787,6 +2735,7 @@ namespace BoxSync.Core
 		#endregion
 
 		#region GetFileInfo
+
 		/// <summary>
 		/// Retrieves the details for a specified file by its ID
 		/// </summary>
@@ -2817,6 +2766,89 @@ namespace BoxSync.Core
 						File = file
 			       	};
 		}
+
+		/// <summary>
+		/// Retrieves the details for a specified file by its ID
+		/// </summary>
+		/// <param name="fileID">File ID</param>
+		/// <param name="getFileInfoCompleted">Callback method which will be invoked after operation completes</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="getFileInfoCompleted"/> is <c>null</c></exception>
+		public void GetFileInfo(long fileID, OperationFinished<GetFileInfoResponse> getFileInfoCompleted)
+		{
+			GetFileInfo(fileID, getFileInfoCompleted, null);
+		}
+
+		/// <summary>
+		/// Retrieves the details for a specified file by its ID
+		/// </summary>
+		/// <param name="fileID">File ID</param>
+		/// <param name="getFileInfoCompleted">Callback method which will be invoked after operation completes</param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="getFileInfoCompleted"/> delegate as a part of response when the operation is completed</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="getFileInfoCompleted"/> is <c>null</c></exception>
+		public void GetFileInfo(long fileID, OperationFinished<GetFileInfoResponse> getFileInfoCompleted, object userState)
+		{
+			ThrowIfParameterIsNull(getFileInfoCompleted, "getFileInfoCompleted");
+
+			_service.get_file_infoCompleted += GetFileInfoCompleted;
+
+			AsyncCallState<OperationFinished<GetFileInfoResponse>> state = new AsyncCallState
+				<OperationFinished<GetFileInfoResponse>>
+			                                                               	{
+			                                                               		CallbackDelegate = getFileInfoCompleted,
+			                                                               		UserState = userState
+			                                                               	};
+
+			_service.get_file_infoAsync(_apiKey, _token, fileID, state);
+		}
+
+		private void GetFileInfoCompleted(object sender, get_file_infoCompletedEventArgs e)
+		{
+			AsyncCallState<OperationFinished<GetFileInfoResponse>> state =
+				(AsyncCallState<OperationFinished<GetFileInfoResponse>>) e.UserState;
+			GetFileInfoResponse response;
+
+			if (e.Error != null)
+			{
+				response = new GetFileInfoResponse
+				           	{
+				           		Error = e.Error,
+				           		Status = GetFileInfoStatus.Failed,
+				           		File = null,
+				           		UserState = state.UserState
+				           	};
+			}
+			else
+			{
+				response = new GetFileInfoResponse
+				           	{
+				           		Error = e.Error,
+				           		Status = StatusMessageParser.ParseGetFileInfoStatus(e.Result),
+				           		File = new File
+				           		       	{
+				           		       		Created = UnixTimeConverter.Instance.FromUnixTime(e.info.created),
+				           		       		Description = e.info.description,
+				           		       		ID = e.info.file_id,
+				           		       		IsShared = e.info.shared == 1,
+				           		       		Name = e.info.file_name,
+				           		       		PublicName = e.info.public_name,
+				           		       		SHA1Hash = e.info.sha1,
+				           		       		Size = e.info.size,
+				           		       		Updated = UnixTimeConverter.Instance.FromUnixTime(e.info.updated)
+				           		       	},
+				           		UserState = state.UserState
+				           	};
+
+				response.Error = response.Status == GetFileInfoStatus.Unknown
+				                 	?
+				                 		new UnknownOperationStatusException(e.Result)
+				                 	:
+				                 		null;
+			}
+
+			state.CallbackDelegate(response);
+		}
+
 		#endregion
 
 		#region GetServerTime
@@ -2826,9 +2858,9 @@ namespace BoxSync.Core
 		/// <returns>Response from server which includes web-method call status and server time</returns>
 		public GetServerTimeResponse GetServerTime()
 		{
-			long unixServerTime;
+			long unixServerTime = 0;
 
-			string status = _service.get_server_time(_apiKey, _token, out unixServerTime);
+			string status = "";// _service.get_server_time(_apiKey, _token, out unixServerTime);
 
 			GetServerTimeStatus parsedStatus = StatusMessageParser.ParseGetServerTimeStatus(status);
 			DateTime serverTime = parsedStatus == GetServerTimeStatus.Successful

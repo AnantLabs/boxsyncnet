@@ -25,11 +25,8 @@ namespace BoxSync.Core.ServiceReference {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Web.Services.WebServiceBindingAttribute(Name="boxnetBinding", Namespace="urn:boxnet")]
-    [System.Xml.Serialization.SoapIncludeAttribute(typeof(SOAPComment))]
-    [System.Xml.Serialization.SoapIncludeAttribute(typeof(SOAPCollaborator))]
+    [System.Xml.Serialization.SoapIncludeAttribute(typeof(SOAPSearchResultItem))]
     public partial class boxnetService : System.Web.Services.Protocols.SoapHttpClientProtocol {
-        
-        private System.Threading.SendOrPostCallback authorizationOperationCompleted;
         
         private System.Threading.SendOrPostCallback get_account_infoOperationCompleted;
         
@@ -38,10 +35,6 @@ namespace BoxSync.Core.ServiceReference {
         private System.Threading.SendOrPostCallback get_ticketOperationCompleted;
         
         private System.Threading.SendOrPostCallback get_auth_tokenOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback check_tokenOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback registerOperationCompleted;
         
         private System.Threading.SendOrPostCallback register_new_userOperationCompleted;
         
@@ -67,15 +60,7 @@ namespace BoxSync.Core.ServiceReference {
         
         private System.Threading.SendOrPostCallback add_to_myboxOperationCompleted;
         
-        private System.Threading.SendOrPostCallback box_add_nodeOperationCompleted;
-        
         private System.Threading.SendOrPostCallback add_to_tagOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback email_sharedOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback get_public_folder_treeOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback add_to_public_folderOperationCompleted;
         
         private System.Threading.SendOrPostCallback verify_registration_emailOperationCompleted;
         
@@ -83,35 +68,11 @@ namespace BoxSync.Core.ServiceReference {
         
         private System.Threading.SendOrPostCallback set_descriptionOperationCompleted;
         
-        private System.Threading.SendOrPostCallback register_new_user_nameOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback register_paid_userOperationCompleted;
-        
         private System.Threading.SendOrPostCallback get_friendsOperationCompleted;
         
         private System.Threading.SendOrPostCallback request_friendsOperationCompleted;
         
         private System.Threading.SendOrPostCallback get_updatesOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback get_collaboration_invitesOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback get_collaboratorsOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback invite_collaboratorsOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback accept_collaborationOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback remove_collaborationOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback get_collaboration_linkOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback toggle_collaboration_linkOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback get_collaboration_permissionsOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback collaborator_change_permissionOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback collaborator_change_notificationOperationCompleted;
         
         private System.Threading.SendOrPostCallback get_commentsOperationCompleted;
         
@@ -119,17 +80,12 @@ namespace BoxSync.Core.ServiceReference {
         
         private System.Threading.SendOrPostCallback delete_commentOperationCompleted;
         
-        private System.Threading.SendOrPostCallback get_directory_checksumOperationCompleted;
-        
-        private System.Threading.SendOrPostCallback get_server_timeOperationCompleted;
+        private System.Threading.SendOrPostCallback searchOperationCompleted;
         
         /// <remarks/>
         public boxnetService() {
-            this.Url = "http://box.net/api/soap";
+            this.Url = "http://www.box.net/api/1.0/soap";
         }
-        
-        /// <remarks/>
-        public event authorizationCompletedEventHandler authorizationCompleted;
         
         /// <remarks/>
         public event get_account_infoCompletedEventHandler get_account_infoCompleted;
@@ -142,12 +98,6 @@ namespace BoxSync.Core.ServiceReference {
         
         /// <remarks/>
         public event get_auth_tokenCompletedEventHandler get_auth_tokenCompleted;
-        
-        /// <remarks/>
-        public event check_tokenCompletedEventHandler check_tokenCompleted;
-        
-        /// <remarks/>
-        public event registerCompletedEventHandler registerCompleted;
         
         /// <remarks/>
         public event register_new_userCompletedEventHandler register_new_userCompleted;
@@ -186,19 +136,7 @@ namespace BoxSync.Core.ServiceReference {
         public event add_to_myboxCompletedEventHandler add_to_myboxCompleted;
         
         /// <remarks/>
-        public event box_add_nodeCompletedEventHandler box_add_nodeCompleted;
-        
-        /// <remarks/>
         public event add_to_tagCompletedEventHandler add_to_tagCompleted;
-        
-        /// <remarks/>
-        public event email_sharedCompletedEventHandler email_sharedCompleted;
-        
-        /// <remarks/>
-        public event get_public_folder_treeCompletedEventHandler get_public_folder_treeCompleted;
-        
-        /// <remarks/>
-        public event add_to_public_folderCompletedEventHandler add_to_public_folderCompleted;
         
         /// <remarks/>
         public event verify_registration_emailCompletedEventHandler verify_registration_emailCompleted;
@@ -210,12 +148,6 @@ namespace BoxSync.Core.ServiceReference {
         public event set_descriptionCompletedEventHandler set_descriptionCompleted;
         
         /// <remarks/>
-        public event register_new_user_nameCompletedEventHandler register_new_user_nameCompleted;
-        
-        /// <remarks/>
-        public event register_paid_userCompletedEventHandler register_paid_userCompleted;
-        
-        /// <remarks/>
         public event get_friendsCompletedEventHandler get_friendsCompleted;
         
         /// <remarks/>
@@ -223,36 +155,6 @@ namespace BoxSync.Core.ServiceReference {
         
         /// <remarks/>
         public event get_updatesCompletedEventHandler get_updatesCompleted;
-        
-        /// <remarks/>
-        public event get_collaboration_invitesCompletedEventHandler get_collaboration_invitesCompleted;
-        
-        /// <remarks/>
-        public event get_collaboratorsCompletedEventHandler get_collaboratorsCompleted;
-        
-        /// <remarks/>
-        public event invite_collaboratorsCompletedEventHandler invite_collaboratorsCompleted;
-        
-        /// <remarks/>
-        public event accept_collaborationCompletedEventHandler accept_collaborationCompleted;
-        
-        /// <remarks/>
-        public event remove_collaborationCompletedEventHandler remove_collaborationCompleted;
-        
-        /// <remarks/>
-        public event get_collaboration_linkCompletedEventHandler get_collaboration_linkCompleted;
-        
-        /// <remarks/>
-        public event toggle_collaboration_linkCompletedEventHandler toggle_collaboration_linkCompleted;
-        
-        /// <remarks/>
-        public event get_collaboration_permissionsCompletedEventHandler get_collaboration_permissionsCompleted;
-        
-        /// <remarks/>
-        public event collaborator_change_permissionCompletedEventHandler collaborator_change_permissionCompleted;
-        
-        /// <remarks/>
-        public event collaborator_change_notificationCompletedEventHandler collaborator_change_notificationCompleted;
         
         /// <remarks/>
         public event get_commentsCompletedEventHandler get_commentsCompleted;
@@ -264,65 +166,7 @@ namespace BoxSync.Core.ServiceReference {
         public event delete_commentCompletedEventHandler delete_commentCompleted;
         
         /// <remarks/>
-        public event get_directory_checksumCompletedEventHandler get_directory_checksumCompleted;
-        
-        /// <remarks/>
-        public event get_server_timeCompletedEventHandler get_server_timeCompleted;
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#authorization", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string authorization(string api_key, string login, string password, string method, out string auth_token, out SOAPUser user) {
-            object[] results = this.Invoke("authorization", new object[] {
-                        api_key,
-                        login,
-                        password,
-                        method});
-            auth_token = ((string)(results[1]));
-            user = ((SOAPUser)(results[2]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginauthorization(string api_key, string login, string password, string method, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("authorization", new object[] {
-                        api_key,
-                        login,
-                        password,
-                        method}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endauthorization(System.IAsyncResult asyncResult, out string auth_token, out SOAPUser user) {
-            object[] results = this.EndInvoke(asyncResult);
-            auth_token = ((string)(results[1]));
-            user = ((SOAPUser)(results[2]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void authorizationAsync(string api_key, string login, string password, string method) {
-            this.authorizationAsync(api_key, login, password, method, null);
-        }
-        
-        /// <remarks/>
-        public void authorizationAsync(string api_key, string login, string password, string method, object userState) {
-            if ((this.authorizationOperationCompleted == null)) {
-                this.authorizationOperationCompleted = new System.Threading.SendOrPostCallback(this.OnauthorizationOperationCompleted);
-            }
-            this.InvokeAsync("authorization", new object[] {
-                        api_key,
-                        login,
-                        password,
-                        method}, this.authorizationOperationCompleted, userState);
-        }
-        
-        private void OnauthorizationOperationCompleted(object arg) {
-            if ((this.authorizationCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.authorizationCompleted(this, new authorizationCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
+        public event searchCompletedEventHandler searchCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_account_info", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
@@ -506,107 +350,6 @@ namespace BoxSync.Core.ServiceReference {
             if ((this.get_auth_tokenCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.get_auth_tokenCompleted(this, new get_auth_tokenCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#check_token", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string check_token(string api_key, ref string auth_token, out SOAPUser user) {
-            object[] results = this.Invoke("check_token", new object[] {
-                        api_key,
-                        auth_token});
-            auth_token = ((string)(results[1]));
-            user = ((SOAPUser)(results[2]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Begincheck_token(string api_key, string auth_token, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("check_token", new object[] {
-                        api_key,
-                        auth_token}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endcheck_token(System.IAsyncResult asyncResult, out string auth_token, out SOAPUser user) {
-            object[] results = this.EndInvoke(asyncResult);
-            auth_token = ((string)(results[1]));
-            user = ((SOAPUser)(results[2]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void check_tokenAsync(string api_key, string auth_token) {
-            this.check_tokenAsync(api_key, auth_token, null);
-        }
-        
-        /// <remarks/>
-        public void check_tokenAsync(string api_key, string auth_token, object userState) {
-            if ((this.check_tokenOperationCompleted == null)) {
-                this.check_tokenOperationCompleted = new System.Threading.SendOrPostCallback(this.Oncheck_tokenOperationCompleted);
-            }
-            this.InvokeAsync("check_token", new object[] {
-                        api_key,
-                        auth_token}, this.check_tokenOperationCompleted, userState);
-        }
-        
-        private void Oncheck_tokenOperationCompleted(object arg) {
-            if ((this.check_tokenCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.check_tokenCompleted(this, new check_tokenCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#register", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string register(string api_key, string login, string password, out string auth_token, out SOAPUser user) {
-            object[] results = this.Invoke("register", new object[] {
-                        api_key,
-                        login,
-                        password});
-            auth_token = ((string)(results[1]));
-            user = ((SOAPUser)(results[2]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginregister(string api_key, string login, string password, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("register", new object[] {
-                        api_key,
-                        login,
-                        password}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endregister(System.IAsyncResult asyncResult, out string auth_token, out SOAPUser user) {
-            object[] results = this.EndInvoke(asyncResult);
-            auth_token = ((string)(results[1]));
-            user = ((SOAPUser)(results[2]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void registerAsync(string api_key, string login, string password) {
-            this.registerAsync(api_key, login, password, null);
-        }
-        
-        /// <remarks/>
-        public void registerAsync(string api_key, string login, string password, object userState) {
-            if ((this.registerOperationCompleted == null)) {
-                this.registerOperationCompleted = new System.Threading.SendOrPostCallback(this.OnregisterOperationCompleted);
-            }
-            this.InvokeAsync("register", new object[] {
-                        api_key,
-                        login,
-                        password}, this.registerOperationCompleted, userState);
-        }
-        
-        private void OnregisterOperationCompleted(object arg) {
-            if ((this.registerCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.registerCompleted(this, new registerCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -821,13 +564,14 @@ namespace BoxSync.Core.ServiceReference {
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#copy", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
         [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string copy(string api_key, string auth_token, string target, long target_id, long destination_id) {
+        public string copy(string api_key, string auth_token, string target, long target_id, long destination_id, out long new_id) {
             object[] results = this.Invoke("copy", new object[] {
                         api_key,
                         auth_token,
                         target,
                         target_id,
                         destination_id});
+            new_id = ((long)(results[1]));
             return ((string)(results[0]));
         }
         
@@ -842,8 +586,9 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public string Endcopy(System.IAsyncResult asyncResult) {
+        public string Endcopy(System.IAsyncResult asyncResult, out long new_id) {
             object[] results = this.EndInvoke(asyncResult);
+            new_id = ((long)(results[1]));
             return ((string)(results[0]));
         }
         
@@ -1262,60 +1007,6 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#box_add_node", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string box_add_node(string api_key, string auth_token, long box_id, string target, long target_id) {
-            object[] results = this.Invoke("box_add_node", new object[] {
-                        api_key,
-                        auth_token,
-                        box_id,
-                        target,
-                        target_id});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginbox_add_node(string api_key, string auth_token, long box_id, string target, long target_id, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("box_add_node", new object[] {
-                        api_key,
-                        auth_token,
-                        box_id,
-                        target,
-                        target_id}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endbox_add_node(System.IAsyncResult asyncResult) {
-            object[] results = this.EndInvoke(asyncResult);
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void box_add_nodeAsync(string api_key, string auth_token, long box_id, string target, long target_id) {
-            this.box_add_nodeAsync(api_key, auth_token, box_id, target, target_id, null);
-        }
-        
-        /// <remarks/>
-        public void box_add_nodeAsync(string api_key, string auth_token, long box_id, string target, long target_id, object userState) {
-            if ((this.box_add_nodeOperationCompleted == null)) {
-                this.box_add_nodeOperationCompleted = new System.Threading.SendOrPostCallback(this.Onbox_add_nodeOperationCompleted);
-            }
-            this.InvokeAsync("box_add_node", new object[] {
-                        api_key,
-                        auth_token,
-                        box_id,
-                        target,
-                        target_id}, this.box_add_nodeOperationCompleted, userState);
-        }
-        
-        private void Onbox_add_nodeOperationCompleted(object arg) {
-            if ((this.box_add_nodeCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.box_add_nodeCompleted(this, new box_add_nodeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#add_to_tag", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
         [return: System.Xml.Serialization.SoapElementAttribute("status")]
         public string add_to_tag(string api_key, string auth_token, string[] tags, string target, long target_id) {
@@ -1366,170 +1057,6 @@ namespace BoxSync.Core.ServiceReference {
             if ((this.add_to_tagCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.add_to_tagCompleted(this, new add_to_tagCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#email_shared", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string email_shared(string api_key, string shared_name, string[] emails, string message, string from_email) {
-            object[] results = this.Invoke("email_shared", new object[] {
-                        api_key,
-                        shared_name,
-                        emails,
-                        message,
-                        from_email});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginemail_shared(string api_key, string shared_name, string[] emails, string message, string from_email, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("email_shared", new object[] {
-                        api_key,
-                        shared_name,
-                        emails,
-                        message,
-                        from_email}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endemail_shared(System.IAsyncResult asyncResult) {
-            object[] results = this.EndInvoke(asyncResult);
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void email_sharedAsync(string api_key, string shared_name, string[] emails, string message, string from_email) {
-            this.email_sharedAsync(api_key, shared_name, emails, message, from_email, null);
-        }
-        
-        /// <remarks/>
-        public void email_sharedAsync(string api_key, string shared_name, string[] emails, string message, string from_email, object userState) {
-            if ((this.email_sharedOperationCompleted == null)) {
-                this.email_sharedOperationCompleted = new System.Threading.SendOrPostCallback(this.Onemail_sharedOperationCompleted);
-            }
-            this.InvokeAsync("email_shared", new object[] {
-                        api_key,
-                        shared_name,
-                        emails,
-                        message,
-                        from_email}, this.email_sharedOperationCompleted, userState);
-        }
-        
-        private void Onemail_sharedOperationCompleted(object arg) {
-            if ((this.email_sharedCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.email_sharedCompleted(this, new email_sharedCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_public_folder_tree", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_public_folder_tree(string api_key, string public_name, string password, string[] @params, [System.Xml.Serialization.SoapElementAttribute(DataType="base64Binary")] out byte[] tree) {
-            object[] results = this.Invoke("get_public_folder_tree", new object[] {
-                        api_key,
-                        public_name,
-                        password,
-                        @params});
-            tree = ((byte[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginget_public_folder_tree(string api_key, string public_name, string password, string[] @params, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("get_public_folder_tree", new object[] {
-                        api_key,
-                        public_name,
-                        password,
-                        @params}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endget_public_folder_tree(System.IAsyncResult asyncResult, out byte[] tree) {
-            object[] results = this.EndInvoke(asyncResult);
-            tree = ((byte[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void get_public_folder_treeAsync(string api_key, string public_name, string password, string[] @params) {
-            this.get_public_folder_treeAsync(api_key, public_name, password, @params, null);
-        }
-        
-        /// <remarks/>
-        public void get_public_folder_treeAsync(string api_key, string public_name, string password, string[] @params, object userState) {
-            if ((this.get_public_folder_treeOperationCompleted == null)) {
-                this.get_public_folder_treeOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_public_folder_treeOperationCompleted);
-            }
-            this.InvokeAsync("get_public_folder_tree", new object[] {
-                        api_key,
-                        public_name,
-                        password,
-                        @params}, this.get_public_folder_treeOperationCompleted, userState);
-        }
-        
-        private void Onget_public_folder_treeOperationCompleted(object arg) {
-            if ((this.get_public_folder_treeCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.get_public_folder_treeCompleted(this, new get_public_folder_treeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#add_to_public_folder", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string add_to_public_folder(string api_key, string auth_token, string public_name, string password, string target, long target_id) {
-            object[] results = this.Invoke("add_to_public_folder", new object[] {
-                        api_key,
-                        auth_token,
-                        public_name,
-                        password,
-                        target,
-                        target_id});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginadd_to_public_folder(string api_key, string auth_token, string public_name, string password, string target, long target_id, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("add_to_public_folder", new object[] {
-                        api_key,
-                        auth_token,
-                        public_name,
-                        password,
-                        target,
-                        target_id}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endadd_to_public_folder(System.IAsyncResult asyncResult) {
-            object[] results = this.EndInvoke(asyncResult);
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void add_to_public_folderAsync(string api_key, string auth_token, string public_name, string password, string target, long target_id) {
-            this.add_to_public_folderAsync(api_key, auth_token, public_name, password, target, target_id, null);
-        }
-        
-        /// <remarks/>
-        public void add_to_public_folderAsync(string api_key, string auth_token, string public_name, string password, string target, long target_id, object userState) {
-            if ((this.add_to_public_folderOperationCompleted == null)) {
-                this.add_to_public_folderOperationCompleted = new System.Threading.SendOrPostCallback(this.Onadd_to_public_folderOperationCompleted);
-            }
-            this.InvokeAsync("add_to_public_folder", new object[] {
-                        api_key,
-                        auth_token,
-                        public_name,
-                        password,
-                        target,
-                        target_id}, this.add_to_public_folderOperationCompleted, userState);
-        }
-        
-        private void Onadd_to_public_folderOperationCompleted(object arg) {
-            if ((this.add_to_public_folderCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.add_to_public_folderCompleted(this, new add_to_public_folderCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -1679,178 +1206,6 @@ namespace BoxSync.Core.ServiceReference {
             if ((this.set_descriptionCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.set_descriptionCompleted(this, new set_descriptionCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#register_new_user_name", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string register_new_user_name(string api_key, string login, string password, string name, out string auth_token, out SOAPUser user) {
-            object[] results = this.Invoke("register_new_user_name", new object[] {
-                        api_key,
-                        login,
-                        password,
-                        name});
-            auth_token = ((string)(results[1]));
-            user = ((SOAPUser)(results[2]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginregister_new_user_name(string api_key, string login, string password, string name, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("register_new_user_name", new object[] {
-                        api_key,
-                        login,
-                        password,
-                        name}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endregister_new_user_name(System.IAsyncResult asyncResult, out string auth_token, out SOAPUser user) {
-            object[] results = this.EndInvoke(asyncResult);
-            auth_token = ((string)(results[1]));
-            user = ((SOAPUser)(results[2]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void register_new_user_nameAsync(string api_key, string login, string password, string name) {
-            this.register_new_user_nameAsync(api_key, login, password, name, null);
-        }
-        
-        /// <remarks/>
-        public void register_new_user_nameAsync(string api_key, string login, string password, string name, object userState) {
-            if ((this.register_new_user_nameOperationCompleted == null)) {
-                this.register_new_user_nameOperationCompleted = new System.Threading.SendOrPostCallback(this.Onregister_new_user_nameOperationCompleted);
-            }
-            this.InvokeAsync("register_new_user_name", new object[] {
-                        api_key,
-                        login,
-                        password,
-                        name}, this.register_new_user_nameOperationCompleted, userState);
-        }
-        
-        private void Onregister_new_user_nameOperationCompleted(object arg) {
-            if ((this.register_new_user_nameCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.register_new_user_nameCompleted(this, new register_new_user_nameCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#register_paid_user", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string register_paid_user(
-                    string api_key, 
-                    string login, 
-                    string password, 
-                    string name, 
-                    string plan, 
-                    string period, 
-                    string credit_card_first_name, 
-                    string credit_card_last_name, 
-                    string credit_card_street_address, 
-                    string credit_card_zip, 
-                    string credit_card_country, 
-                    string credit_card_number, 
-                    string credit_card_cvv, 
-                    string credit_card_exp_date, 
-                    out string auth_token, 
-                    out SOAPUser user) {
-            object[] results = this.Invoke("register_paid_user", new object[] {
-                        api_key,
-                        login,
-                        password,
-                        name,
-                        plan,
-                        period,
-                        credit_card_first_name,
-                        credit_card_last_name,
-                        credit_card_street_address,
-                        credit_card_zip,
-                        credit_card_country,
-                        credit_card_number,
-                        credit_card_cvv,
-                        credit_card_exp_date});
-            auth_token = ((string)(results[1]));
-            user = ((SOAPUser)(results[2]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginregister_paid_user(
-                    string api_key, 
-                    string login, 
-                    string password, 
-                    string name, 
-                    string plan, 
-                    string period, 
-                    string credit_card_first_name, 
-                    string credit_card_last_name, 
-                    string credit_card_street_address, 
-                    string credit_card_zip, 
-                    string credit_card_country, 
-                    string credit_card_number, 
-                    string credit_card_cvv, 
-                    string credit_card_exp_date, 
-                    System.AsyncCallback callback, 
-                    object asyncState) {
-            return this.BeginInvoke("register_paid_user", new object[] {
-                        api_key,
-                        login,
-                        password,
-                        name,
-                        plan,
-                        period,
-                        credit_card_first_name,
-                        credit_card_last_name,
-                        credit_card_street_address,
-                        credit_card_zip,
-                        credit_card_country,
-                        credit_card_number,
-                        credit_card_cvv,
-                        credit_card_exp_date}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endregister_paid_user(System.IAsyncResult asyncResult, out string auth_token, out SOAPUser user) {
-            object[] results = this.EndInvoke(asyncResult);
-            auth_token = ((string)(results[1]));
-            user = ((SOAPUser)(results[2]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void register_paid_userAsync(string api_key, string login, string password, string name, string plan, string period, string credit_card_first_name, string credit_card_last_name, string credit_card_street_address, string credit_card_zip, string credit_card_country, string credit_card_number, string credit_card_cvv, string credit_card_exp_date) {
-            this.register_paid_userAsync(api_key, login, password, name, plan, period, credit_card_first_name, credit_card_last_name, credit_card_street_address, credit_card_zip, credit_card_country, credit_card_number, credit_card_cvv, credit_card_exp_date, null);
-        }
-        
-        /// <remarks/>
-        public void register_paid_userAsync(string api_key, string login, string password, string name, string plan, string period, string credit_card_first_name, string credit_card_last_name, string credit_card_street_address, string credit_card_zip, string credit_card_country, string credit_card_number, string credit_card_cvv, string credit_card_exp_date, object userState) {
-            if ((this.register_paid_userOperationCompleted == null)) {
-                this.register_paid_userOperationCompleted = new System.Threading.SendOrPostCallback(this.Onregister_paid_userOperationCompleted);
-            }
-            this.InvokeAsync("register_paid_user", new object[] {
-                        api_key,
-                        login,
-                        password,
-                        name,
-                        plan,
-                        period,
-                        credit_card_first_name,
-                        credit_card_last_name,
-                        credit_card_street_address,
-                        credit_card_zip,
-                        credit_card_country,
-                        credit_card_number,
-                        credit_card_cvv,
-                        credit_card_exp_date}, this.register_paid_userOperationCompleted, userState);
-        }
-        
-        private void Onregister_paid_userOperationCompleted(object arg) {
-            if ((this.register_paid_userCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.register_paid_userCompleted(this, new register_paid_userCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -2015,593 +1370,25 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_collaboration_invites", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_collaboration_invites(string api_key, string auth_token, string collab_status, [System.Xml.Serialization.SoapElementAttribute(DataType="base64Binary")] out byte[] collaborations) {
-            object[] results = this.Invoke("get_collaboration_invites", new object[] {
-                        api_key,
-                        auth_token,
-                        collab_status});
-            collaborations = ((byte[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginget_collaboration_invites(string api_key, string auth_token, string collab_status, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("get_collaboration_invites", new object[] {
-                        api_key,
-                        auth_token,
-                        collab_status}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endget_collaboration_invites(System.IAsyncResult asyncResult, out byte[] collaborations) {
-            object[] results = this.EndInvoke(asyncResult);
-            collaborations = ((byte[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void get_collaboration_invitesAsync(string api_key, string auth_token, string collab_status) {
-            this.get_collaboration_invitesAsync(api_key, auth_token, collab_status, null);
-        }
-        
-        /// <remarks/>
-        public void get_collaboration_invitesAsync(string api_key, string auth_token, string collab_status, object userState) {
-            if ((this.get_collaboration_invitesOperationCompleted == null)) {
-                this.get_collaboration_invitesOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_collaboration_invitesOperationCompleted);
-            }
-            this.InvokeAsync("get_collaboration_invites", new object[] {
-                        api_key,
-                        auth_token,
-                        collab_status}, this.get_collaboration_invitesOperationCompleted, userState);
-        }
-        
-        private void Onget_collaboration_invitesOperationCompleted(object arg) {
-            if ((this.get_collaboration_invitesCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.get_collaboration_invitesCompleted(this, new get_collaboration_invitesCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_collaborators", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_collaborators(string api_key, string auth_token, string target, long target_id, out SOAPCollaborator[] collaborators) {
-            object[] results = this.Invoke("get_collaborators", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id});
-            collaborators = ((SOAPCollaborator[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginget_collaborators(string api_key, string auth_token, string target, long target_id, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("get_collaborators", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endget_collaborators(System.IAsyncResult asyncResult, out SOAPCollaborator[] collaborators) {
-            object[] results = this.EndInvoke(asyncResult);
-            collaborators = ((SOAPCollaborator[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void get_collaboratorsAsync(string api_key, string auth_token, string target, long target_id) {
-            this.get_collaboratorsAsync(api_key, auth_token, target, target_id, null);
-        }
-        
-        /// <remarks/>
-        public void get_collaboratorsAsync(string api_key, string auth_token, string target, long target_id, object userState) {
-            if ((this.get_collaboratorsOperationCompleted == null)) {
-                this.get_collaboratorsOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_collaboratorsOperationCompleted);
-            }
-            this.InvokeAsync("get_collaborators", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id}, this.get_collaboratorsOperationCompleted, userState);
-        }
-        
-        private void Onget_collaboratorsOperationCompleted(object arg) {
-            if ((this.get_collaboratorsCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.get_collaboratorsCompleted(this, new get_collaboratorsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#invite_collaborators", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string invite_collaborators(string api_key, string auth_token, string target, long target_id, string emails, string permission_name, bool resend_invite, bool no_email, string[] @params, [System.Xml.Serialization.SoapElementAttribute(DataType="base64Binary")] out byte[] invited_collaborators, [System.Xml.Serialization.SoapElementAttribute(DataType="base64Binary")] out byte[] unsuccessful_invitations, out SOAPCollaborator[] collaborators) {
-            object[] results = this.Invoke("invite_collaborators", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        emails,
-                        permission_name,
-                        resend_invite,
-                        no_email,
-                        @params});
-            invited_collaborators = ((byte[])(results[1]));
-            unsuccessful_invitations = ((byte[])(results[2]));
-            collaborators = ((SOAPCollaborator[])(results[3]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Begininvite_collaborators(string api_key, string auth_token, string target, long target_id, string emails, string permission_name, bool resend_invite, bool no_email, string[] @params, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("invite_collaborators", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        emails,
-                        permission_name,
-                        resend_invite,
-                        no_email,
-                        @params}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endinvite_collaborators(System.IAsyncResult asyncResult, out byte[] invited_collaborators, out byte[] unsuccessful_invitations, out SOAPCollaborator[] collaborators) {
-            object[] results = this.EndInvoke(asyncResult);
-            invited_collaborators = ((byte[])(results[1]));
-            unsuccessful_invitations = ((byte[])(results[2]));
-            collaborators = ((SOAPCollaborator[])(results[3]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void invite_collaboratorsAsync(string api_key, string auth_token, string target, long target_id, string emails, string permission_name, bool resend_invite, bool no_email, string[] @params) {
-            this.invite_collaboratorsAsync(api_key, auth_token, target, target_id, emails, permission_name, resend_invite, no_email, @params, null);
-        }
-        
-        /// <remarks/>
-        public void invite_collaboratorsAsync(string api_key, string auth_token, string target, long target_id, string emails, string permission_name, bool resend_invite, bool no_email, string[] @params, object userState) {
-            if ((this.invite_collaboratorsOperationCompleted == null)) {
-                this.invite_collaboratorsOperationCompleted = new System.Threading.SendOrPostCallback(this.Oninvite_collaboratorsOperationCompleted);
-            }
-            this.InvokeAsync("invite_collaborators", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        emails,
-                        permission_name,
-                        resend_invite,
-                        no_email,
-                        @params}, this.invite_collaboratorsOperationCompleted, userState);
-        }
-        
-        private void Oninvite_collaboratorsOperationCompleted(object arg) {
-            if ((this.invite_collaboratorsCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.invite_collaboratorsCompleted(this, new invite_collaboratorsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#accept_collaboration", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string accept_collaboration(string api_key, string auth_token, string target, long target_id, bool accept, string invite_token) {
-            object[] results = this.Invoke("accept_collaboration", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        accept,
-                        invite_token});
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginaccept_collaboration(string api_key, string auth_token, string target, long target_id, bool accept, string invite_token, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("accept_collaboration", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        accept,
-                        invite_token}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endaccept_collaboration(System.IAsyncResult asyncResult) {
-            object[] results = this.EndInvoke(asyncResult);
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void accept_collaborationAsync(string api_key, string auth_token, string target, long target_id, bool accept, string invite_token) {
-            this.accept_collaborationAsync(api_key, auth_token, target, target_id, accept, invite_token, null);
-        }
-        
-        /// <remarks/>
-        public void accept_collaborationAsync(string api_key, string auth_token, string target, long target_id, bool accept, string invite_token, object userState) {
-            if ((this.accept_collaborationOperationCompleted == null)) {
-                this.accept_collaborationOperationCompleted = new System.Threading.SendOrPostCallback(this.Onaccept_collaborationOperationCompleted);
-            }
-            this.InvokeAsync("accept_collaboration", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        accept,
-                        invite_token}, this.accept_collaborationOperationCompleted, userState);
-        }
-        
-        private void Onaccept_collaborationOperationCompleted(object arg) {
-            if ((this.accept_collaborationCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.accept_collaborationCompleted(this, new accept_collaborationCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#remove_collaboration", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string remove_collaboration(string api_key, string auth_token, string target, long target_id, string email, out SOAPCollaborator[] collaborators) {
-            object[] results = this.Invoke("remove_collaboration", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        email});
-            collaborators = ((SOAPCollaborator[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginremove_collaboration(string api_key, string auth_token, string target, long target_id, string email, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("remove_collaboration", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        email}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endremove_collaboration(System.IAsyncResult asyncResult, out SOAPCollaborator[] collaborators) {
-            object[] results = this.EndInvoke(asyncResult);
-            collaborators = ((SOAPCollaborator[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void remove_collaborationAsync(string api_key, string auth_token, string target, long target_id, string email) {
-            this.remove_collaborationAsync(api_key, auth_token, target, target_id, email, null);
-        }
-        
-        /// <remarks/>
-        public void remove_collaborationAsync(string api_key, string auth_token, string target, long target_id, string email, object userState) {
-            if ((this.remove_collaborationOperationCompleted == null)) {
-                this.remove_collaborationOperationCompleted = new System.Threading.SendOrPostCallback(this.Onremove_collaborationOperationCompleted);
-            }
-            this.InvokeAsync("remove_collaboration", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        email}, this.remove_collaborationOperationCompleted, userState);
-        }
-        
-        private void Onremove_collaborationOperationCompleted(object arg) {
-            if ((this.remove_collaborationCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.remove_collaborationCompleted(this, new remove_collaborationCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_collaboration_link", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_collaboration_link(string api_key, string auth_token, string target, long target_id, string[] @params, [System.Xml.Serialization.SoapElementAttribute(DataType="base64Binary")] out byte[] collab_link) {
-            object[] results = this.Invoke("get_collaboration_link", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        @params});
-            collab_link = ((byte[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginget_collaboration_link(string api_key, string auth_token, string target, long target_id, string[] @params, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("get_collaboration_link", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        @params}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endget_collaboration_link(System.IAsyncResult asyncResult, out byte[] collab_link) {
-            object[] results = this.EndInvoke(asyncResult);
-            collab_link = ((byte[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void get_collaboration_linkAsync(string api_key, string auth_token, string target, long target_id, string[] @params) {
-            this.get_collaboration_linkAsync(api_key, auth_token, target, target_id, @params, null);
-        }
-        
-        /// <remarks/>
-        public void get_collaboration_linkAsync(string api_key, string auth_token, string target, long target_id, string[] @params, object userState) {
-            if ((this.get_collaboration_linkOperationCompleted == null)) {
-                this.get_collaboration_linkOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_collaboration_linkOperationCompleted);
-            }
-            this.InvokeAsync("get_collaboration_link", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        @params}, this.get_collaboration_linkOperationCompleted, userState);
-        }
-        
-        private void Onget_collaboration_linkOperationCompleted(object arg) {
-            if ((this.get_collaboration_linkCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.get_collaboration_linkCompleted(this, new get_collaboration_linkCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#toggle_collaboration_link", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string toggle_collaboration_link(string api_key, string auth_token, string target, long target_id, bool enable, string[] @params, [System.Xml.Serialization.SoapElementAttribute(DataType="base64Binary")] out byte[] collab_link) {
-            object[] results = this.Invoke("toggle_collaboration_link", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        enable,
-                        @params});
-            collab_link = ((byte[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Begintoggle_collaboration_link(string api_key, string auth_token, string target, long target_id, bool enable, string[] @params, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("toggle_collaboration_link", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        enable,
-                        @params}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endtoggle_collaboration_link(System.IAsyncResult asyncResult, out byte[] collab_link) {
-            object[] results = this.EndInvoke(asyncResult);
-            collab_link = ((byte[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void toggle_collaboration_linkAsync(string api_key, string auth_token, string target, long target_id, bool enable, string[] @params) {
-            this.toggle_collaboration_linkAsync(api_key, auth_token, target, target_id, enable, @params, null);
-        }
-        
-        /// <remarks/>
-        public void toggle_collaboration_linkAsync(string api_key, string auth_token, string target, long target_id, bool enable, string[] @params, object userState) {
-            if ((this.toggle_collaboration_linkOperationCompleted == null)) {
-                this.toggle_collaboration_linkOperationCompleted = new System.Threading.SendOrPostCallback(this.Ontoggle_collaboration_linkOperationCompleted);
-            }
-            this.InvokeAsync("toggle_collaboration_link", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        enable,
-                        @params}, this.toggle_collaboration_linkOperationCompleted, userState);
-        }
-        
-        private void Ontoggle_collaboration_linkOperationCompleted(object arg) {
-            if ((this.toggle_collaboration_linkCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.toggle_collaboration_linkCompleted(this, new toggle_collaboration_linkCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_collaboration_permissions", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_collaboration_permissions(string api_key, string auth_token, string[] @params, [System.Xml.Serialization.SoapElementAttribute(DataType="base64Binary")] out byte[] permissions) {
-            object[] results = this.Invoke("get_collaboration_permissions", new object[] {
-                        api_key,
-                        auth_token,
-                        @params});
-            permissions = ((byte[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginget_collaboration_permissions(string api_key, string auth_token, string[] @params, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("get_collaboration_permissions", new object[] {
-                        api_key,
-                        auth_token,
-                        @params}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endget_collaboration_permissions(System.IAsyncResult asyncResult, out byte[] permissions) {
-            object[] results = this.EndInvoke(asyncResult);
-            permissions = ((byte[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void get_collaboration_permissionsAsync(string api_key, string auth_token, string[] @params) {
-            this.get_collaboration_permissionsAsync(api_key, auth_token, @params, null);
-        }
-        
-        /// <remarks/>
-        public void get_collaboration_permissionsAsync(string api_key, string auth_token, string[] @params, object userState) {
-            if ((this.get_collaboration_permissionsOperationCompleted == null)) {
-                this.get_collaboration_permissionsOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_collaboration_permissionsOperationCompleted);
-            }
-            this.InvokeAsync("get_collaboration_permissions", new object[] {
-                        api_key,
-                        auth_token,
-                        @params}, this.get_collaboration_permissionsOperationCompleted, userState);
-        }
-        
-        private void Onget_collaboration_permissionsOperationCompleted(object arg) {
-            if ((this.get_collaboration_permissionsCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.get_collaboration_permissionsCompleted(this, new get_collaboration_permissionsCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#collaborator_change_permission", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string collaborator_change_permission(string api_key, string auth_token, string target, long target_id, string email, string permission_name, out SOAPCollaborator[] collaborators) {
-            object[] results = this.Invoke("collaborator_change_permission", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        email,
-                        permission_name});
-            collaborators = ((SOAPCollaborator[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Begincollaborator_change_permission(string api_key, string auth_token, string target, long target_id, string email, string permission_name, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("collaborator_change_permission", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        email,
-                        permission_name}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endcollaborator_change_permission(System.IAsyncResult asyncResult, out SOAPCollaborator[] collaborators) {
-            object[] results = this.EndInvoke(asyncResult);
-            collaborators = ((SOAPCollaborator[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void collaborator_change_permissionAsync(string api_key, string auth_token, string target, long target_id, string email, string permission_name) {
-            this.collaborator_change_permissionAsync(api_key, auth_token, target, target_id, email, permission_name, null);
-        }
-        
-        /// <remarks/>
-        public void collaborator_change_permissionAsync(string api_key, string auth_token, string target, long target_id, string email, string permission_name, object userState) {
-            if ((this.collaborator_change_permissionOperationCompleted == null)) {
-                this.collaborator_change_permissionOperationCompleted = new System.Threading.SendOrPostCallback(this.Oncollaborator_change_permissionOperationCompleted);
-            }
-            this.InvokeAsync("collaborator_change_permission", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        email,
-                        permission_name}, this.collaborator_change_permissionOperationCompleted, userState);
-        }
-        
-        private void Oncollaborator_change_permissionOperationCompleted(object arg) {
-            if ((this.collaborator_change_permissionCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.collaborator_change_permissionCompleted(this, new collaborator_change_permissionCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#collaborator_change_notification", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string collaborator_change_notification(string api_key, string auth_token, string target, long target_id, bool enable, out SOAPCollaborator[] collaborators) {
-            object[] results = this.Invoke("collaborator_change_notification", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        enable});
-            collaborators = ((SOAPCollaborator[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Begincollaborator_change_notification(string api_key, string auth_token, string target, long target_id, bool enable, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("collaborator_change_notification", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        enable}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endcollaborator_change_notification(System.IAsyncResult asyncResult, out SOAPCollaborator[] collaborators) {
-            object[] results = this.EndInvoke(asyncResult);
-            collaborators = ((SOAPCollaborator[])(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void collaborator_change_notificationAsync(string api_key, string auth_token, string target, long target_id, bool enable) {
-            this.collaborator_change_notificationAsync(api_key, auth_token, target, target_id, enable, null);
-        }
-        
-        /// <remarks/>
-        public void collaborator_change_notificationAsync(string api_key, string auth_token, string target, long target_id, bool enable, object userState) {
-            if ((this.collaborator_change_notificationOperationCompleted == null)) {
-                this.collaborator_change_notificationOperationCompleted = new System.Threading.SendOrPostCallback(this.Oncollaborator_change_notificationOperationCompleted);
-            }
-            this.InvokeAsync("collaborator_change_notification", new object[] {
-                        api_key,
-                        auth_token,
-                        target,
-                        target_id,
-                        enable}, this.collaborator_change_notificationOperationCompleted, userState);
-        }
-        
-        private void Oncollaborator_change_notificationOperationCompleted(object arg) {
-            if ((this.collaborator_change_notificationCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.collaborator_change_notificationCompleted(this, new collaborator_change_notificationCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_comments", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
         [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_comments(string api_key, string auth_token, long item_id, string item_type, out SOAPComment[] comments) {
+        public string get_comments(string api_key, string auth_token, long target_id, string target, out SOAPComment[] comments) {
             object[] results = this.Invoke("get_comments", new object[] {
                         api_key,
                         auth_token,
-                        item_id,
-                        item_type});
+                        target_id,
+                        target});
             comments = ((SOAPComment[])(results[1]));
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public System.IAsyncResult Beginget_comments(string api_key, string auth_token, long item_id, string item_type, System.AsyncCallback callback, object asyncState) {
+        public System.IAsyncResult Beginget_comments(string api_key, string auth_token, long target_id, string target, System.AsyncCallback callback, object asyncState) {
             return this.BeginInvoke("get_comments", new object[] {
                         api_key,
                         auth_token,
-                        item_id,
-                        item_type}, callback, asyncState);
+                        target_id,
+                        target}, callback, asyncState);
         }
         
         /// <remarks/>
@@ -2612,20 +1399,20 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public void get_commentsAsync(string api_key, string auth_token, long item_id, string item_type) {
-            this.get_commentsAsync(api_key, auth_token, item_id, item_type, null);
+        public void get_commentsAsync(string api_key, string auth_token, long target_id, string target) {
+            this.get_commentsAsync(api_key, auth_token, target_id, target, null);
         }
         
         /// <remarks/>
-        public void get_commentsAsync(string api_key, string auth_token, long item_id, string item_type, object userState) {
+        public void get_commentsAsync(string api_key, string auth_token, long target_id, string target, object userState) {
             if ((this.get_commentsOperationCompleted == null)) {
                 this.get_commentsOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_commentsOperationCompleted);
             }
             this.InvokeAsync("get_comments", new object[] {
                         api_key,
                         auth_token,
-                        item_id,
-                        item_type}, this.get_commentsOperationCompleted, userState);
+                        target_id,
+                        target}, this.get_commentsOperationCompleted, userState);
         }
         
         private void Onget_commentsOperationCompleted(object arg) {
@@ -2638,49 +1425,49 @@ namespace BoxSync.Core.ServiceReference {
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#add_comment", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
         [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string add_comment(string api_key, string auth_token, long item_id, string item_type, string message, out SOAPComment[] comments) {
+        public string add_comment(string api_key, string auth_token, long target_id, string target, string message, out SOAPComment comment) {
             object[] results = this.Invoke("add_comment", new object[] {
                         api_key,
                         auth_token,
-                        item_id,
-                        item_type,
+                        target_id,
+                        target,
                         message});
-            comments = ((SOAPComment[])(results[1]));
+            comment = ((SOAPComment)(results[1]));
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public System.IAsyncResult Beginadd_comment(string api_key, string auth_token, long item_id, string item_type, string message, System.AsyncCallback callback, object asyncState) {
+        public System.IAsyncResult Beginadd_comment(string api_key, string auth_token, long target_id, string target, string message, System.AsyncCallback callback, object asyncState) {
             return this.BeginInvoke("add_comment", new object[] {
                         api_key,
                         auth_token,
-                        item_id,
-                        item_type,
+                        target_id,
+                        target,
                         message}, callback, asyncState);
         }
         
         /// <remarks/>
-        public string Endadd_comment(System.IAsyncResult asyncResult, out SOAPComment[] comments) {
+        public string Endadd_comment(System.IAsyncResult asyncResult, out SOAPComment comment) {
             object[] results = this.EndInvoke(asyncResult);
-            comments = ((SOAPComment[])(results[1]));
+            comment = ((SOAPComment)(results[1]));
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void add_commentAsync(string api_key, string auth_token, long item_id, string item_type, string message) {
-            this.add_commentAsync(api_key, auth_token, item_id, item_type, message, null);
+        public void add_commentAsync(string api_key, string auth_token, long target_id, string target, string message) {
+            this.add_commentAsync(api_key, auth_token, target_id, target, message, null);
         }
         
         /// <remarks/>
-        public void add_commentAsync(string api_key, string auth_token, long item_id, string item_type, string message, object userState) {
+        public void add_commentAsync(string api_key, string auth_token, long target_id, string target, string message, object userState) {
             if ((this.add_commentOperationCompleted == null)) {
                 this.add_commentOperationCompleted = new System.Threading.SendOrPostCallback(this.Onadd_commentOperationCompleted);
             }
             this.InvokeAsync("add_comment", new object[] {
                         api_key,
                         auth_token,
-                        item_id,
-                        item_type,
+                        target_id,
+                        target,
                         message}, this.add_commentOperationCompleted, userState);
         }
         
@@ -2694,20 +1481,20 @@ namespace BoxSync.Core.ServiceReference {
         /// <remarks/>
         [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#delete_comment", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
         [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string delete_comment(string api_key, string auth_token, long message_id) {
+        public string delete_comment(string api_key, string auth_token, long target_id) {
             object[] results = this.Invoke("delete_comment", new object[] {
                         api_key,
                         auth_token,
-                        message_id});
+                        target_id});
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public System.IAsyncResult Begindelete_comment(string api_key, string auth_token, long message_id, System.AsyncCallback callback, object asyncState) {
+        public System.IAsyncResult Begindelete_comment(string api_key, string auth_token, long target_id, System.AsyncCallback callback, object asyncState) {
             return this.BeginInvoke("delete_comment", new object[] {
                         api_key,
                         auth_token,
-                        message_id}, callback, asyncState);
+                        target_id}, callback, asyncState);
         }
         
         /// <remarks/>
@@ -2717,19 +1504,19 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public void delete_commentAsync(string api_key, string auth_token, long message_id) {
-            this.delete_commentAsync(api_key, auth_token, message_id, null);
+        public void delete_commentAsync(string api_key, string auth_token, long target_id) {
+            this.delete_commentAsync(api_key, auth_token, target_id, null);
         }
         
         /// <remarks/>
-        public void delete_commentAsync(string api_key, string auth_token, long message_id, object userState) {
+        public void delete_commentAsync(string api_key, string auth_token, long target_id, object userState) {
             if ((this.delete_commentOperationCompleted == null)) {
                 this.delete_commentOperationCompleted = new System.Threading.SendOrPostCallback(this.Ondelete_commentOperationCompleted);
             }
             this.InvokeAsync("delete_comment", new object[] {
                         api_key,
                         auth_token,
-                        message_id}, this.delete_commentOperationCompleted, userState);
+                        target_id}, this.delete_commentOperationCompleted, userState);
         }
         
         private void Ondelete_commentOperationCompleted(object arg) {
@@ -2740,99 +1527,69 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_directory_checksum", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
+        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#search", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
         [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_directory_checksum(string api_key, string auth_token, long folder_id, out string checksum) {
-            object[] results = this.Invoke("get_directory_checksum", new object[] {
+        public string search(string api_key, string auth_token, string query, int page, int per_page, string sort, string direction, string[] @params, out SOAPSearchResultItem[] files, out SOAPSearchResultItem[] folders) {
+            object[] results = this.Invoke("search", new object[] {
                         api_key,
                         auth_token,
-                        folder_id});
-            checksum = ((string)(results[1]));
+                        query,
+                        page,
+                        per_page,
+                        sort,
+                        direction,
+                        @params});
+            files = ((SOAPSearchResultItem[])(results[1]));
+            folders = ((SOAPSearchResultItem[])(results[2]));
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public System.IAsyncResult Beginget_directory_checksum(string api_key, string auth_token, long folder_id, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("get_directory_checksum", new object[] {
+        public System.IAsyncResult Beginsearch(string api_key, string auth_token, string query, int page, int per_page, string sort, string direction, string[] @params, System.AsyncCallback callback, object asyncState) {
+            return this.BeginInvoke("search", new object[] {
                         api_key,
                         auth_token,
-                        folder_id}, callback, asyncState);
+                        query,
+                        page,
+                        per_page,
+                        sort,
+                        direction,
+                        @params}, callback, asyncState);
         }
         
         /// <remarks/>
-        public string Endget_directory_checksum(System.IAsyncResult asyncResult, out string checksum) {
+        public string Endsearch(System.IAsyncResult asyncResult, out SOAPSearchResultItem[] files, out SOAPSearchResultItem[] folders) {
             object[] results = this.EndInvoke(asyncResult);
-            checksum = ((string)(results[1]));
+            files = ((SOAPSearchResultItem[])(results[1]));
+            folders = ((SOAPSearchResultItem[])(results[2]));
             return ((string)(results[0]));
         }
         
         /// <remarks/>
-        public void get_directory_checksumAsync(string api_key, string auth_token, long folder_id) {
-            this.get_directory_checksumAsync(api_key, auth_token, folder_id, null);
+        public void searchAsync(string api_key, string auth_token, string query, int page, int per_page, string sort, string direction, string[] @params) {
+            this.searchAsync(api_key, auth_token, query, page, per_page, sort, direction, @params, null);
         }
         
         /// <remarks/>
-        public void get_directory_checksumAsync(string api_key, string auth_token, long folder_id, object userState) {
-            if ((this.get_directory_checksumOperationCompleted == null)) {
-                this.get_directory_checksumOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_directory_checksumOperationCompleted);
+        public void searchAsync(string api_key, string auth_token, string query, int page, int per_page, string sort, string direction, string[] @params, object userState) {
+            if ((this.searchOperationCompleted == null)) {
+                this.searchOperationCompleted = new System.Threading.SendOrPostCallback(this.OnsearchOperationCompleted);
             }
-            this.InvokeAsync("get_directory_checksum", new object[] {
+            this.InvokeAsync("search", new object[] {
                         api_key,
                         auth_token,
-                        folder_id}, this.get_directory_checksumOperationCompleted, userState);
+                        query,
+                        page,
+                        per_page,
+                        sort,
+                        direction,
+                        @params}, this.searchOperationCompleted, userState);
         }
         
-        private void Onget_directory_checksumOperationCompleted(object arg) {
-            if ((this.get_directory_checksumCompleted != null)) {
+        private void OnsearchOperationCompleted(object arg) {
+            if ((this.searchCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.get_directory_checksumCompleted(this, new get_directory_checksumCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
-            }
-        }
-        
-        /// <remarks/>
-        [System.Web.Services.Protocols.SoapRpcMethodAttribute("urn:boxnet#Box_SoapApi#get_server_time", RequestNamespace="urn:boxnet", ResponseNamespace="urn:boxnet")]
-        [return: System.Xml.Serialization.SoapElementAttribute("status")]
-        public string get_server_time(string api_key, string auth_token, out long time) {
-            object[] results = this.Invoke("get_server_time", new object[] {
-                        api_key,
-                        auth_token});
-            time = ((long)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public System.IAsyncResult Beginget_server_time(string api_key, string auth_token, System.AsyncCallback callback, object asyncState) {
-            return this.BeginInvoke("get_server_time", new object[] {
-                        api_key,
-                        auth_token}, callback, asyncState);
-        }
-        
-        /// <remarks/>
-        public string Endget_server_time(System.IAsyncResult asyncResult, out long time) {
-            object[] results = this.EndInvoke(asyncResult);
-            time = ((long)(results[1]));
-            return ((string)(results[0]));
-        }
-        
-        /// <remarks/>
-        public void get_server_timeAsync(string api_key, string auth_token) {
-            this.get_server_timeAsync(api_key, auth_token, null);
-        }
-        
-        /// <remarks/>
-        public void get_server_timeAsync(string api_key, string auth_token, object userState) {
-            if ((this.get_server_timeOperationCompleted == null)) {
-                this.get_server_timeOperationCompleted = new System.Threading.SendOrPostCallback(this.Onget_server_timeOperationCompleted);
-            }
-            this.InvokeAsync("get_server_time", new object[] {
-                        api_key,
-                        auth_token}, this.get_server_timeOperationCompleted, userState);
-        }
-        
-        private void Onget_server_timeOperationCompleted(object arg) {
-            if ((this.get_server_timeCompleted != null)) {
-                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
-                this.get_server_timeCompleted(this, new get_server_timeCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+                this.searchCompleted(this, new searchCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -2941,112 +1698,23 @@ namespace BoxSync.Core.ServiceReference {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:boxnet")]
-    public partial class SOAPComment {
+    public partial class SOAPSearchMatchType {
         
-        private long message_idField;
-        
-        private string messageField;
-        
-        private string from_userField;
-        
-        private long from_user_idField;
-        
-        private string dateField;
-        
-        private string timeField;
-        
-        /// <remarks/>
-        public long message_id {
-            get {
-                return this.message_idField;
-            }
-            set {
-                this.message_idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string message {
-            get {
-                return this.messageField;
-            }
-            set {
-                this.messageField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string from_user {
-            get {
-                return this.from_userField;
-            }
-            set {
-                this.from_userField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public long from_user_id {
-            get {
-                return this.from_user_idField;
-            }
-            set {
-                this.from_user_idField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string date {
-            get {
-                return this.dateField;
-            }
-            set {
-                this.dateField = value;
-            }
-        }
-        
-        /// <remarks/>
-        public string time {
-            get {
-                return this.timeField;
-            }
-            set {
-                this.timeField = value;
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:boxnet")]
-    public partial class SOAPCollaborator {
-        
-        private long user_idField;
+        private string collaboratorField;
         
         private string nameField;
         
-        private string emailField;
+        private string descriptionField;
         
-        private string item_permissions_nameField;
-        
-        private string statusField;
-        
-        private int notificationField;
-        
-        private long target_idField;
-        
-        private string targetField;
+        private string search_textField;
         
         /// <remarks/>
-        public long user_id {
+        public string collaborator {
             get {
-                return this.user_idField;
+                return this.collaboratorField;
             }
             set {
-                this.user_idField = value;
+                this.collaboratorField = value;
             }
         }
         
@@ -3061,62 +1729,208 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public string email {
+        public string description {
             get {
-                return this.emailField;
+                return this.descriptionField;
             }
             set {
-                this.emailField = value;
+                this.descriptionField = value;
             }
         }
         
         /// <remarks/>
-        public string item_permissions_name {
+        public string search_text {
             get {
-                return this.item_permissions_nameField;
+                return this.search_textField;
             }
             set {
-                this.item_permissions_nameField = value;
+                this.search_textField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:boxnet")]
+    public partial class SOAPSearchResultItem {
+        
+        private string nameField;
+        
+        private long idField;
+        
+        private string descriptionField;
+        
+        private string folder_pathField;
+        
+        private string thumbnailField;
+        
+        private string parent_idField;
+        
+        private SOAPSearchMatchType match_typeField;
+        
+        /// <remarks/>
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
             }
         }
         
         /// <remarks/>
-        public string status {
+        public long id {
             get {
-                return this.statusField;
+                return this.idField;
             }
             set {
-                this.statusField = value;
+                this.idField = value;
             }
         }
         
         /// <remarks/>
-        public int notification {
+        public string description {
             get {
-                return this.notificationField;
+                return this.descriptionField;
             }
             set {
-                this.notificationField = value;
+                this.descriptionField = value;
             }
         }
         
         /// <remarks/>
-        public long target_id {
+        public string folder_path {
             get {
-                return this.target_idField;
+                return this.folder_pathField;
             }
             set {
-                this.target_idField = value;
+                this.folder_pathField = value;
             }
         }
         
         /// <remarks/>
-        public string target {
+        public string thumbnail {
             get {
-                return this.targetField;
+                return this.thumbnailField;
             }
             set {
-                this.targetField = value;
+                this.thumbnailField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string parent_id {
+            get {
+                return this.parent_idField;
+            }
+            set {
+                this.parent_idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SOAPSearchMatchType match_type {
+            get {
+                return this.match_typeField;
+            }
+            set {
+                this.match_typeField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.SoapTypeAttribute(Namespace="urn:boxnet")]
+    public partial class SOAPComment {
+        
+        private long comment_idField;
+        
+        private string messageField;
+        
+        private string user_nameField;
+        
+        private long user_idField;
+        
+        private long createdField;
+        
+        private string avatar_urlField;
+        
+        private SOAPComment[] reply_commentsField;
+        
+        /// <remarks/>
+        public long comment_id {
+            get {
+                return this.comment_idField;
+            }
+            set {
+                this.comment_idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string message {
+            get {
+                return this.messageField;
+            }
+            set {
+                this.messageField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string user_name {
+            get {
+                return this.user_nameField;
+            }
+            set {
+                this.user_nameField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long user_id {
+            get {
+                return this.user_idField;
+            }
+            set {
+                this.user_idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public long created {
+            get {
+                return this.createdField;
+            }
+            set {
+                this.createdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public string avatar_url {
+            get {
+                return this.avatar_urlField;
+            }
+            set {
+                this.avatar_urlField = value;
+            }
+        }
+        
+        /// <remarks/>
+        public SOAPComment[] reply_comments {
+            get {
+                return this.reply_commentsField;
+            }
+            set {
+                this.reply_commentsField = value;
             }
         }
     }
@@ -3369,48 +2183,6 @@ namespace BoxSync.Core.ServiceReference {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void authorizationCompletedEventHandler(object sender, authorizationCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class authorizationCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal authorizationCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public string auth_token {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[1]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPUser user {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPUser)(this.results[2]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
     public delegate void get_account_infoCompletedEventHandler(object sender, get_account_infoCompletedEventArgs e);
     
     /// <remarks/>
@@ -3516,90 +2288,6 @@ namespace BoxSync.Core.ServiceReference {
         private object[] results;
         
         internal get_auth_tokenCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public string auth_token {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[1]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPUser user {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPUser)(this.results[2]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void check_tokenCompletedEventHandler(object sender, check_tokenCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class check_tokenCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal check_tokenCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public string auth_token {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[1]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPUser user {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPUser)(this.results[2]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void registerCompletedEventHandler(object sender, registerCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class registerCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal registerCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
@@ -3797,6 +2485,14 @@ namespace BoxSync.Core.ServiceReference {
                 return ((string)(this.results[0]));
             }
         }
+        
+        /// <remarks/>
+        public long new_id {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((long)(this.results[1]));
+            }
+        }
     }
     
     /// <remarks/>
@@ -3991,32 +2687,6 @@ namespace BoxSync.Core.ServiceReference {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void box_add_nodeCompletedEventHandler(object sender, box_add_nodeCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class box_add_nodeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal box_add_nodeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
     public delegate void add_to_tagCompletedEventHandler(object sender, add_to_tagCompletedEventArgs e);
     
     /// <remarks/>
@@ -4028,92 +2698,6 @@ namespace BoxSync.Core.ServiceReference {
         private object[] results;
         
         internal add_to_tagCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void email_sharedCompletedEventHandler(object sender, email_sharedCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class email_sharedCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal email_sharedCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void get_public_folder_treeCompletedEventHandler(object sender, get_public_folder_treeCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class get_public_folder_treeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal get_public_folder_treeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public byte[] tree {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((byte[])(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void add_to_public_folderCompletedEventHandler(object sender, add_to_public_folderCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class add_to_public_folderCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal add_to_public_folderCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
@@ -4215,90 +2799,6 @@ namespace BoxSync.Core.ServiceReference {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void register_new_user_nameCompletedEventHandler(object sender, register_new_user_nameCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class register_new_user_nameCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal register_new_user_nameCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public string auth_token {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[1]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPUser user {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPUser)(this.results[2]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void register_paid_userCompletedEventHandler(object sender, register_paid_userCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class register_paid_userCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal register_paid_userCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public string auth_token {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[1]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPUser user {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPUser)(this.results[2]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
     public delegate void get_friendsCompletedEventHandler(object sender, get_friendsCompletedEventArgs e);
     
     /// <remarks/>
@@ -4393,354 +2893,6 @@ namespace BoxSync.Core.ServiceReference {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void get_collaboration_invitesCompletedEventHandler(object sender, get_collaboration_invitesCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class get_collaboration_invitesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal get_collaboration_invitesCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public byte[] collaborations {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((byte[])(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void get_collaboratorsCompletedEventHandler(object sender, get_collaboratorsCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class get_collaboratorsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal get_collaboratorsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPCollaborator[] collaborators {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPCollaborator[])(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void invite_collaboratorsCompletedEventHandler(object sender, invite_collaboratorsCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class invite_collaboratorsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal invite_collaboratorsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public byte[] invited_collaborators {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((byte[])(this.results[1]));
-            }
-        }
-        
-        /// <remarks/>
-        public byte[] unsuccessful_invitations {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((byte[])(this.results[2]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPCollaborator[] collaborators {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPCollaborator[])(this.results[3]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void accept_collaborationCompletedEventHandler(object sender, accept_collaborationCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class accept_collaborationCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal accept_collaborationCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void remove_collaborationCompletedEventHandler(object sender, remove_collaborationCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class remove_collaborationCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal remove_collaborationCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPCollaborator[] collaborators {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPCollaborator[])(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void get_collaboration_linkCompletedEventHandler(object sender, get_collaboration_linkCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class get_collaboration_linkCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal get_collaboration_linkCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public byte[] collab_link {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((byte[])(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void toggle_collaboration_linkCompletedEventHandler(object sender, toggle_collaboration_linkCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class toggle_collaboration_linkCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal toggle_collaboration_linkCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public byte[] collab_link {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((byte[])(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void get_collaboration_permissionsCompletedEventHandler(object sender, get_collaboration_permissionsCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class get_collaboration_permissionsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal get_collaboration_permissionsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public byte[] permissions {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((byte[])(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void collaborator_change_permissionCompletedEventHandler(object sender, collaborator_change_permissionCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class collaborator_change_permissionCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal collaborator_change_permissionCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPCollaborator[] collaborators {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPCollaborator[])(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void collaborator_change_notificationCompletedEventHandler(object sender, collaborator_change_notificationCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class collaborator_change_notificationCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal collaborator_change_notificationCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
-            }
-        }
-        
-        /// <remarks/>
-        public SOAPCollaborator[] collaborators {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((SOAPCollaborator[])(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
     public delegate void get_commentsCompletedEventHandler(object sender, get_commentsCompletedEventArgs e);
     
     /// <remarks/>
@@ -4799,10 +2951,10 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public SOAPComment[] comments {
+        public SOAPComment comment {
             get {
                 this.RaiseExceptionIfNecessary();
-                return ((SOAPComment[])(this.results[1]));
+                return ((SOAPComment)(this.results[1]));
             }
         }
     }
@@ -4835,17 +2987,17 @@ namespace BoxSync.Core.ServiceReference {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void get_directory_checksumCompletedEventHandler(object sender, get_directory_checksumCompletedEventArgs e);
+    public delegate void searchCompletedEventHandler(object sender, searchCompletedEventArgs e);
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class get_directory_checksumCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+    public partial class searchCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
         
-        internal get_directory_checksumCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+        internal searchCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
@@ -4859,44 +3011,18 @@ namespace BoxSync.Core.ServiceReference {
         }
         
         /// <remarks/>
-        public string checksum {
+        public SOAPSearchResultItem[] files {
             get {
                 this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[1]));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    public delegate void get_server_timeCompletedEventHandler(object sender, get_server_timeCompletedEventArgs e);
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.3038")]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class get_server_timeCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
-        
-        private object[] results;
-        
-        internal get_server_timeCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
-                base(exception, cancelled, userState) {
-            this.results = results;
-        }
-        
-        /// <remarks/>
-        public string Result {
-            get {
-                this.RaiseExceptionIfNecessary();
-                return ((string)(this.results[0]));
+                return ((SOAPSearchResultItem[])(this.results[1]));
             }
         }
         
         /// <remarks/>
-        public long time {
+        public SOAPSearchResultItem[] folders {
             get {
                 this.RaiseExceptionIfNecessary();
-                return ((long)(this.results[1]));
+                return ((SOAPSearchResultItem[])(this.results[2]));
             }
         }
     }

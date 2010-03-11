@@ -16,6 +16,11 @@
 		Successful = 1,
 
 		/// <summary>
+		/// File information retrieval failed by unknown reason
+		/// </summary>
+		Failed = 2,
+
+		/// <summary>
 		/// The user did not successfully authenticate.
 		/// Represents 'not_logged_in' status string.
 		/// </summary>

@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncCallState.cs" />
     <Compile Include="BoxManager.cs" />
     <Compile Include="MultipartWebRequest.cs" />
     <Compile Include="MessageParser.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Primitives\File.cs" />
     <Compile Include="Primitives\ImageFile.cs" />
     <Compile Include="Statuses\GetAccountInfoStatus.cs" />
+    <Compile Include="Statuses\GetCommentsStatus.cs" />
     <Compile Include="Statuses\GetFileInfoStatus.cs" />
     <Compile Include="Statuses\GetServerTimeStatus.cs" />
     <Compile Include="Statuses\GetUpdatesStatus.cs" />
