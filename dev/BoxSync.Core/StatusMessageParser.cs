@@ -19,7 +19,7 @@ namespace BoxSync.Core
 
 		internal static CreateFolderStatus ParseAddFolderStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "create_ok":
 					return CreateFolderStatus.Successful;
@@ -36,7 +36,7 @@ namespace BoxSync.Core
 
 		internal static UploadFileStatus ParseUploadFileStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "upload_ok":
 					return UploadFileStatus.Successful;
@@ -53,7 +53,7 @@ namespace BoxSync.Core
 
 		internal static DeleteObjectStatus ParseDeleteObjectStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "s_delete_node":
 					return DeleteObjectStatus.Successful;
@@ -70,7 +70,7 @@ namespace BoxSync.Core
 
 		internal static ExportTagsStatus ParseExportTagStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "export_tags_ok":
 					return ExportTagsStatus.Successful;
@@ -85,7 +85,7 @@ namespace BoxSync.Core
 
 		internal static SetDescriptionStatus ParseSetDescriptionStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "s_set_description":
 					return SetDescriptionStatus.Successful;
@@ -100,7 +100,7 @@ namespace BoxSync.Core
 
 		internal static GetAccountTreeStatus ParseGetAccountTreeStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "listing_ok":
 					return GetAccountTreeStatus.Successful;
@@ -117,7 +117,7 @@ namespace BoxSync.Core
 
 		internal static GetTicketStatus ParseGetTicketStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "application_restricted":
 					return GetTicketStatus.ApplicationRestricted;
@@ -130,7 +130,7 @@ namespace BoxSync.Core
 
 		internal static GetAuthenticationTokenStatus ParseGetAuthenticationTokenStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "application_restricted":
 					return GetAuthenticationTokenStatus.ApplicationRestricted;
@@ -147,7 +147,7 @@ namespace BoxSync.Core
 
 		internal static RenameObjectStatus ParseRenameObjectStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "s_rename_node":
 					return RenameObjectStatus.Successful;
@@ -164,7 +164,7 @@ namespace BoxSync.Core
 
 		internal static MoveObjectStatus ParseMoveObjectStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "s_move_node":
 					return MoveObjectStatus.Successful;
@@ -181,7 +181,7 @@ namespace BoxSync.Core
 
 		internal static CopyObjectStatus ParseCopyObjectStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "s_copy_node":
 					return CopyObjectStatus.Successful;
@@ -198,7 +198,7 @@ namespace BoxSync.Core
 
 		internal static LogoutStatus ParseLogoutStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "logout_ok":
 					return LogoutStatus.Successful;
@@ -215,7 +215,7 @@ namespace BoxSync.Core
 
 		internal static RegisterNewUserStatus ParseRegisterNewUserStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "successful_register":
 					return RegisterNewUserStatus.Successful;
@@ -234,7 +234,7 @@ namespace BoxSync.Core
 
 		internal static VerifyRegistrationEmailStatus ParseVerifyRegistrationEmailStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "email_ok":
 					return VerifyRegistrationEmailStatus.EmailOK;
@@ -251,7 +251,7 @@ namespace BoxSync.Core
 
 		internal static PublicShareStatus ParsePublicShareStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "share_ok":
 					return PublicShareStatus.Successful;
@@ -270,7 +270,7 @@ namespace BoxSync.Core
 
 		internal static PublicUnshareStatus ParsePublicUnshareStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "unshare_ok":
 					return PublicUnshareStatus.Successful;
@@ -289,7 +289,7 @@ namespace BoxSync.Core
 
 		internal static PrivateShareStatus ParsePrivateShareStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "private_share_ok":
 					return PrivateShareStatus.Successful;
@@ -308,7 +308,7 @@ namespace BoxSync.Core
 
 		internal static AddToMyBoxStatus ParseAddToMyBoxStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "addtomybox_ok":
 					return AddToMyBoxStatus.Successful;
@@ -327,10 +327,11 @@ namespace BoxSync.Core
 
 		internal static GetAccountInfoStatus ParseGetAccountInfoStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "get_account_info_ok":
 					return GetAccountInfoStatus.Successful;
+				case "not_logged_id":
 				case "not_logged_in":
 					return GetAccountInfoStatus.NotLoggedIn;
 				case "application_restricted":
@@ -342,7 +343,7 @@ namespace BoxSync.Core
 
 		internal static GetUpdatesStatus ParseGetUpdatesStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "s_get_updates":
 					return GetUpdatesStatus.Successful;
@@ -359,7 +360,7 @@ namespace BoxSync.Core
 
 		internal static GetServerTimeStatus ParseGetServerTimeStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "get_server_time":
 					return GetServerTimeStatus.Successful;
@@ -374,7 +375,7 @@ namespace BoxSync.Core
 
 		internal static GetFileInfoStatus ParseGetFileInfoStatus(string status)
 		{
-			switch (status)
+			switch (status.ToLower())
 			{
 				case "s_get_file_info":
 					return GetFileInfoStatus.Successful;
@@ -386,6 +387,24 @@ namespace BoxSync.Core
 					return GetFileInfoStatus.AccessDenied;
 				default:
 					return GetFileInfoStatus.Unknown;
+			}
+		}
+
+		internal static AddCommentStatus ParseAddCommentStatus(string status)
+		{
+			switch (status.ToLower())
+			{
+				case "add_comment_ok":
+					return AddCommentStatus.Successful;
+				case "application_restricted":
+					return AddCommentStatus.ApplicationRestricted;
+				case "add_comment_error":
+					return AddCommentStatus.Failed;
+				case "not_logged_in":
+				case "not_logged_id":
+					return AddCommentStatus.NotLoggedIn;
+				default:
+					return AddCommentStatus.Unknown;
 			}
 		}
 	}

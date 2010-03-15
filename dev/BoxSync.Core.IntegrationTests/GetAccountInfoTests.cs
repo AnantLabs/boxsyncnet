@@ -19,18 +19,7 @@ namespace BoxSync.Core.IntegrationTests
 		[Test]
 		public void TestSyncGetAccountInfo()
 		{
-			BoxManager manager = new BoxManager(ApplicationKey, ServiceUrl, null);
-			string ticket;
-			string token;
-			User user;
-
-			manager.GetTicket(out ticket);
-
-			SubmitAuthenticationInformation(ticket);
-
-			manager.GetAuthenticationToken(ticket, out token, out user);
-
-			GetAccountInfoResponse response = manager.GetAccountInfo();
+			GetAccountInfoResponse response = Context.Manager.GetAccountInfo();
 
 			Assert.AreEqual(GetAccountInfoStatus.Successful, response.Status);
 
@@ -38,29 +27,26 @@ namespace BoxSync.Core.IntegrationTests
 			Assert.IsNull(response.UserState);
 
 			Assert.IsNotNull(response.User);
-			
-			Assert.AreEqual(user.AccessID, response.User.AccessID);
-			Assert.AreEqual(user.ID, response.User.ID);
-			Assert.AreEqual(user.MaxUploadSize, response.User.MaxUploadSize);
-			Assert.AreEqual(user.SpaceAmount, response.User.SpaceAmount);
-			Assert.AreEqual(user.SpaceUsed, response.User.SpaceUsed);
 
-			StringAssert.IsMatch(user.Email, response.User.Email);
-			StringAssert.IsMatch(user.Login, response.User.Login);
+			Assert.AreEqual(Context.AuthenticatedUser.AccessID, response.User.AccessID);
+			Assert.AreEqual(Context.AuthenticatedUser.ID, response.User.ID);
+			Assert.AreEqual(Context.AuthenticatedUser.MaxUploadSize, response.User.MaxUploadSize);
+			Assert.AreEqual(Context.AuthenticatedUser.SpaceAmount, response.User.SpaceAmount);
+			Assert.AreEqual(Context.AuthenticatedUser.SpaceUsed, response.User.SpaceUsed);
+
+			StringAssert.IsMatch(Context.AuthenticatedUser.Email, response.User.Email);
+			StringAssert.IsMatch(Context.AuthenticatedUser.Login, response.User.Login);
 		}
 
 		/// <summary>
 		/// Tests the behavior of synchronous "GetAccountInfo" method in case if user didn't log in
 		/// </summary>
 		[Test]
-		public void TestSyncGetAccountInfoIfUserIsNotLoggedIn()
+		public void TestSyncGetAccountInfo_WhenUserIsNotLoggedIn_ThenStatusIsNotLoggedIn()
 		{
-			BoxManager manager = new BoxManager(ApplicationKey, ServiceUrl, null);
-			string ticket;
-			
-			manager.GetTicket(out ticket);
+			Context.Manager.Logout();
 
-			GetAccountInfoResponse response = manager.GetAccountInfo();
+			GetAccountInfoResponse response = Context.Manager.GetAccountInfo();
 
 			Assert.AreEqual(GetAccountInfoStatus.NotLoggedIn, response.Status);
 
@@ -75,25 +61,15 @@ namespace BoxSync.Core.IntegrationTests
 		[Test]
 		public void TestAsyncGetAccountInfo()
 		{
-			BoxManager manager = new BoxManager(ApplicationKey, ServiceUrl, null);
-			string ticket;
-			string token;
-			User user;
 			const int status = 847587532;
 			ManualResetEvent wait = new ManualResetEvent(false);
 			bool callbackWasExecuted = false;
-
-			manager.GetTicket(out ticket);
-
-			SubmitAuthenticationInformation(ticket);
-
-			manager.GetAuthenticationToken(ticket, out token, out user);
 
 			OperationFinished<GetAccountInfoResponse> callback = resp =>
 			                                                     	{
 			                                                     		Assert.AreEqual(GetAccountInfoStatus.Successful, resp.Status);
 			                                                     		Assert.IsNull(resp.Error);
-			                                                     		Assert.IsInstanceOfType(typeof(int), resp.UserState);
+			                                                     		Assert.IsInstanceOf(typeof(int), resp.UserState);
 																		Assert.AreEqual(status, (int)resp.UserState);
 
 
@@ -101,21 +77,21 @@ namespace BoxSync.Core.IntegrationTests
 
 
 
-																		Assert.AreEqual(user.AccessID, resp.User.AccessID);
-																		Assert.AreEqual(user.ID, resp.User.ID);
-																		//Assert.AreEqual(user.MaxUploadSize, resp.User.MaxUploadSize);
-																		Assert.AreEqual(user.SpaceAmount, resp.User.SpaceAmount);
-																		Assert.AreEqual(user.SpaceUsed, resp.User.SpaceUsed);
+																		Assert.AreEqual(Context.AuthenticatedUser.AccessID, resp.User.AccessID);
+																		Assert.AreEqual(Context.AuthenticatedUser.ID, resp.User.ID);
+																		Assert.AreEqual(Context.AuthenticatedUser.MaxUploadSize, resp.User.MaxUploadSize);
+																		Assert.AreEqual(Context.AuthenticatedUser.SpaceAmount, resp.User.SpaceAmount);
+																		Assert.AreEqual(Context.AuthenticatedUser.SpaceUsed, resp.User.SpaceUsed);
 
-																		StringAssert.IsMatch(user.Email, resp.User.Email);
-																		StringAssert.IsMatch(user.Login, resp.User.Login);
+																		StringAssert.IsMatch(Context.AuthenticatedUser.Email, resp.User.Email);
+																		StringAssert.IsMatch(Context.AuthenticatedUser.Login, resp.User.Login);
 
 			                                                     		callbackWasExecuted = true;
 
 			                                                     		wait.Reset();
 			                                                     	};
 
-			manager.GetAccountInfo(callback, status);
+			Context.Manager.GetAccountInfo(callback, status);
 
 			wait.WaitOne(30000);
 
@@ -127,21 +103,17 @@ namespace BoxSync.Core.IntegrationTests
 		/// Tests the behavior of asynchronous "GetAccountInfo" method in case if user didn't log in
 		/// </summary>
 		[Test]
-		public void TestAsyncGetAccountInfoIfUserIsNotLoggedIn()
+		public void TestAsyncGetAccountInfo_WhenUserIsNotLoggedIn_ThenStatusIsNotLoggedIn()
 		{
-			BoxManager manager = new BoxManager(ApplicationKey, ServiceUrl, null);
-			string ticket;
 			const int status = 847587532;
 			ManualResetEvent wait = new ManualResetEvent(false);
 			bool callbackWasExecuted = false;
-
-			manager.GetTicket(out ticket);
 
 			OperationFinished<GetAccountInfoResponse> callback = resp =>
 			                                                     	{
 																		Assert.AreEqual(GetAccountInfoStatus.NotLoggedIn, resp.Status);
 
-																		Assert.IsInstanceOfType(typeof(int), resp.UserState);
+																		Assert.IsInstanceOf(typeof(int), resp.UserState);
 																		Assert.AreEqual(status, (int)resp.UserState);
 																		
 																		Assert.IsNull(resp.Error);
@@ -152,7 +124,9 @@ namespace BoxSync.Core.IntegrationTests
 			                                                     		wait.Reset();
 			                                                     	};
 
-			manager.GetAccountInfo(callback, status);
+			Context.Manager.Logout();
+
+			Context.Manager.GetAccountInfo(callback, status);
 
 			wait.WaitOne(30000);
 
