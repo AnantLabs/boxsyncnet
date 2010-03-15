@@ -2622,8 +2622,12 @@ namespace BoxSync.Core
 
 			string result = _service.get_account_info(_apiKey, _token, out user);
 
-			response.User = new User(user);
 			response.Status = StatusMessageParser.ParseGetAccountInfoStatus(result);
+
+			if (response.Status == GetAccountInfoStatus.Successful)
+			{
+				response.User = new User(user);
+			}
 
 			return response;
 		}
@@ -2674,11 +2678,14 @@ namespace BoxSync.Core
 			}
 			else
 			{
+				GetAccountInfoStatus status = StatusMessageParser.ParseGetAccountInfoStatus(e.Result);
+				User user = status == GetAccountInfoStatus.Successful ? new User(e.user) : null;
+
 				response = new GetAccountInfoResponse
 				           	{
-				           		Status = StatusMessageParser.ParseGetAccountInfoStatus(e.Result),
+				           		Status = status,
 				           		UserState = userState[0],
-								User = new User(e.user)
+				           		User = user
 				           	};
 
 				response.Error = response.Status == GetAccountInfoStatus.Unknown
@@ -2693,15 +2700,36 @@ namespace BoxSync.Core
 		#endregion
 
 		#region GetComments
-		public void GetComments(long objectID, ObjectType objectType)
+		public GetCommentsResponse GetComments(long objectID, ObjectType objectType)
 		{
 			SOAPComment[] comments;
 
-			string status = _service.get_comments(_apiKey, _token, objectID, objectType.ToString(), out comments);
+			string status = _service.get_comments(_apiKey, _token, objectID, ObjectType2String(objectType), out comments);
+
+			return null;
 		}
 		#endregion
 
 		#region AddComment
+		public AddCommentResponse AddComment(long objectID, ObjectType objectType, string commentText)
+		{
+			ThrowIfParameterIsNull(commentText, "commentText");
+
+			SOAPComment comment;
+
+			string status = _service.add_comment(_apiKey, _token, objectID, ObjectType2String(objectType), commentText, out comment);
+			AddCommentStatus parsedStatus = StatusMessageParser.ParseAddCommentStatus(status);
+
+			return new AddCommentResponse
+			       	{
+			       		PostedComment = parsedStatus == AddCommentStatus.Successful
+			       		                	?
+			       		                		new Comment(comment)
+			       		                	:
+			       		                		null,
+			       		Status = parsedStatus
+			       	};
+		}
 		#endregion
 
 		#region GetUpdates
@@ -2890,7 +2918,6 @@ namespace BoxSync.Core
 				throw new ArgumentException(string.Format("'{0}' can not be null", parameterName));
 			}
 		}
-
 
 		/// <summary>
 		/// Converts list of tags to comma-separated string which contains tags' IDs

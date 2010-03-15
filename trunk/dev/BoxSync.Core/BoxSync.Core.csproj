@@ -58,8 +58,10 @@
     <Compile Include="MultipartWebRequest.cs" />
     <Compile Include="MessageParser.cs" />
     <Compile Include="NotSupportedObjectTypeException.cs" />
+    <Compile Include="Primitives\AddCommentResponse.cs" />
     <Compile Include="Primitives\AddToMyBoxResponse.cs" />
     <Compile Include="Primitives\AuthenticateUserResponse.cs" />
+    <Compile Include="Primitives\Comment.cs" />
     <Compile Include="Primitives\CopyFileResponse.cs" />
     <Compile Include="Primitives\CreateFolderResponse.cs" />
     <Compile Include="Primitives\DeleteObjectResponse.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="Primitives\FileNewCopyResponse.cs" />
     <Compile Include="Primitives\FolderBase.cs" />
     <Compile Include="Primitives\GetAccountInfoResponse.cs" />
+    <Compile Include="Primitives\GetCommentsResponse.cs" />
     <Compile Include="Primitives\GetFileInfoResponse.cs" />
     <Compile Include="Primitives\GetFolderStructureResponse.cs" />
     <Compile Include="Primitives\GetServerTimeResponse.cs" />
@@ -89,6 +92,7 @@
     <Compile Include="Primitives\UpdateItem.cs" />
     <Compile Include="Primitives\UpdateType.cs" />
     <Compile Include="Primitives\VerifyRegistrationEmailResponse.cs" />
+    <Compile Include="Statuses\AddCommentStatus.cs" />
     <Compile Include="Statuses\AddToMyBoxStatus.cs" />
     <Compile Include="Statuses\AuthenticationStatus.cs" />
     <Compile Include="Statuses\CreateFolderStatus.cs" />

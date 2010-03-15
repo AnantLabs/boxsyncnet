@@ -1,0 +1,1 @@
+"%ProgramFiles%NUnit 2.5.2\bin\net-2.0>nunit-x86.exe" ..\bin\BoxSync.Core.IntegrationTests.dll /run

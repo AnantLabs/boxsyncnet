@@ -5,6 +5,7 @@ using BoxSync.Core.ServiceReference;
 
 using NUnit.Framework;
 
+
 namespace BoxSync.Core.UnitTests
 {
 	[TestFixture]
