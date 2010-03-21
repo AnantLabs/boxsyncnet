@@ -72,11 +72,11 @@ namespace BoxSync.Core.IntegrationTests
 
 			Context.Manager.GetFileInfo(uploadedFileInfo.ID, operationFinished, someUserState);
 
-			bool isTimedOut = WaitHandle.WaitAll(new[] {mre}, new TimeSpan(0, 0, 0, 15));
+			bool isCompetedOnTime = WaitHandle.WaitAll(new[] {mre}, new TimeSpan(0, 0, 0, 15));
 
 			DeleteTemporaryFile(Context.Manager, uploadedFileInfo.ID);
 
-			Assert.IsTrue(isTimedOut);
+			Assert.IsTrue(isCompetedOnTime);
 			Assert.IsNotNull(response);
 			Assert.AreEqual(someUserState, (int)response.UserState);
 

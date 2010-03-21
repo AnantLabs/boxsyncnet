@@ -14,6 +14,11 @@
 		/// <summary>
 		/// Folder
 		/// </summary>
-		Folder = 2
+		Folder = 2,
+
+		/// <summary>
+		/// Comment
+		/// </summary>
+		Comment = 3
 	}
 }
