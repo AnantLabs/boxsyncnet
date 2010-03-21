@@ -147,6 +147,11 @@ namespace BoxSync.Core.IntegrationTests
 			return uploadResult;
 		}
 
+		protected static CreateFolderResponse CreateFolder(BoxManager manager, string folderName)
+		{
+			return manager.CreateFolder(folderName, 0, false);
+		}
+
 		protected static UploadFileResponse UploadTemporaryFile(BoxManager manager)
 		{
 			byte[] fileContent = Encoding.UTF8.GetBytes(Guid.Empty.ToString());

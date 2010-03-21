@@ -2708,9 +2708,19 @@ namespace BoxSync.Core
 
 			return null;
 		}
+
+
+
 		#endregion
 
 		#region AddComment
+		/// <summary>
+		/// Adds user comment to an item
+		/// </summary>
+		/// <param name="objectID">ID of the object to comment</param>
+		/// <param name="objectType">Type of the object</param>
+		/// <param name="commentText">The comment's message to be added</param>
+		/// <returns>Operation response</returns>
 		public AddCommentResponse AddComment(long objectID, ObjectType objectType, string commentText)
 		{
 			ThrowIfParameterIsNull(commentText, "commentText");
@@ -2729,6 +2739,96 @@ namespace BoxSync.Core
 			       		                		null,
 			       		Status = parsedStatus
 			       	};
+		}
+
+		/// <summary>
+		/// Asynchronously adds user comment to an item
+		/// </summary>
+		/// <param name="objectID">ID of the object to comment</param>
+		/// <param name="objectType">Type of the object</param>
+		/// <param name="commentText">The comment's message to be added</param>
+		/// <param name="addCommentCompleted">Callback method which will be invoked after operation completes</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="addCommentCompleted"/> is <c>null</c></exception>
+		public void AddComment(
+			long objectID,
+			ObjectType objectType,
+			string commentText,
+			OperationFinished<AddCommentResponse> addCommentCompleted)
+		{
+			AddComment(objectID, objectType, commentText, addCommentCompleted, null);
+		}
+
+		/// <summary>
+		/// Asynchronously adds user comment to an item
+		/// </summary>
+		/// <param name="objectID">ID of the object to comment</param>
+		/// <param name="objectType">Type of the object</param>
+		/// <param name="commentText">The comment's message to be added</param>
+		/// <param name="addCommentCompleted">Callback method which will be invoked after operation completes</param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="addCommentCompleted"/> delegate as a part of response when the operation is completed</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="addCommentCompleted"/> is <c>null</c></exception>
+		public void AddComment(
+			long objectID, 
+			ObjectType objectType, 
+			string commentText, 
+			OperationFinished<AddCommentResponse> addCommentCompleted,
+			object userState)
+		{
+			ThrowIfParameterIsNull(addCommentCompleted, "addCommentCompleted");
+
+			AsyncCallState<OperationFinished<AddCommentResponse>> state = new AsyncCallState
+				<OperationFinished<AddCommentResponse>>
+			                                                              	{
+			                                                              		CallbackDelegate = addCommentCompleted,
+			                                                              		UserState = userState
+			                                                              	};
+
+			_service.add_commentCompleted += AddCommentFinished;
+
+			_service.add_commentAsync(_apiKey, _token, objectID, ObjectType2String(objectType), commentText, state);
+		}
+
+		private void AddCommentFinished(object sender, add_commentCompletedEventArgs e)
+		{
+			AsyncCallState<OperationFinished<AddCommentResponse>> state =
+				(AsyncCallState<OperationFinished<AddCommentResponse>>) e.UserState;
+			AddCommentResponse response;
+
+			if(e.Error != null)
+			{
+				response = new AddCommentResponse
+				           	{
+				           		Error = e.Error,
+								Status = AddCommentStatus.Failed,
+                                PostedComment = null,
+				           		UserState = state.UserState
+				           	};
+			}
+			else
+			{
+				AddCommentStatus parsedStatus = StatusMessageParser.ParseAddCommentStatus(e.Result);
+
+				response = new AddCommentResponse
+				           	{
+				           		Error = e.Error,
+				           		Status = parsedStatus,
+				           		PostedComment = parsedStatus == AddCommentStatus.Successful
+				           		                	?
+				           		                		new Comment(e.comment)
+				           		                	:
+				           		                		null,
+				           		UserState = state.UserState
+				           	};
+
+				response.Error = response.Status == AddCommentStatus.Unknown
+									?
+										new UnknownOperationStatusException(e.Result)
+									:
+										null;
+			}
+
+			state.CallbackDelegate(response);
 		}
 		#endregion
 
@@ -2818,7 +2918,7 @@ namespace BoxSync.Core
 		{
 			ThrowIfParameterIsNull(getFileInfoCompleted, "getFileInfoCompleted");
 
-			_service.get_file_infoCompleted += GetFileInfoCompleted;
+			_service.get_file_infoCompleted += GetFileInfoFinished;
 
 			AsyncCallState<OperationFinished<GetFileInfoResponse>> state = new AsyncCallState
 				<OperationFinished<GetFileInfoResponse>>
@@ -2830,7 +2930,7 @@ namespace BoxSync.Core
 			_service.get_file_infoAsync(_apiKey, _token, fileID, state);
 		}
 
-		private void GetFileInfoCompleted(object sender, get_file_infoCompletedEventArgs e)
+		private void GetFileInfoFinished(object sender, get_file_infoCompletedEventArgs e)
 		{
 			AsyncCallState<OperationFinished<GetFileInfoResponse>> state =
 				(AsyncCallState<OperationFinished<GetFileInfoResponse>>) e.UserState;
@@ -2958,6 +3058,9 @@ namespace BoxSync.Core
 					break;
 				case ObjectType.Folder:
 					type = "folder";
+					break;
+				case ObjectType.Comment:
+					type = "comment";
 					break;
 				default:
 					throw new NotSupportedObjectTypeException(objectType);
