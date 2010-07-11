@@ -2700,6 +2700,13 @@ namespace BoxSync.Core
 		#endregion
 
 		#region GetComments
+		
+		/// <summary>
+		/// Adds comment to the object
+		/// </summary>
+		/// <param name="objectID">ID of the object which should be commented</param>
+		/// <param name="objectType">Object type</param>
+		/// <returns>Response which contains operation status and related data</returns>
 		public GetCommentsResponse GetComments(long objectID, ObjectType objectType)
 		{
 			SOAPComment[] comments;
@@ -2709,6 +2716,90 @@ namespace BoxSync.Core
 			return null;
 		}
 
+		/// <summary>
+		/// Adds comment to an object
+		/// </summary>
+		/// <param name="objectID">ID of the object which should be commented</param>
+		/// <param name="objectType">Object type</param>
+		/// <param name="getCommentsCompleted">Callback method which will be invoked after operation completes</param>
+		public void GetComments(long objectID, ObjectType objectType, OperationFinished<GetCommentsResponse> getCommentsCompleted)
+		{
+			GetComments(objectID, objectType, getCommentsCompleted, null);
+		}
+
+		/// <summary>
+		/// Adds comment to an object
+		/// </summary>
+		/// <param name="objectID">ID of the object which should be commented</param>
+		/// <param name="objectType">Object type</param>
+		/// <param name="getCommentsCompleted">Callback method which will be invoked after operation completes</param>
+		/// <param name="userState">A user-defined object containing state information. 
+		/// This object is passed to the <paramref name="getCommentsCompleted"/> delegate as a part of response when the operation is completed</param>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="getCommentsCompleted"/> is <c>null</c></exception>
+		public void GetComments(long objectID,
+								ObjectType objectType,
+								OperationFinished<GetCommentsResponse> getCommentsCompleted,
+								object userState)
+		{
+			ThrowIfParameterIsNull(getCommentsCompleted, "getCommentsCompleted");
+
+			AsyncCallState<OperationFinished<GetCommentsResponse>> state = new AsyncCallState
+				<OperationFinished<GetCommentsResponse>>
+			                                                               	{
+			                                                               		CallbackDelegate = getCommentsCompleted,
+			                                                               		UserState = userState
+			                                                               	};
+
+			_service.get_commentsCompleted += GetCommentsFinished;
+
+			_service.get_commentsAsync(_apiKey, _token, objectID, ObjectType2String(objectType), state);
+		}
+
+		private void GetCommentsFinished(object sender, get_commentsCompletedEventArgs e)
+		{
+			AsyncCallState<OperationFinished<GetCommentsResponse>> state =
+				(AsyncCallState<OperationFinished<GetCommentsResponse>>) e.UserState;
+
+			GetCommentsResponse response;
+
+			if (e.Error != null)
+			{
+				response = new GetCommentsResponse
+				           	{
+				           		Error = e.Error,
+				           		Status = GetCommentsStatus.Failed,
+				           		UserState = state.UserState
+				           	};
+			}
+			else
+			{
+				response = new GetCommentsResponse
+				           	{
+				           		Status = StatusMessageParser.ParseGetFileInfoStatus(e.Result),
+				           		File = new File
+				           		       	{
+				           		       		Created = UnixTimeConverter.Instance.FromUnixTime(e.info.created),
+				           		       		Description = e.info.description,
+				           		       		ID = e.info.file_id,
+				           		       		IsShared = e.info.shared == 1,
+				           		       		Name = e.info.file_name,
+				           		       		PublicName = e.info.public_name,
+				           		       		SHA1Hash = e.info.sha1,
+				           		       		Size = e.info.size,
+				           		       		Updated = UnixTimeConverter.Instance.FromUnixTime(e.info.updated)
+				           		       	},
+				           		UserState = state.UserState
+				           	};
+
+				response.Error = response.Status == GetCommentsStatus.Unknown
+									?
+										new UnknownOperationStatusException(e.Result)
+									:
+										null;
+			}
+
+			state.CallbackDelegate(response);
+		}
 
 
 		#endregion
@@ -2950,7 +3041,6 @@ namespace BoxSync.Core
 			{
 				response = new GetFileInfoResponse
 				           	{
-				           		Error = e.Error,
 				           		Status = StatusMessageParser.ParseGetFileInfoStatus(e.Result),
 				           		File = new File
 				           		       	{
