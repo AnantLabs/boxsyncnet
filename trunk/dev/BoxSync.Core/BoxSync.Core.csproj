@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncCallState.cs" />
+    <Compile Include="BoxManager.Copy.cs" />
     <Compile Include="BoxManager.cs" />
     <Compile Include="MultipartWebRequest.cs" />
     <Compile Include="MessageParser.cs" />
@@ -136,6 +137,11 @@
     <Compile Include="TagPrimitiveCollection.cs" />
     <Compile Include="UnixTimeConverter.cs" />
     <Compile Include="UnknownOperationStatusException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BoxManager.CreateFolder.cs" />
+    <Compile Include="BoxManager.DeleteObject.cs" />
+    <Compile Include="BoxManager.FileNewCopy.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

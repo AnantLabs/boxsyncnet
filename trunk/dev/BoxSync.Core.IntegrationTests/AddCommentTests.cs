@@ -121,7 +121,7 @@ namespace BoxSync.Core.IntegrationTests
 			Assert.IsNull(addCommentResponse.PostedComment);
 		}
 
-		[Test, Ignore("HAS TO BE CLARIFIED")]
+		[Test]
 		public void TestAddComment_Sync_WhenCommentTextIsEmpty_ThenOperationStatusIsFailed()
 		{
 			string commentText = string.Empty;
