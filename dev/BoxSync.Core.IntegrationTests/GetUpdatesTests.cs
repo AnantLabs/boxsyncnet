@@ -23,9 +23,20 @@ namespace BoxSync.Core.IntegrationTests
 		public void TestGetUpdates()
 		{
 			UploadFileResponse uploadResponse = UploadTemporaryFile(Context.Manager);
-			DateTime createdDate = uploadResponse.UploadedFileStatus.Keys.ElementAt(0).Created;
+		    UploadFileError status = uploadResponse.UploadedFileStatus[uploadResponse.UploadedFileStatus.Keys.ElementAt(0)];
+
+            Assert.AreEqual(UploadFileError.None, status);
+
+		    GetFileInfoResponse getFileInfoResponse =
+		        Context.Manager.GetFileInfo(uploadResponse.UploadedFileStatus.Keys.ElementAt(0).ID);
+
+            Assert.AreEqual(GetFileInfoStatus.Successful, getFileInfoResponse.Status);
+
+            DateTime createdDate = getFileInfoResponse.File.Created;
+
+            Assert.AreNotEqual(DateTime.MinValue, createdDate);
 			
-			Assert.AreEqual(UploadFileStatus.Successful, uploadResponse.Status);
+            Assert.AreEqual(UploadFileStatus.Successful, uploadResponse.Status);
 
 			GetUpdatesResponse getUpdatesResponse = Context.Manager.GetUpdates(createdDate.AddSeconds(-1), createdDate.AddSeconds(1), GetUpdatesOptions.NoZip);
 
