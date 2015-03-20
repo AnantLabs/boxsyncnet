@@ -1,0 +1,238 @@
+# General overview #
+
+There're two methods which you can use to upload files:
+  * `BoxManager.AddFiles(...)` - uploads multiple files into specific folder. Current implementation creates single request to submit all files at once. It is not recomended to submit multiple large files at the same time.
+  * `BoxManager.AddFile(...)` - uploads single file into specific folder. In a background it uses `BoxManager.AddFiles(...)`
+
+As a parameters you can specify notification message and list of emails which should be notified about uploaded files.
+
+It's highly recomended to use asynchronous versions of `AddFile(...)` and `AddFiles(...)` methods.
+
+
+# Implementation #
+
+_Source code could be found [here](http://boxsyncnet.googlecode.com/files/BoxSync.Sample.FileUploaderApp.zip)_
+
+**The following code shows you how to use synchronous and asynchronous versions of `BoxManager.AddFiles(...)` method:**
+
+```
+	public class BoxProvider
+	{
+		private readonly BoxManager _manager;
+		private string _ticket;
+
+		/// <summary>
+		/// Initializes BoxProvider type instance
+		/// </summary>
+		/// <param name="applicationApiKey"></param>
+		public BoxProvider(string applicationApiKey)
+		{
+			_manager = new BoxManager(applicationApiKey, "http://box.net/api/soap", null);
+		}
+
+		/// <summary>
+		/// Asynchronously gets authorization ticket 
+		/// and opens web browser to logging on Box.NET portal
+		/// </summary>
+		public void StartAuthentication()
+		{
+			_manager.GetTicket(GetTicketCompleted);
+		}
+
+		/// <summary>
+		/// Finishes authorization process after user has 
+		/// successfully finished loggin process on Box.NET portal
+		/// </summary>
+		/// <param name="printUserInfoCallback">Callback method which will be invoked after operation completes</param>
+		public void FinishAuthentication(Action<User> printUserInfoCallback)
+		{
+			_manager.GetAuthenticationToken(_ticket, GetAuthenticationTokenCompleted, printUserInfoCallback);
+		}
+
+		/// <summary>
+		/// Uploads files to user's root folder
+		/// </summary>
+		/// <param name="filePathes">Paths to files to upload</param>
+		public UploadFileResponse UploadFiles(string[] filePathes)
+		{
+			return _manager.AddFiles(filePathes, 0);
+		}
+
+		/// <summary>
+		/// Asynchronously uploads files to the user's root folder
+		/// </summary>
+		/// <param name="files">Paths to files to upload</param>
+		/// <param name="asyncUploadCompleted">Callback method which will be invoked after operation completes</param>
+		public void AsyncUploadFiles(string[] files, Action<Dictionary<File, UploadFileError>> asyncUploadCompleted)
+		{
+			_manager.AddFiles(files, 0, false, string.Empty, null, AsyncUploadFinished, asyncUploadCompleted);
+		}
+
+		/// <summary>
+		/// Method is called when asynchronous file upload process is completed
+		/// </summary>
+		/// <param name="response">Response from server</param>
+		private void AsyncUploadFinished(UploadFileResponse response)
+		{
+			Action<Dictionary<File, UploadFileError>> asyncUploadCompleted = (Action<Dictionary<File, UploadFileError>>)response.UserState;
+
+			asyncUploadCompleted(response.UploadedFileStatus);
+		}
+
+
+		private void GetAuthenticationTokenCompleted(GetAuthenticationTokenResponse response)
+		{
+			Action<User> printUserInfoCallback = (Action<User>)response.UserState;
+
+			printUserInfoCallback(response.AuthenticatedUser);
+		}
+
+		private void GetTicketCompleted(GetTicketResponse response)
+		{
+			if (response.Status == GetTicketStatus.Successful)
+			{
+				_ticket = response.Ticket;
+
+				string url = string.Format("www.box.net/api/1.0/auth/{0}", response.Ticket);
+
+				BrowserLauncher.OpenUrl(url);
+			}
+			else
+			{
+				Exception error = response.Error ??
+				                  new ApplicationException(
+				                  	string.Format("Can't get an authorization ticket. Operation status is {0}",
+				                  	              response.Status));
+
+				throw error;
+			}
+		}
+
+	}
+```
+
+**Following code, depending on number of files, uses either asynchronous or synchronous version of `BoxManager.AddFiles(...)` method:**
+
+```
+	class Program
+	{
+		private static string[] _fileNames;
+
+		static void Main(string[] args)
+		{
+			_fileNames = args;
+
+			Console.WriteLine("Press ENTER to start...");
+			Console.ReadLine();
+
+			BoxProvider boxProvider = new BoxProvider("API_KEY");
+
+			boxProvider.StartAuthentication();
+
+			//Now new instance of user's default browser should be opened.
+			//Please, use web-form which you see in your browser to login on Box.NET portal
+
+			Console.WriteLine(@"Type ""1"" and press ENTER after successful logging on Box.NET portal...");
+
+			while (Console.ReadLine() != "1")
+			{ }
+
+			boxProvider.FinishAuthentication(PrintUserInformation);
+
+			while (Console.ReadLine() != "1")
+			{ }
+
+			Console.WriteLine();
+
+			if (args.Length < 3)
+			{
+				Console.WriteLine("Synchronous upload process started...");
+
+				UploadFileResponse response = boxProvider.UploadFiles(args);
+
+				Console.WriteLine("Synchronous upload process finished");
+				Console.WriteLine(string.Format("Upload status is [{0}]", response.Status));
+			}
+			else
+			{
+				Console.WriteLine("Asynchronous upload process started...");
+
+				boxProvider.AsyncUploadFiles(args, AsyncUploadCompleted);
+			}
+
+			Console.ReadLine();
+		}
+
+		/// <summary>
+		/// Prints account information and asks for confirmation to upload files
+		/// </summary>
+		/// <param name="user">Account information</param>
+		private static void PrintUserInformation(User user)
+		{
+			Console.WriteLine(string.Format("Login: {0}", user.Login));
+			Console.WriteLine(string.Format("Email: {0}", user.Email));
+			Console.WriteLine(string.Format("Available space: {0}", user.SpaceAmount));
+			Console.WriteLine(string.Format("Used space: {0}", user.SpaceUsed));
+
+			Console.WriteLine();
+
+			Console.WriteLine(@"Type ""1"" and press ENTER to upload following files:");
+
+			foreach (string fileName in _fileNames)
+			{
+				Console.WriteLine(Path.GetFileName(fileName));
+			}
+
+			Console.WriteLine();
+		}
+
+		/// <summary>
+		/// Prints upload status information
+		/// </summary>
+		/// <param name="uploadFileStatuses">Upload status information</param>
+		private static void AsyncUploadCompleted(Dictionary<File, UploadFileError> uploadFileStatuses)
+		{
+			Console.WriteLine("Asynchronous upload process finished");
+			Console.WriteLine();
+
+			foreach (KeyValuePair<File, UploadFileError> uploadStatus in uploadFileStatuses)
+			{
+				Console.WriteLine(string.Format("File [{0}] -> upload error status is [{1}]", uploadStatus.Key.Name, uploadStatus.Value));
+			}
+
+			Console.WriteLine();
+		}
+	}
+```
+
+To open a web page you can use code from [http://dotnetpulse.blogspot.com/2006/04/opening-url-from-within-c-program.html](http://dotnetpulse.blogspot.com/2006/04/opening-url-from-within-c-program.html):
+
+```
+	internal static class BrowserLauncher
+	{
+		/// <summary>
+		/// Reads path of default browser from registry
+		/// </summary>
+		/// <returns>Path to the default web browser executable file</returns>
+		private static string GetDefaultBrowserPath()
+		{
+			string key = @"htmlfile\shell\open\command";
+
+			RegistryKey registryKey = Registry.ClassesRoot.OpenSubKey(key, false);
+
+			return ((string)registryKey.GetValue(null, null)).Split('"')[1];
+
+		}
+
+		/// <summary>
+		/// Opens <paramref name="url"/> in a default web browser
+		/// </summary>
+		/// <param name="url">Destination URL</param>
+		public static void OpenUrl(string url)
+		{
+			string defaultBrowserPath = GetDefaultBrowserPath();
+
+			Process.Start(defaultBrowserPath, url);
+		}
+	}
+```
